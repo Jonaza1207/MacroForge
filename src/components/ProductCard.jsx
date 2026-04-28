@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { PRODUCT_IMAGES } from '../data/images';
-import { CATEGORY_TYPES } from '../data/catalog';
+import { CATEGORY_TYPES, MF_BG } from '../data/catalog';
 
 function getImageUrl(url) {
   if (!url) return null;
@@ -22,7 +22,7 @@ function ProductCard({ product, onClick }) {
   return (
     <div className={cardClass} onClick={onClick} role="button" tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onClick()}>
-      <div className="c-img">
+      <div className="c-img" style={MF_BG}>
         {imageUrl && (
           <img
             className="real-img"

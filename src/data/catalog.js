@@ -2,7 +2,7 @@ export const SECTIONS = {
   gym: {
     label: 'GYM & PERFORMANCE',
     sublabel: 'Sección 01 · Performance',
-    color: '#c8ff00',
+    color: '#ff4500',
     categories: [
       'Creatinas','Shakers y Botellas','Proteínas Whey','Pre-Entrenamientos',
       'Proteínas Isoladas','Accesorios de Gym','Gainers de Masa','Quemadores de Grasa',
@@ -14,7 +14,7 @@ export const SECTIONS = {
   vita: {
     label: 'VITAMINAS & BIENESTAR',
     sublabel: 'Sección 02 · Salud',
-    color: '#7fffd4',
+    color: '#ff6a00',
     categories: [
       'Magnesio','Vitaminas Esenciales','Adaptógenos y Hormonas','Multivitamínicos',
       'Detox y Salud Hepática','Colágeno y Belleza','Omega y Grasas Saludables',
@@ -27,7 +27,7 @@ export const SECTIONS = {
   dote: {
     label: 'DOTERRA',
     sublabel: 'Sección 03 · Aromaterapia',
-    color: '#ffd700',
+    color: '#cc1500',
     categories: [
       'Aceites Esenciales Individuales','Mezclas doTERRA','Bienestar Interno doTERRA',
       'Cuidado Personal','Kits Especiales','Cuidado del Cabello','Cuidado de la Piel',
@@ -67,8 +67,13 @@ export const CATEGORY_TYPES = {
   'Protección Solar doTERRA':'SKIN CARE','Kits de AutoEnvío':'KIT',
 };
 
-export const SECTION_BG = {
-  gym: 'linear-gradient(135deg,#1a2a0a 0%,#0a0a08 100%)',
-  vita: 'linear-gradient(135deg,#0a2a22 0%,#0a0a08 100%)',
-  dote: 'linear-gradient(135deg,#2a2010 0%,#0a0a08 100%)',
+// Fondo MF: negro con marca de agua "MF" en rojo/naranja
+const _mfSvg = encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">` +
+  `<rect width="100" height="100" fill="#0d0a0a"/>` +
+  `<text x="50" y="64" font-family="Impact,Arial Black,sans-serif" font-size="58" font-weight="900" fill="rgba(255,80,0,0.55)" text-anchor="middle" letter-spacing="-2">MF</text>` +
+  `</svg>`
+);
+export const MF_BG = {
+  background: `#0d0a0a url("data:image/svg+xml,${_mfSvg}") center/80% no-repeat`,
 };

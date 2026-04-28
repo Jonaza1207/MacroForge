@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
 import { PRODUCT_IMAGES } from '../data/images';
-import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
+import { CATEGORY_TYPES, WA_NUMBER, MF_BG } from '../data/catalog';
 
 function getImageUrl(url) {
   if (!url) return null;
@@ -11,7 +11,7 @@ function getImageUrl(url) {
 }
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
-const SECTION_COLORS = { gym: '#c8ff00', vita: '#7fffd4', dote: '#ffd700' };
+const SECTION_COLORS = { gym: '#ff4500', vita: '#ff6a00', dote: '#cc1500' };
 
 function parsePrices(prices) {
   return prices.map((pr, i) => {
@@ -53,7 +53,7 @@ export default function ProductModal({ productId, onClose }) {
   return (
     <div className="modal-bg" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={`modal ${p.s}`}>
-        <div className="m-img">
+        <div className="m-img" style={MF_BG}>
           {getImageUrl(p.u) && (
             <img
               className="real-img"
