@@ -272,6 +272,17 @@ img { max-width: 100%; display: block; }
   background: #fff;
   overflow: hidden;
 }
+.c-img img.real-img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  background: #fff;
+  display: block;
+  z-index: 1;
+}
 .cv {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -394,6 +405,17 @@ img { max-width: 100%; display: block; }
   padding-top: 60%;
   overflow: hidden;
   background: #fff;
+}
+.m-img img.real-img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 20px;
+  background: #fff;
+  display: block;
+  z-index: 1;
 }
 .m-img .cv-name { font-size: 32px; }
 .m-close {

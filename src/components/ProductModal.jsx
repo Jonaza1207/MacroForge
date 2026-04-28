@@ -1,7 +1,14 @@
 import { useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
+import { PRODUCT_IMAGES } from '../data/images';
 import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
+
+function getImageUrl(url) {
+  if (!url) return null;
+  const m = url.match(/\/tienda\/([^/?#]+)/);
+  return m ? PRODUCT_IMAGES[m[1]] || null : null;
+}
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#c8ff00', vita: '#7fffd4', dote: '#ffd700' };
@@ -46,8 +53,15 @@ export default function ProductModal({ productId, onClose }) {
   return (
     <div className="modal-bg" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={`modal ${p.s}`}>
-        {/* Imagen MacroForge — sin fotos del distribuidor */}
         <div className="m-img">
+          {getImageUrl(p.u) && (
+            <img
+              className="real-img"
+              src={getImageUrl(p.u)}
+              alt={`${p.n} | ${p.b}`}
+              onError={e => { e.currentTarget.style.display = 'none'; }}
+            />
+          )}
           <div className={`cv cv-${p.s}`}>
             <div className="cv-tag">{p.b}</div>
             <div className="cv-name">{p.n.toUpperCase()}</div>
