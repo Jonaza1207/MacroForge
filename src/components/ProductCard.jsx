@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { CATEGORY_TYPES, SECTION_BG } from '../data/catalog';
+import { CATEGORY_TYPES } from '../data/catalog';
 
 function ProductCard({ product, onClick }) {
   const { n, b, c, s, p } = product;
@@ -15,7 +15,7 @@ function ProductCard({ product, onClick }) {
     <div className={cardClass} onClick={onClick} role="button" tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onClick()}>
       <div className="c-img">
-        <div className={cvClass} style={{ background: SECTION_BG[s] }}>
+        <div className={cvClass}>
           <div className="cv-tag">{b}</div>
           <div className="cv-name">{n.toUpperCase()}</div>
           <div className="cv-bar" />

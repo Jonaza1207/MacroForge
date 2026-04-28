@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
-import { CATEGORY_TYPES, SECTION_BG, WA_NUMBER } from '../data/catalog';
+import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#c8ff00', vita: '#7fffd4', dote: '#ffd700' };
@@ -48,7 +48,7 @@ export default function ProductModal({ productId, onClose }) {
       <div className={`modal ${p.s}`}>
         {/* Imagen MacroForge — sin fotos del distribuidor */}
         <div className="m-img">
-          <div className={`cv cv-${p.s}`} style={{ background: SECTION_BG[p.s] }}>
+          <div className={`cv cv-${p.s}`}>
             <div className="cv-tag">{p.b}</div>
             <div className="cv-name">{p.n.toUpperCase()}</div>
             <div className="cv-bar" />
