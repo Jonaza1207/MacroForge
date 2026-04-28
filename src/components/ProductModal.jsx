@@ -1,14 +1,7 @@
 import { useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
-import { PRODUCT_IMAGES } from '../data/images';
 import { CATEGORY_TYPES, SECTION_BG, WA_NUMBER } from '../data/catalog';
-
-function getImageUrl(productUrl) {
-  if (!productUrl) return null;
-  const m = productUrl.match(/\/tienda\/([^/?#]+)/);
-  return m ? PRODUCT_IMAGES[m[1]] || null : null;
-}
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#c8ff00', vita: '#7fffd4', dote: '#ffd700' };
@@ -38,7 +31,6 @@ export default function ProductModal({ productId, onClose }) {
 
   if (!p) return null;
 
-  const imageUrl = getImageUrl(p.u);
   const sectionColor = SECTION_COLORS[p.s];
   const cardType = CATEGORY_TYPES[p.c] || 'SUPPLEMENT';
 
@@ -54,16 +46,8 @@ export default function ProductModal({ productId, onClose }) {
   return (
     <div className="modal-bg" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={`modal ${p.s}`}>
-        {/* Image */}
+        {/* Imagen MacroForge — sin fotos del distribuidor */}
         <div className="m-img">
-          {imageUrl && (
-            <img
-              className="real-img"
-              src={imageUrl}
-              alt={`${p.n} | ${p.b}`}
-              onError={e => { e.currentTarget.style.display = 'none'; }}
-            />
-          )}
           <div className={`cv cv-${p.s}`} style={{ background: SECTION_BG[p.s] }}>
             <div className="cv-tag">{p.b}</div>
             <div className="cv-name">{p.n.toUpperCase()}</div>
