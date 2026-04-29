@@ -18,10 +18,9 @@ export default function App() {
 
   const handleFilter = useCallback(f => setActiveFilter(f), []);
   const handleSearch = useCallback(q => setSearchQuery(q), []);
-  const handleOpen = useCallback(id => setOpenProductId(id), []);
-  const handleClose = useCallback(() => setOpenProductId(null), []);
+  const handleOpen   = useCallback(id => setOpenProductId(id), []);
+  const handleClose  = useCallback(() => setOpenProductId(null), []);
 
-  // Filter products
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return Object.entries(PRODUCTS).filter(([, p]) => {
@@ -31,7 +30,6 @@ export default function App() {
     });
   }, [activeFilter, searchQuery]);
 
-  // Group filtered products by section > category
   const grouped = useMemo(() => {
     const result = {};
     for (const [id, p] of filtered) {
@@ -41,8 +39,6 @@ export default function App() {
     }
     return result;
   }, [filtered]);
-
-  const visibleCount = filtered.length;
 
   return (
     <>
@@ -56,7 +52,7 @@ export default function App() {
       <Controls
         activeFilter={activeFilter}
         searchQuery={searchQuery}
-        visibleCount={visibleCount}
+        visibleCount={filtered.length}
         onFilter={handleFilter}
         onSearch={handleSearch}
       />
@@ -74,20 +70,20 @@ export default function App() {
         );
       })}
 
-      {visibleCount === 0 && (
-        <div style={{ textAlign: 'center', padding: '80px 24px', color: '#8a8a84' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Sin resultados</div>
-          <div style={{ fontSize: 14 }}>Probá con otro término o limpié el filtro.</div>
+      {filtered.length === 0 && (
+        <div className="empty">
+          <div className="empty-icon">🔍</div>
+          <div className="empty-title">Sin resultados</div>
+          <div className="empty-sub">Probá con otro término o limpiá el filtro.</div>
         </div>
       )}
 
-      <footer>
-        <div className="f-brand">MACRO<span>FORGE</span></div>
-        <div className="f-info">
+      <footer className="footer">
+        <div className="footer-brand">MACRO<span>FORGE</span></div>
+        <div className="footer-meta">
           <div>Catálogo 2026 · SJ, CR</div>
           <div>Todos los precios +IVA</div>
-          <div style={{ color: '#c8ff00' }}>✦ Salud · Performance · Bienestar ✦</div>
+          <div><em>✦ Salud · Performance · Bienestar ✦</em></div>
         </div>
       </footer>
 

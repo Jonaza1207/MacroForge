@@ -5,10 +5,16 @@ const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola MacroF
 export default function WhatsAppFloat() {
   return (
     <>
-      <a className="wa-float" href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
+      <a
+        className="wa-float"
+        href={waUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Contactar por WhatsApp"
+      >
         💬
       </a>
-      <div className="wa-float-tip">WhatsApp · 8443-6311</div>
+      <div className="wa-tooltip">WhatsApp · 8443-6311</div>
     </>
   );
 }

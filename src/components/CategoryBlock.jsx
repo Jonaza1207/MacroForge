@@ -1,22 +1,37 @@
 import { memo } from 'react';
 import ProductCard from './ProductCard';
-import { HEALTH } from '../data/health';
+
+const BADGE_MAP = {
+  'Pre-Entrenamientos':     { label: '🔥 HOT',         cls: 'badge-hot' },
+  'Creatinas':              { label: '★ BEST SELLER',   cls: 'badge-bestseller' },
+  'Proteínas Whey':         { label: '★ BEST SELLER',   cls: 'badge-bestseller' },
+  'Quemadores de Grasa':    { label: '🔥 HOT',         cls: 'badge-hot' },
+  'Proteínas Isoladas':     { label: '◆ PREMIUM',       cls: 'badge-limited' },
+  'Gainers de Masa':        { label: '💪 POPULAR',      cls: 'badge-hot' },
+  'BCAA':                   { label: '★ TOP SELLER',    cls: 'badge-bestseller' },
+  'Bebidas Energéticas':    { label: '⚡ ENERGY',       cls: 'badge-new' },
+  'Vasodilatadores / Pump': { label: '💥 PUMP',         cls: 'badge-hot' },
+  'Precursores Hormonales': { label: '◆ ADVANCED',      cls: 'badge-limited' },
+  'Aminoácidos Esenciales': { label: '★ TOP SELLER',    cls: 'badge-bestseller' },
+  'Glutamina':              { label: '★ BEST SELLER',   cls: 'badge-bestseller' },
+};
 
 function CategoryBlock({ categoryName, products, onOpenProduct }) {
   if (!products.length) return null;
-  const h = HEALTH[categoryName] || {};
+  const badge = BADGE_MAP[categoryName] || null;
+
   return (
-    <div className="cat-block">
+    <div className="cat">
       <div className="cat-header">
-        <h3 className="cat-title">{categoryName}</h3>
-        <span className="cat-count">{products.length} producto{products.length !== 1 ? 's' : ''}</span>
+        <h3 className="cat-name">{categoryName}</h3>
+        <span className="cat-count-label">{products.length} producto{products.length !== 1 ? 's' : ''}</span>
       </div>
-      {h.d && <p className="cat-desc">{h.d}</p>}
-      <div className="grid">
+      <div className="product-grid">
         {products.map(([id, product]) => (
           <ProductCard
             key={id}
             product={product}
+            badge={badge}
             onClick={() => onOpenProduct(id)}
           />
         ))}

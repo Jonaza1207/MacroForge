@@ -1,14 +1,14 @@
 export default function Controls({ activeFilter, searchQuery, visibleCount, onFilter, onSearch }) {
   const filters = [
-    { id: 'all', label: 'Todos' },
-    { id: 'gym', label: '💪 Gym' },
+    { id: 'all',  label: 'Todos' },
+    { id: 'gym',  label: '💪 Gym' },
     { id: 'vita', label: '🌿 Vitaminas' },
     { id: 'dote', label: '🌸 doTERRA' },
   ];
 
   return (
     <div className="controls">
-      <div className="search-wrap">
+      <div className="search">
         <span className="search-icon">🔍</span>
         <input
           type="text"
@@ -20,13 +20,13 @@ export default function Controls({ activeFilter, searchQuery, visibleCount, onFi
       {filters.map(f => (
         <button
           key={f.id}
-          className={`fbtn${activeFilter === f.id ? ' active' : ''}`}
+          className={`filter-btn${activeFilter === f.id ? ' active' : ''}`}
           onClick={() => onFilter(f.id)}
         >
           {f.label}
         </button>
       ))}
-      <span className="results">{visibleCount} resultado{visibleCount !== 1 ? 's' : ''}</span>
+      <span className="count">{visibleCount} resultado{visibleCount !== 1 ? 's' : ''}</span>
     </div>
   );
 }

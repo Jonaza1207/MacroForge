@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
 import { PRODUCT_IMAGES } from '../data/images';
-import { CATEGORY_TYPES, WA_NUMBER, MF_BG } from '../data/catalog';
+import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
 
 function getImageUrl(url) {
   if (!url) return null;
@@ -40,6 +40,7 @@ export default function ProductModal({ productId, onClose }) {
 
   const sectionColor = SECTION_COLORS[p.s];
   const cardType = CATEGORY_TYPES[p.c] || 'SUPPLEMENT';
+  const imgUrl = getImageUrl(p.u);
 
   const waMsg = `Hola MacroForge! 💪 Me interesa: ${p.n} (${p.b}) — ${p.p[0] || ''}. ¿Tienen disponibilidad?`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
@@ -51,86 +52,95 @@ export default function ProductModal({ productId, onClose }) {
   const prices = parsePrices(p.p);
 
   return (
-    <div className="modal-bg" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className={`modal ${p.s}`}>
-        <div className="m-img" style={MF_BG}>
-          {getImageUrl(p.u) && (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+
+        {/* Image */}
+        <div className="modal-img">
+          {imgUrl && (
             <img
-              className="real-img"
-              src={getImageUrl(p.u)}
+              src={imgUrl}
               alt={`${p.n} | ${p.b}`}
-              onError={e => { e.currentTarget.style.display = 'none'; }}
+              onError={e => {
+                e.currentTarget.style.display = 'none';
+                if (import.meta.env?.DEV) console.warn(`[MacroForge] Failed to load modal image for: ${p.n}`);
+              }}
             />
           )}
-          <div className={`cv cv-${p.s}`}>
-            <div className="cv-tag">{p.b}</div>
-            <div className="cv-name">{p.n.toUpperCase()}</div>
-            <div className="cv-bar" />
-            <div className="cv-type">{cardType}</div>
-          </div>
+          {!imgUrl && (
+            <div className="card-fallback">
+              <div className="card-fallback-brand">{p.b}</div>
+              <div className="card-fallback-name" style={{ fontSize: 28 }}>{p.n.toUpperCase()}</div>
+              <div className="card-fallback-bar" />
+              <div className="card-fallback-type">{cardType}</div>
+            </div>
+          )}
         </div>
 
-        <div className="m-tag" style={{ color: sectionColor }}>
+        {/* Section tag */}
+        <div className="modal-tag" style={{ color: sectionColor }}>
           {SECTION_LABELS[p.s]}
         </div>
-        <button className="m-close" onClick={onClose} aria-label="Cerrar">✕</button>
 
-        <div className="m-body">
-          <div className="m-brand">{p.b}</div>
-          <div className="m-name">{p.n}</div>
-          <div className="m-cat">{p.c}</div>
+        {/* Close */}
+        <button className="modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
 
-          {/* Solo WhatsApp — sin link a tienda distribuidora */}
-          <a className="m-wa" href={waUrl} target="_blank" rel="noopener noreferrer">
+        {/* Body */}
+        <div className="modal-body">
+          <div className="modal-brand">{p.b}</div>
+          <div className="modal-name">{p.n}</div>
+          <div className="modal-cat">{p.c}</div>
+
+          <a className="modal-wa" href={waUrl} target="_blank" rel="noopener noreferrer">
             💬 Pedir por WhatsApp
           </a>
 
           {h.d && (
-            <div className="m-section">
+            <div className="modal-section">
               <h4>¿Qué es y para qué sirve?</h4>
               <p>{h.d}</p>
             </div>
           )}
 
           {h.b?.length > 0 && (
-            <div className="m-section">
+            <div className="modal-section">
               <h4>Beneficios clave</h4>
               <ul>{h.b.map((ben, i) => <li key={i}>{ben}</li>)}</ul>
             </div>
           )}
 
           {flavors.length > 0 && (
-            <div className="m-section">
+            <div className="modal-section">
               <h4>Sabores / Variantes</h4>
               <div className="flavor-list">
-                {flavors.map((f, i) => <span key={i} className="flavor">{f}</span>)}
+                {flavors.map((f, i) => <span key={i} className="flavor-tag">{f}</span>)}
               </div>
             </div>
           )}
 
           {h.u && (
-            <div className="m-section">
+            <div className="modal-section">
               <h4>Cómo usar</h4>
               <p>{h.u}</p>
             </div>
           )}
 
-          <div className="m-section">
+          <div className="modal-section">
             <h4>Precios disponibles</h4>
-            <div className="m-prices">
+            <div className="modal-prices">
               {prices.map((pr, i) => (
-                <div key={i} className="m-pi">
-                  <span className="m-pi-opt">{pr.rest}</span>
-                  <span className="m-pi-val">{pr.val}</span>
+                <div key={i} className="modal-price-row">
+                  <span className="modal-price-opt">{pr.rest}</span>
+                  <span className="modal-price-val">{pr.val}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {h.w && (
-            <div className="m-section">
+            <div className="modal-section">
               <h4>Aviso importante</h4>
-              <div className="m-warn">{h.w}</div>
+              <div className="modal-warn">{h.w}</div>
             </div>
           )}
         </div>
