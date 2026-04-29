@@ -71,7 +71,7 @@ export const CATEGORY_TYPES = {
 const _mfSvg = encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">` +
   `<rect width="100" height="100" fill="#0d0a0a"/>` +
-  `<text x="50" y="64" font-family="Impact,Arial Black,sans-serif" font-size="58" font-weight="900" fill="rgba(255,80,0,0.55)" text-anchor="middle" letter-spacing="-2">MF</text>` +
+  `<text x="50" y="64" font-family="Montserrat,Arial Black,sans-serif" font-size="58" font-weight="900" fill="rgba(255,80,0,0.55)" text-anchor="middle" letter-spacing="-2">MF</text>` +
   `</svg>`
 );
 export const MF_BG = {

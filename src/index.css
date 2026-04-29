@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
 /* Reset & Base */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   background: #0a0a08;
   color: #f5f4f0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -42,7 +44,7 @@ img { max-width: 100%; display: block; }
   font-weight: 500;
 }
 .hero h1 {
-  font-family: Impact, "Arial Black", "Helvetica Neue", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 64px;
   line-height: 0.92;
   letter-spacing: -0.01em;
@@ -52,7 +54,7 @@ img { max-width: 100%; display: block; }
 }
 .hero h1 .ac { color: #ff4500; }
 .hero-sub {
-  font-family: Georgia, serif;
+  font-family: 'Montserrat', sans-serif;
   font-style: italic;
   font-size: 16px;
   color: #ede9e0;
@@ -68,7 +70,7 @@ img { max-width: 100%; display: block; }
   border-top: 1px solid #2a2a26;
 }
 .hs-num {
-  font-family: Impact, "Arial Black", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 38px;
   color: #ff4500;
   line-height: 1;
@@ -194,7 +196,7 @@ img { max-width: 100%; display: block; }
   font-weight: 600;
 }
 .sec-title {
-  font-family: Impact, "Arial Black", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 38px;
   line-height: 1;
   font-weight: 900;
@@ -218,7 +220,7 @@ img { max-width: 100%; display: block; }
   border-bottom: 1px solid #2a2a26;
 }
 .cat-title {
-  font-family: Georgia, serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 20px;
   color: #f5f4f0;
   font-weight: 700;
@@ -302,7 +304,7 @@ img { max-width: 100%; display: block; }
   text-transform: uppercase;
 }
 .cv-name {
-  font-family: Impact, "Arial Black", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 20px;
   font-weight: 900;
   line-height: 1;
@@ -322,7 +324,7 @@ img { max-width: 100%; display: block; }
   letter-spacing: 0.25em;
   font-weight: 600;
   text-transform: uppercase;
-  font-family: "SF Mono", Monaco, "Courier New", monospace;
+  font-family: 'Montserrat', sans-serif;
   color: rgba(255,120,0,0.7);
 }
 .cv-gym .cv-tag  { color: #ff6a00; }
@@ -348,7 +350,7 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
 }
 .c-name {
-  font-family: Georgia, serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: #f5f4f0;
@@ -357,7 +359,7 @@ img { max-width: 100%; display: block; }
   flex: 1;
 }
 .c-price {
-  font-family: Impact, "Arial Black", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -458,7 +460,7 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
 }
 .m-name {
-  font-family: Georgia, serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 24px;
   line-height: 1.2;
   font-weight: 700;
@@ -544,7 +546,7 @@ img { max-width: 100%; display: block; }
   flex: 1;
 }
 .m-pi-val {
-  font-family: Impact, sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   font-weight: 900;
 }
@@ -613,7 +615,7 @@ footer {
   gap: 20px;
 }
 .f-brand {
-  font-family: Impact, "Arial Black", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 50px;
   line-height: 0.9;
   font-weight: 900;
