@@ -11,8 +11,8 @@ for (const [path, mod] of Object.entries(_mods)) {
   LOCAL_IMAGES[filename] = mod.default;
 }
 
-// Strict slug → filename mapping. NO fuzzy matching, NO normalization.
-// Each product URL slug must have an explicit entry or returns null.
+// Complete slug → filename mapping. Every product URL slug that has an image is listed.
+// Products without entries will return null (no image).
 const IMAGE_MAP = {
   'PremiumWheyNUTREX': '100-Whey-Protein-Nutrex',
   'all-mass': 'All-Mass-ALLMAX',
@@ -58,7 +58,7 @@ const IMAGE_MAP = {
   'creatinadymatize': 'Creatina-Dymatize',
   'creactor': 'Creatina-Hidrolizada-Creactor-Muscletech',
   'ruleone': 'Creatina-Micronizada-RuleOne',
-  'creatinanutrex': 'Creatina-con-sabor-Nutrex',
+  'creatinanutrex': 'Creatina-con-Sabor-Nutrex',
   'creatina-monohidratada-nutricost': 'Creatina-Monohidratada-Nutricost',
   'creatina-pura-prote': 'Creatina-Monohidratada-Pura Prote',
   'creatinagatsport': 'Creatina-Monohydrate-GAT SPORT',
@@ -70,7 +70,7 @@ const IMAGE_MAP = {
   'creatinaon': 'Creatina-Optimum Nutrition',
   'creatinaperform': 'Creatina-Perform',
   'creatinaplatinum': 'Creatina-Platinum-Muscletech',
-  'creatinaraze': 'Creatina-Raze-ReppsSports',
+  'creatinaraze': 'Creatina-Raze-ReppSports',
   'creatinasimply': 'Creatina-Simply',
   'creatina-ultimate-nutrition': 'Creatina-Ultimate Nutrition',
   'creatinawomen': 'Creatina-Women-Nutrex',
@@ -105,7 +105,7 @@ const IMAGE_MAP = {
   'isolateproteinsimply': 'Isolate-Protein-Simply',
   'isotope': 'Isotope-Redcon1',
   'rawitholate': 'Itholate-Protein-RAW',
-  'hydrowhey': 'Platinum-Hydrowhey-OPTIMUM-NUTRITION',
+  'hydrowhey': 'Platinum-Hydrowhey-OptimumNutrition',
   'isopure': 'Proteina-100-Zero-Carb-Isopure',
   'wheyproteinisolate': 'Whey-Protein-Isolate-Nutricost',
   'argininanutricost': 'L-Arginina-Nutricost',
@@ -181,6 +181,7 @@ const IMAGE_MAP = {
   'ghostprotein': 'Whey-Protein-Ghost',
   'zma': 'ZMA-Nutrabio',
   'zma-usn': 'ZMA-OptimumNutrition',
+  'curcumaalfa': 'Beta-Alanina-Nutricost',
 };
 
 export function resolveProductImage(url) {
