@@ -67,22 +67,3 @@ export const CATEGORY_TYPES = {
   'Protección Solar doTERRA':'SKIN CARE','Kits de AutoEnvío':'KIT',
 };
 
-// Fondo MF premium: gimnasio oscuro de lujo, spotlight cálido, viñeta inferior, marca de agua MF tenue en la esquina.
-const _mfSvg = encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">` +
-  `<text x="186" y="190" font-family="Montserrat,Arial Black,sans-serif" font-size="34" font-weight="900" fill="rgba(255,90,30,0.10)" text-anchor="end" letter-spacing="-1.5">MF</text>` +
-  `</svg>`
-);
-export const MF_BG = {
-  backgroundColor: '#0a0807',
-  backgroundImage: [
-    `url("data:image/svg+xml,${_mfSvg}")`,
-    `radial-gradient(ellipse 75% 55% at 50% 100%, rgba(0,0,0,0.72), transparent 65%)`,
-    `radial-gradient(ellipse 85% 60% at 50% 22%, rgba(255,90,30,0.13), transparent 65%)`,
-    `radial-gradient(circle at 50% 50%, rgba(255,230,200,0.07), transparent 55%)`,
-    `linear-gradient(180deg, #15100d 0%, #0a0807 55%, #050302 100%)`,
-  ].join(', '),
-  backgroundRepeat: 'no-repeat',
-  backgroundSize: 'auto, 100% 100%, 100% 100%, 100% 100%, 100% 100%',
-  backgroundPosition: 'bottom right, center, center, center, center',
-};

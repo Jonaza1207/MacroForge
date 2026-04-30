@@ -1,14 +1,8 @@
 import { useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
-import { PRODUCT_IMAGES } from '../data/images';
+import { resolveProductImage } from '../data/images';
 import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
-
-function getImageUrl(url) {
-  if (!url) return null;
-  const m = url.match(/\/tienda\/([^/?#]+)/);
-  return m ? PRODUCT_IMAGES[m[1]] || null : null;
-}
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#ff4500', vita: '#ff6a00', dote: '#cc1500' };
@@ -40,7 +34,7 @@ export default function ProductModal({ productId, onClose }) {
 
   const sectionColor = SECTION_COLORS[p.s];
   const cardType = CATEGORY_TYPES[p.c] || 'SUPPLEMENT';
-  const imgUrl = getImageUrl(p.u);
+  const imgUrl = resolveProductImage(p.u);
 
   const waMsg = `Hola MacroForge! 💪 Me interesa: ${p.n} (${p.b}) — ${p.p[0] || ''}. ¿Tienen disponibilidad?`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
