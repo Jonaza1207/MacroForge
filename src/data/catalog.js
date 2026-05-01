@@ -2,7 +2,7 @@ export const SECTIONS = {
   gym: {
     label: 'GYM & PERFORMANCE',
     sublabel: 'Sección 01 · Performance',
-    color: '#2B7FFF',
+    color: '#FF5500',
     categories: [
       'Creatinas','Shakers y Botellas','Proteínas Whey','Pre-Entrenamientos',
       'Proteínas Isoladas','Accesorios de Gym','Gainers de Masa','Quemadores de Grasa',

@@ -1,11 +1,13 @@
 import { memo } from 'react';
 import ProductCard from './ProductCard';
 
-function CategoryBlock({ categoryName, products, onOpenProduct }) {
+function CategoryBlock({ sectionId, categoryName, products, onOpenProduct }) {
   if (!products.length) return null;
 
+  const id = `cat-${sectionId}-${categoryName.replace(/[\s/]+/g, '-').toLowerCase()}`;
+
   return (
-    <div className="cat">
+    <div className="cat" id={id}>
       <div className="cat-header">
         <h3 className="cat-name">{categoryName}</h3>
         <span className="cat-count-label">

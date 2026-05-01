@@ -2,12 +2,14 @@ import { memo } from 'react';
 import { resolveProductImage } from '../data/images';
 
 function ProductCard({ product, badge, onClick }) {
-  const { n, b, p, u } = product;
+  const { n, b, p, u, f } = product;
   const imageUrl = resolveProductImage(u);
 
   const firstPrice = p[0] || '';
   const priceMatch = firstPrice.match(/(₡\s*[\d\s,.]+)(.*)/);
   const priceVal = priceMatch ? priceMatch[1].trim() : firstPrice;
+
+  const hasFlavors = Array.isArray(f) && f.some(fl => fl && fl.trim());
 
   return (
     <div
@@ -32,20 +34,27 @@ function ProductCard({ product, badge, onClick }) {
           <div className="card-fallback-name">{n.toUpperCase()}</div>
           <div className="card-fallback-bar" />
         </div>
-        {badge && (
-          <div className={`card-badge ${badge.cls}`}>{badge.label}</div>
-        )}
+        {badge && <div className={`card-badge ${badge.cls}`}>{badge.label}</div>}
       </div>
 
       <div className="card-body">
         <div className="card-brand">{b}</div>
         <div className="card-name">{n}</div>
+
+        {hasFlavors && (
+          <div className="card-flavors">
+            <span className="card-flavor-dot" />
+            <span className="card-flavor-text">Sabores disponibles</span>
+          </div>
+        )}
+
         <div className="card-price-row">
           <span className="card-price">{priceVal}</span>
           {p.length > 1 && (
-            <span className="card-multi">+{p.length - 1}</span>
+            <span className="card-multi">+{p.length - 1} opciones</span>
           )}
         </div>
+
         <button className="card-cta" aria-label={`Ver detalle de ${n}`}>
           CONSULTAR →
         </button>

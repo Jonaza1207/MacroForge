@@ -44,6 +44,38 @@ export default function App() {
     <>
       <Hero />
 
+      {/* Trust bar */}
+      <div className="trust-bar">
+        <div className="trust-bar-item">
+          <span className="trust-bar-icon">🚀</span>
+          <div className="trust-bar-text">
+            <span className="trust-bar-label">Envíos en Costa Rica</span>
+            <span className="trust-bar-sub">Entrega rápida</span>
+          </div>
+        </div>
+        <div className="trust-bar-item">
+          <span className="trust-bar-icon">✅</span>
+          <div className="trust-bar-text">
+            <span className="trust-bar-label">Marcas 100% Originales</span>
+            <span className="trust-bar-sub">Garantía de autenticidad</span>
+          </div>
+        </div>
+        <div className="trust-bar-item">
+          <span className="trust-bar-icon">💬</span>
+          <div className="trust-bar-text">
+            <span className="trust-bar-label">Atención por WhatsApp</span>
+            <span className="trust-bar-sub">Respuesta en minutos</span>
+          </div>
+        </div>
+        <div className="trust-bar-item">
+          <span className="trust-bar-icon">⭐</span>
+          <div className="trust-bar-text">
+            <span className="trust-bar-label">+500 Clientes Satisfechos</span>
+            <span className="trust-bar-sub">+3 años en el mercado</span>
+          </div>
+        </div>
+      </div>
+
       <div className="tip">
         <b>Mejor experiencia:</b> Si abriste esto desde WhatsApp, tocá <b>Compartir</b> y elegí{' '}
         <b>Abrir en Chrome/Safari</b> para ver el catálogo completo.
