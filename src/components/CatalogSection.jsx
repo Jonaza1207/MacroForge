@@ -9,7 +9,7 @@ export default function CatalogSection({ sectionId, sectionData, productsByCateg
   return (
     <section className="section" id={`sec-${sectionId}`}>
       <div className="section-header">
-        <div className="section-dot" style={{ background: color }} />
+        <div className="section-accent-bar" style={{ background: color }} />
         <div className="section-meta">
           <div className="section-sublabel">{sublabel}</div>
           <div className="section-title" style={{ color }}>{label}</div>

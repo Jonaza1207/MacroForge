@@ -8,6 +8,8 @@ export default function Controls({ activeFilter, searchQuery, visibleCount, onFi
 
   return (
     <div className="controls">
+      <div className="controls-brand">MACRO<span>FORGE</span></div>
+
       <div className="search">
         <span className="search-icon">🔍</span>
         <input
@@ -17,6 +19,7 @@ export default function Controls({ activeFilter, searchQuery, visibleCount, onFi
           onChange={e => onSearch(e.target.value)}
         />
       </div>
+
       {filters.map(f => (
         <button
           key={f.id}
@@ -26,6 +29,7 @@ export default function Controls({ activeFilter, searchQuery, visibleCount, onFi
           {f.label}
         </button>
       ))}
+
       <span className="count">{visibleCount} resultado{visibleCount !== 1 ? 's' : ''}</span>
     </div>
   );

@@ -45,8 +45,8 @@ export default function App() {
       <Hero />
 
       <div className="tip">
-        💡 <b>Mejor experiencia:</b> Si abriste esto desde WhatsApp, tocá <b>Compartir</b> y elegí{' '}
-        <b>Abrir en Chrome/Safari</b> para verlo completo.
+        <b>Mejor experiencia:</b> Si abriste esto desde WhatsApp, tocá <b>Compartir</b> y elegí{' '}
+        <b>Abrir en Chrome/Safari</b> para ver el catálogo completo.
       </div>
 
       <Controls

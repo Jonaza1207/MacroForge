@@ -5,7 +5,7 @@ import { resolveProductImage } from '../data/images';
 import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
-const SECTION_COLORS = { gym: '#ff4500', vita: '#ff6a00', dote: '#cc1500' };
+const SECTION_COLORS = { gym: '#2B7FFF', vita: '#00C896', dote: '#D4A843' };
 
 function parsePrices(prices) {
   return prices.map((pr, i) => {

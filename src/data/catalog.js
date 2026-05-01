@@ -2,7 +2,7 @@ export const SECTIONS = {
   gym: {
     label: 'GYM & PERFORMANCE',
     sublabel: 'Sección 01 · Performance',
-    color: '#ff4500',
+    color: '#2B7FFF',
     categories: [
       'Creatinas','Shakers y Botellas','Proteínas Whey','Pre-Entrenamientos',
       'Proteínas Isoladas','Accesorios de Gym','Gainers de Masa','Quemadores de Grasa',
@@ -14,7 +14,7 @@ export const SECTIONS = {
   vita: {
     label: 'VITAMINAS & BIENESTAR',
     sublabel: 'Sección 02 · Salud',
-    color: '#ff6a00',
+    color: '#00C896',
     categories: [
       'Magnesio','Vitaminas Esenciales','Adaptógenos y Hormonas','Multivitamínicos',
       'Detox y Salud Hepática','Colágeno y Belleza','Omega y Grasas Saludables',
@@ -27,7 +27,7 @@ export const SECTIONS = {
   dote: {
     label: 'DOTERRA',
     sublabel: 'Sección 03 · Aromaterapia',
-    color: '#cc1500',
+    color: '#D4A843',
     categories: [
       'Aceites Esenciales Individuales','Mezclas doTERRA','Bienestar Interno doTERRA',
       'Cuidado Personal','Kits Especiales','Cuidado del Cabello','Cuidado de la Piel',
@@ -66,4 +66,3 @@ export const CATEGORY_TYPES = {
   'Aromaterapia Emocional':'ROLL-ON','Difusores':'DIFFUSER',
   'Protección Solar doTERRA':'SKIN CARE','Kits de AutoEnvío':'KIT',
 };
-
