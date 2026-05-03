@@ -544,16 +544,18 @@ input  { font-family: inherit; }
 .card:active { transform: translateY(-2px) scale(1.005); }
 
 /* ── Card image ─────────────────────────────────────────── */
+/*
+ * Clean neutral stage — product is the only hero.
+ * No tinted gradients that compete with the product.
+ * Just a dark surface with a bottom shadow to ground the image.
+ */
 .card-img {
   position: relative;
   padding-top: 100%;
   overflow: hidden;
-  background-color: #0C0B09;
+  background: #111111;
   background-image:
-    radial-gradient(ellipse 75% 55% at 50% 100%, rgba(0,0,0,0.78), transparent 65%),
-    radial-gradient(ellipse 80% 55% at 50% 20%,  rgba(255,85,0,0.07), transparent 65%),
-    radial-gradient(circle   at 50% 50%,          rgba(255,180,80,0.04), transparent 55%),
-    linear-gradient(180deg, #131210 0%, #0D0C0A 55%, #080706 100%);
+    radial-gradient(ellipse 90% 32% at 50% 100%, rgba(0,0,0,0.7), transparent 52%);
 }
 .card-img img {
   position: absolute;
@@ -561,34 +563,46 @@ input  { font-family: inherit; }
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center 44%;
-  padding: 8px 8px 14px;
-  z-index: 1;
-  filter: drop-shadow(0 14px 12px rgba(0,0,0,0.6)) drop-shadow(0 3px 5px rgba(0,0,0,0.4));
-  transition: transform 0.3s ease;
+  object-position: center 46%;
+  padding: 10px 10px 16px;
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,0.55)) drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+  transition: transform 0.28s ease;
 }
 .card:hover .card-img img {
-  transform: scale(1.05) translateY(-3px);
+  transform: scale(1.05) translateY(-4px);
 }
 
-/* ── Card fallback ──────────────────────────────────────── */
+/* ── Card fallback (no image / image error) ─────────────── */
+/*
+ * Only renders when there is genuinely no image.
+ * Never overlaps a loaded product photo.
+ */
 .card-fallback {
-  position: absolute; inset: 0; z-index: 0;
+  position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 14px; text-align: center; gap: 8px;
+  padding: 16px; text-align: center; gap: 10px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255,85,0,0.05), transparent 70%),
+    linear-gradient(180deg, #181816 0%, #111110 100%);
 }
 .card-fallback-brand {
   font-size: 8px; font-weight: 800;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--accent);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.9;
 }
 .card-fallback-name {
-  font-size: 14px; font-weight: 900; text-transform: uppercase;
-  color: var(--text-1); line-height: 1.05; letter-spacing: -0.02em;
+  font-size: 13px; font-weight: 700;
+  color: var(--text-1); line-height: 1.25;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .card-fallback-bar {
-  width: 22px; height: 2px; background: var(--accent); border-radius: 2px;
+  width: 20px; height: 2px; background: var(--accent);
+  border-radius: 2px; opacity: 0.7;
 }
 
 /* ── Badges ─────────────────────────────────────────────── */
@@ -692,11 +706,9 @@ input  { font-family: inherit; }
 }
 .modal-img {
   position: relative; width: 100%; padding-top: 56%; overflow: hidden;
-  background-color: #0C0B09;
+  background: #111111;
   background-image:
-    radial-gradient(ellipse 75% 55% at 50% 100%, rgba(0,0,0,0.78), transparent 65%),
-    radial-gradient(ellipse 80% 55% at 50% 20%,  rgba(255,85,0,0.08), transparent 65%),
-    linear-gradient(180deg, #131210 0%, #0D0C0A 55%, #080706 100%);
+    radial-gradient(ellipse 90% 32% at 50% 100%, rgba(0,0,0,0.7), transparent 52%);
 }
 .modal-img img {
   position: absolute; inset: 0;
