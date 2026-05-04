@@ -1,4 +1,4 @@
-import logo from '../assets/Branding/macroforge-logo.jpg';
+import logo from '../assets/Branding/MacroForge-logo.webp';
 import { PRODUCTS } from '../data/products';
 import { WA_NUMBER } from '../data/catalog';
 
@@ -91,6 +91,9 @@ export default function Hero() {
           <div className="hero-logo-wrap">
             {/* Ambient glow — behind the logo */}
             <div className="hero-logo-glow" aria-hidden="true" />
+            {/* Micro energy sparks */}
+            <div className="hero-logo-spark hero-logo-spark--a" aria-hidden="true" />
+            <div className="hero-logo-spark hero-logo-spark--b" aria-hidden="true" />
             {/* Stage clips the metallic shine sweep */}
             <div className="hero-logo-stage">
               <img
