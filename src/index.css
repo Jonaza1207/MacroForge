@@ -76,12 +76,14 @@
   background: var(--bg);
 }
 [data-theme="light"] .hero::before {
-  background-image: radial-gradient(circle, rgba(227,0,30,0.06) 1px, transparent 1px);
+  /* Light mode: softer dots — clean parchment, not a red stain */
+  background-image: radial-gradient(circle, rgba(200,0,20,0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 [data-theme="light"] .hero::after {
   background:
-    radial-gradient(ellipse 65% 45% at 85% -5%, rgba(227,0,30,0.09), transparent 55%),
-    radial-gradient(ellipse 40% 30% at 0% 100%, rgba(227,0,30,0.05), transparent 60%);
+    radial-gradient(ellipse 65% 45% at 85% -5%, rgba(227,0,30,0.07), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 0% 100%, rgba(227,0,30,0.04), transparent 60%);
 }
 [data-theme="light"] .card {
   box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
@@ -129,15 +131,30 @@
   -webkit-tap-highlight-color: transparent;
 }
 html { scroll-behavior: smooth; }
+
+/* ── Global brand background ─────────────────────────────
+ *  Three CSS layers on body:
+ *    1. Red particle dot grid — tighter spacing, visible opacity
+ *    2. Top-right atmospheric glow — mimics logo energy
+ *    3. Bottom-left counter-glow — creates diagonal depth
+ *  Cards / sections have solid surfaces so dots mainly show in:
+ *  hero area, section gaps, page margins.
+ *  The atmospheric glows bleed through semi-transparent areas.
+ * ─────────────────────────────────────────────────────── */
 body {
   background-color: var(--bg);
-  /* Subtle branded particle texture — creates depth without visual noise */
-  background-image: radial-gradient(
-    circle,
-    rgba(227, 0, 30, 0.038) 1px,
-    transparent 1px
-  );
-  background-size: 40px 40px;
+  background-image:
+    /* Layer 1: dot particle grid — 0.11 opacity, 26px grid */
+    radial-gradient(circle, rgba(227, 0, 30, 0.11) 1.5px, transparent 1.5px),
+    /* Layer 2: top-right atmospheric red glow */
+    radial-gradient(ellipse 72% 55% at 92% 0%, rgba(227, 0, 30, 0.09), transparent 62%),
+    /* Layer 3: bottom-left counter glow */
+    radial-gradient(ellipse 52% 40% at 4% 100%, rgba(227, 0, 30, 0.06), transparent 60%);
+  background-size:
+    26px 26px,   /* dot grid repeats */
+    100% 100%,   /* atmospheric glow — covers full page */
+    100% 100%;   /* counter glow */
+  background-repeat: repeat, no-repeat, no-repeat;
   color: var(--text-1);
   font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -145,13 +162,16 @@ body {
   overflow-x: hidden;
   min-height: 100dvh;
 }
+
+/* Light mode: much softer — clean parchment with barely-there texture */
 [data-theme="light"] body {
-  background-image: radial-gradient(
-    circle,
-    rgba(0, 0, 0, 0.028) 1px,
-    transparent 1px
-  );
-  background-size: 40px 40px;
+  background-image:
+    radial-gradient(circle, rgba(0, 0, 0, 0.042) 1px, transparent 1px),
+    /* No large glows in light mode — keep it clean */
+    none,
+    none;
+  background-size: 30px 30px, auto, auto;
+  background-repeat: repeat, no-repeat, no-repeat;
 }
 img { display: block; max-width: 100%; }
 a   { text-decoration: none; color: inherit; }
@@ -164,21 +184,25 @@ input  { font-family: inherit; }
   overflow: hidden;
   background: var(--bg);
 }
-/* Dot grid — red energy */
+/* Dot grid — red energy — boosted for hero energy zone */
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(227,0,30,0.10) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image: radial-gradient(circle, rgba(227,0,30,0.17) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
   pointer-events: none; z-index: 0;
 }
-/* Red glow corners */
+/* Red corner glows — stronger, logo-matching energy */
 .hero::after {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 65% 45% at 88% -5%, rgba(227,0,30,0.13), transparent 55%),
-    radial-gradient(ellipse 40% 30% at 0% 105%,  rgba(227,0,30,0.07), transparent 60%);
+    /* Primary: strong top-right bloom matching logo right side */
+    radial-gradient(ellipse 78% 58% at 95% -8%, rgba(227,0,30,0.22), transparent 52%),
+    /* Secondary: bottom-left echo */
+    radial-gradient(ellipse 52% 42% at 0% 112%, rgba(227,0,30,0.12), transparent 58%),
+    /* Centre-right warmth to tie logo in */
+    radial-gradient(ellipse 38% 48% at 78% 55%, rgba(227,0,30,0.05), transparent 65%);
   pointer-events: none; z-index: 0;
 }
 .hero > * { position: relative; z-index: 1; }
@@ -1677,6 +1701,28 @@ input  { font-family: inherit; }
 .footer-meta em { font-style: normal; color: var(--vita); }
 
 /* ── Responsive ──────────────────────────────────────────── */
+/* ── Mobile: reduce background intensity ─────────────────
+ *  Toned-down dots and glows — keeps text readable and
+ *  prevents visual noise on small screens.
+ * ─────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  body {
+    background-image:
+      radial-gradient(circle, rgba(227, 0, 30, 0.075) 1.5px, transparent 1.5px),
+      radial-gradient(ellipse 80% 60% at 95% 0%, rgba(227, 0, 30, 0.06), transparent 62%),
+      none;
+    background-size: 26px 26px, 100% 100%, auto;
+  }
+  .hero::before {
+    background-image: radial-gradient(circle, rgba(227,0,30,0.11) 1.5px, transparent 1.5px);
+  }
+  .hero::after {
+    background:
+      radial-gradient(ellipse 80% 58% at 95% -8%, rgba(227,0,30,0.15), transparent 52%),
+      radial-gradient(ellipse 52% 42% at 0% 112%, rgba(227,0,30,0.08), transparent 58%);
+  }
+}
+
 /* ── Mobile hero: stack columns ────────────────────────── */
 @media (max-width: 767px) {
   .hero-inner {
