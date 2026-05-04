@@ -451,7 +451,18 @@ input  { font-family: inherit; }
   color: var(--text-3);
 }
 
-/* ── Hero logo (right column) ────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   HERO LOGO — INTEGRATED SCENE SYSTEM
+   Z-index stack (within .hero-logo-wrap):
+     0  ::before  — particle ring (dense near edges, clear center)
+     1  .hero-logo-glow  — large deep red energy cloud
+     2  .hero-logo-stage — the actual logo + its sub-layers
+        Inside stage:
+          1  img      — the logo
+          3  ::before — metallic shine sweep
+          4  ::after  — edge vignette (blends JPEG rect into bg)
+   ══════════════════════════════════════════════════════════ */
+
 @keyframes logoIn {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -460,12 +471,10 @@ input  { font-family: inherit; }
   0%, 100% { transform: translateY(0);  }
   50%       { transform: translateY(-6px); }
 }
-/* Breathing glow — slow pulse, never aggressive */
 @keyframes glowPulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.65; }
+  50%       { opacity: 0.60; }
 }
-/* Metallic light sweep — slow, infrequent, premium */
 @keyframes logoShine {
   0%, 18%  { left: -120%; opacity: 0; }
   20%       { opacity: 1; }
@@ -473,6 +482,7 @@ input  { font-family: inherit; }
   100%      { left: 160%; opacity: 0; }
 }
 
+/* Wrapper — entry + float. No overflow:hidden so glow/particles bleed outward */
 .hero-logo-wrap {
   position: relative;
   display: inline-block;
@@ -481,26 +491,72 @@ input  { font-family: inherit; }
     logoFloat 5s   ease-in-out 0.62s infinite;
 }
 
-/* Ambient radial glow — breathing energy behind the logo */
-.hero-logo-glow {
+/* ── Layer 0: Particle ring surrounding the logo ──────────
+ * Dense red dots positioned around the logo, invisible at
+ * the center (clear view of logo), fading inward and outward.
+ * Uses mask-image to create the ring shape.
+ * Connects local logo atmosphere with global page particles.
+ */
+.hero-logo-wrap::before {
+  content: '';
   position: absolute;
-  inset: -40% -28%;
-  background:
-    radial-gradient(ellipse at 50% 65%, rgba(227, 0, 30, 0.16), transparent 58%),
-    radial-gradient(ellipse at 50% 50%, rgba(227, 0, 30, 0.06), transparent 76%);
+  inset: -55% -45%;
+  background-image: radial-gradient(circle, rgba(227,0,30,0.26) 1.5px, transparent 1.5px);
+  background-size: 17px 17px;
   pointer-events: none;
   z-index: 0;
+  /* Ring mask: clear in center (logo area), ring of particles around it, fade at edges */
+  mask-image: radial-gradient(
+    ellipse 78% 75% at 50% 50%,
+    transparent 22%,
+    rgba(0,0,0,0.50) 38%,
+    black 55%,
+    black 72%,
+    transparent 92%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 78% 75% at 50% 50%,
+    transparent 22%,
+    rgba(0,0,0,0.50) 38%,
+    black 55%,
+    black 72%,
+    transparent 92%
+  );
+}
+
+/* ── Layer 1: Deep ambient energy cloud ───────────────────
+ * Three-gradient system:
+ *  - Core glow: concentrated energy where the logo sits
+ *  - Wide halo: broad atmospheric light connecting to hero
+ *  - Ground reflection: subtle under-logo warmth
+ * All breathe on the same glowPulse animation.
+ */
+.hero-logo-glow {
+  position: absolute;
+  inset: -65% -55%;
+  background:
+    radial-gradient(ellipse 62% 52% at 50% 55%, rgba(227,0,30,0.26), transparent 50%),
+    radial-gradient(ellipse 92% 82% at 50% 52%, rgba(227,0,30,0.12), transparent 68%),
+    radial-gradient(ellipse 52% 28% at 50% 97%, rgba(227,0,30,0.18), transparent 55%);
+  pointer-events: none;
+  z-index: 1;
   animation: glowPulse 4.5s ease-in-out 1s infinite;
 }
 
-/* Stage clips the metallic shine sweep to the image bounds */
+/* ── Layer 2: Logo stage ──────────────────────────────────
+ * overflow:hidden clips the metallic shine sweep.
+ * Elevated z-index places it above glow and particle ring.
+ */
 .hero-logo-stage {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   overflow: hidden;
-  border-radius: 6px; /* minimal rounding for clean shine clip */
+  border-radius: 8px;
 }
-/* Metallic shine — one slow sweep every ~10s */
+
+/* ── Layer 2→3: Metallic shine (inside stage) ─────────────
+ * Slow, infrequent light sweep suggesting brushed metal.
+ */
 .hero-logo-stage::before {
   content: '';
   position: absolute;
@@ -508,11 +564,11 @@ input  { font-family: inherit; }
   width: 50%; height: 110%;
   background: linear-gradient(
     108deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.05) 48%,
-    rgba(255, 255, 255, 0.10) 52%,
-    rgba(255, 255, 255, 0.05) 56%,
-    transparent 64%
+    transparent 36%,
+    rgba(255, 255, 255, 0.04) 46%,
+    rgba(255, 255, 255, 0.09) 52%,
+    rgba(255, 255, 255, 0.04) 58%,
+    transparent 66%
   );
   transform: skewX(-12deg);
   pointer-events: none;
@@ -520,6 +576,30 @@ input  { font-family: inherit; }
   animation: logoShine 10s ease-in-out 3s infinite;
 }
 
+/* ── Layer 2→4: Edge vignette (inside stage, topmost) ─────
+ * Radial gradient fades the JPEG rectangle edges to match
+ * the dark background. Eliminates the "pasted rectangle" look.
+ * Logo center is fully transparent — logo visuals untouched.
+ */
+.hero-logo-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 74% 72% at 50% 44%,
+    transparent 36%,
+    rgba(8, 8, 8, 0.18) 54%,
+    rgba(8, 8, 8, 0.52) 72%,
+    rgba(8, 8, 8, 0.88) 90%
+  );
+}
+
+/* ── Logo image ───────────────────────────────────────────
+ * Slight scale for presence. Red-tinged drop-shadow
+ * connects image to surrounding glow environment.
+ */
 .hero-logo-img {
   position: relative;
   z-index: 1;
@@ -530,46 +610,63 @@ input  { font-family: inherit; }
   display: block;
   transform: scale(1.02);
   filter:
-    drop-shadow(0 12px 32px rgba(0, 0, 0, 0.55))
-    drop-shadow(0 3px  8px  rgba(0, 0, 0, 0.30))
-    drop-shadow(0 0   40px rgba(227, 0, 30, 0.08));
+    drop-shadow(0 12px 36px rgba(0, 0, 0, 0.58))
+    drop-shadow(0 3px  8px  rgba(0, 0, 0, 0.32))
+    drop-shadow(0 0   52px rgba(227, 0, 30, 0.14));
   transition: transform 0.3s ease, filter 0.3s ease;
   will-change: transform;
 }
 .hero-logo-wrap:hover .hero-logo-img {
   transform: scale(1.05);
   filter:
-    drop-shadow(0 16px 40px rgba(0, 0, 0, 0.60))
-    drop-shadow(0 3px  8px  rgba(0, 0, 0, 0.30))
-    drop-shadow(0 0   32px rgba(227, 0, 30, 0.14));
+    drop-shadow(0 16px 44px rgba(0, 0, 0, 0.62))
+    drop-shadow(0 3px  8px  rgba(0, 0, 0, 0.32))
+    drop-shadow(0 0   40px rgba(227, 0, 30, 0.20));
 }
 
-/* Light mode: softer shadow, lighter glow, subtler shine */
+/* ── Light mode overrides ─────────────────────────────────
+ * Particles much softer — no "burning" on warm parchment.
+ * Vignette fades to light bg colour instead of near-black.
+ */
+[data-theme="light"] .hero-logo-wrap::before {
+  background-image: radial-gradient(circle, rgba(180,0,20,0.10) 1.5px, transparent 1.5px);
+}
 [data-theme="light"] .hero-logo-glow {
   background:
-    radial-gradient(ellipse at 50% 65%, rgba(227, 0, 30, 0.09), transparent 58%),
-    radial-gradient(ellipse at 50% 50%, rgba(227, 0, 30, 0.04), transparent 76%);
+    radial-gradient(ellipse 62% 52% at 50% 55%, rgba(227,0,30,0.10), transparent 50%),
+    radial-gradient(ellipse 92% 82% at 50% 52%, rgba(227,0,30,0.05), transparent 68%),
+    radial-gradient(ellipse 52% 28% at 50% 97%, rgba(227,0,30,0.08), transparent 55%);
+}
+[data-theme="light"] .hero-logo-stage::after {
+  background: radial-gradient(
+    ellipse 74% 72% at 50% 44%,
+    transparent 36%,
+    rgba(242, 240, 235, 0.12) 54%,
+    rgba(242, 240, 235, 0.45) 72%,
+    rgba(242, 240, 235, 0.82) 90%
+  );
 }
 [data-theme="light"] .hero-logo-stage::before {
   background: linear-gradient(
     108deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.12) 48%,
-    rgba(255, 255, 255, 0.22) 52%,
-    rgba(255, 255, 255, 0.12) 56%,
-    transparent 64%
+    transparent 36%,
+    rgba(255, 255, 255, 0.10) 46%,
+    rgba(255, 255, 255, 0.20) 52%,
+    rgba(255, 255, 255, 0.10) 58%,
+    transparent 66%
   );
 }
 [data-theme="light"] .hero-logo-img {
   filter:
-    drop-shadow(0 6px 20px rgba(0, 0, 0, 0.16))
-    drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.10));
+    drop-shadow(0 6px 20px rgba(0, 0, 0, 0.15))
+    drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.10))
+    drop-shadow(0 0   24px rgba(227, 0, 30, 0.06));
 }
 [data-theme="light"] .hero-logo-wrap:hover .hero-logo-img {
   filter:
-    drop-shadow(0 10px 28px rgba(0, 0, 0, 0.20))
+    drop-shadow(0 10px 28px rgba(0, 0, 0, 0.18))
     drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.12))
-    drop-shadow(0 0   20px rgba(227, 0, 30, 0.07));
+    drop-shadow(0 0   20px rgba(227, 0, 30, 0.09));
 }
 
 /* ── View transition ─────────────────────────────────────── */
@@ -1735,13 +1832,33 @@ input  { font-family: inherit; }
     justify-content: center;
     order: 2; /* logo below text */
   }
-  /* Mobile logo: entry only — no float, no shine, no hover effects */
+  /* Mobile logo: simplified — no float, no shine, reduced glow/particles */
   .hero-logo-wrap {
     align-self: center;
     animation: logoIn 0.5s ease-out 0.1s both;
   }
-  .hero-logo-glow { animation: none; }
-  .hero-logo-stage::before { display: none; }   /* disable shine on mobile */
+  /* Kill particle ring on mobile — saves battery, avoids clutter */
+  .hero-logo-wrap::before { display: none; }
+  /* Reduce glow — static, no pulse */
+  .hero-logo-glow {
+    animation: none;
+    inset: -30% -25%;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 55%, rgba(227,0,30,0.14), transparent 52%),
+      radial-gradient(ellipse 55% 30% at 50% 97%, rgba(227,0,30,0.08), transparent 55%);
+  }
+  /* Disable metallic shine sweep on mobile */
+  .hero-logo-stage::before { display: none; }
+  /* Lighter vignette on mobile — logo is smaller */
+  .hero-logo-stage::after {
+    background: radial-gradient(
+      ellipse 74% 72% at 50% 44%,
+      transparent 40%,
+      rgba(8, 8, 8, 0.12) 58%,
+      rgba(8, 8, 8, 0.45) 78%,
+      rgba(8, 8, 8, 0.82) 95%
+    );
+  }
   .hero-logo-img {
     max-width: 280px;
     transform: none;
