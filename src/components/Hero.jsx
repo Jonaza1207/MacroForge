@@ -1,4 +1,4 @@
-import logo from '../assets/branding/macroforge-logo.jpg';
+import logo from '../assets/Branding/macroforge-logo.jpg';
 import { PRODUCTS } from '../data/products';
 import { WA_NUMBER } from '../data/catalog';
 

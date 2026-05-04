@@ -55,6 +55,8 @@ export default function ProductModal({ productId, onClose }) {
             <img
               src={imgUrl}
               alt={`${p.n} | ${p.b}`}
+              loading="lazy"
+              decoding="async"
               onError={e => {
                 e.currentTarget.style.display = 'none';
                 if (import.meta.env?.DEV) console.warn(`[MacroForge] Failed to load modal image for: ${p.n}`);

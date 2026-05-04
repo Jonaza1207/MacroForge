@@ -1,13 +1,19 @@
-// Load all local product images
+// Load all local product images (PNG, JPEG, and WebP)
 const _mods = import.meta.glob(
   '../assets/products/**/*.{png,jpg,jpeg,webp,PNG,JPG,JPEG,WEBP}',
   { eager: true }
 );
 
 // Build LOCAL_IMAGES map: filename → image URL
+// Two-pass strategy: load PNG/JPEG first, then WebP overwrites.
+// This guarantees WebP is always preferred when both exist for the same filename.
 export const LOCAL_IMAGES = {};
-for (const [path, mod] of Object.entries(_mods)) {
-  const filename = path.split('/').pop().replace(/\.[^.]+$/, '');
+const _entries = Object.entries(_mods);
+const _nonWebP = _entries.filter(([p]) => !/\.webp$/i.test(p));
+const _webp    = _entries.filter(([p]) =>  /\.webp$/i.test(p));
+
+for (const [imgPath, mod] of [..._nonWebP, ..._webp]) {
+  const filename = imgPath.split('/').pop().replace(/\.[^.]+$/, '');
   LOCAL_IMAGES[filename] = mod.default;
 }
 
