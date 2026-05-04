@@ -1,3 +1,4 @@
+import logo from '../assets/branding/macroforge-logo.jpg';
 import { PRODUCTS } from '../data/products';
 import { WA_NUMBER } from '../data/catalog';
 
@@ -37,7 +38,7 @@ export default function Hero() {
             Pedí por WhatsApp — respuesta en minutos.
           </p>
 
-          {/* Single CTA — main conversion button */}
+          {/* Primary CTA */}
           <div className="hero-cta-wrap">
             <a className="btn-consultar" href={waUrl} target="_blank" rel="noopener noreferrer">
               💬&nbsp; Consultar
@@ -84,19 +85,20 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* RIGHT: Brand mark */}
+        {/* RIGHT: Brand logo */}
         <div className="hero-right">
-          <div className="hero-brand-mark">
-            <div className="brand-mark-glow" />
-            <div className="brand-mark-name">
-              <span className="brand-mark-macro">MACRO</span>
-              <span className="brand-mark-forge">FORGE</span>
-            </div>
-            <div className="brand-mark-divider" />
-            <div className="brand-mark-meta">
-              <span className="brand-mark-location">Costa Rica · 2026</span>
-              <span className="brand-mark-tagline">Suplementos Originales</span>
-            </div>
+          <div className="hero-logo-wrap">
+            {/* Ambient glow — behind the logo */}
+            <div className="hero-logo-glow" aria-hidden="true" />
+            <img
+              src={logo}
+              alt="MacroForge — Suplementos Originales Costa Rica"
+              className="hero-logo-img"
+              loading="eager"
+              decoding="async"
+              width="1536"
+              height="1024"
+            />
           </div>
         </div>
 
