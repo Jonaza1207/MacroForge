@@ -3,6 +3,7 @@ import { PRODUCTS } from '../data/products';
 import { HEALTH } from '../data/health';
 import { resolveProductImage } from '../data/images';
 import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
+import { trackCta } from '../hooks/useClickTracking';
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#E3001E', vita: '#00C896', dote: '#D4A843' };
@@ -36,7 +37,8 @@ export default function ProductModal({ productId, onClose }) {
   const cardType = CATEGORY_TYPES[p.c] || 'SUPPLEMENT';
   const imgUrl = resolveProductImage(p.u);
 
-  const waMsg = `Hola MacroForge! 💪 Me interesa: ${p.n} (${p.b}) — ${p.p[0] || ''}. ¿Tienen disponibilidad?`;
+  const slug  = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
+  const waMsg = `Hola, quiero consultar sobre ${p.n} 💪`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
   const flavors = (p.f || [])
@@ -87,8 +89,19 @@ export default function ProductModal({ productId, onClose }) {
           <div className="modal-name">{p.n}</div>
           <div className="modal-cat">{p.c}</div>
 
-          <a className="modal-wa" href={waUrl} target="_blank" rel="noopener noreferrer">
-            💬 Pedir por WhatsApp
+          <div className="modal-demand" aria-label="Alta demanda">
+            <span className="modal-demand-dot" aria-hidden="true" />
+            Alta demanda · Consultá disponibilidad
+          </div>
+
+          <a
+            className="modal-wa"
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackCta(slug)}
+          >
+            💬 Consultar este producto
           </a>
 
           {h.d && (

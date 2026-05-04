@@ -34,8 +34,9 @@ export default function Hero() {
           </h1>
 
           <p className="hero-sub">
-            Suplementos 100% originales en Costa Rica.
-            Pedí por WhatsApp — respuesta en minutos.
+            Suplementos originales para mejorar tu rendimiento,
+            ganar masa y alcanzar tu mejor físico.
+            Disponibles en Costa Rica — pedí por WhatsApp.
           </p>
 
           {/* Primary CTA */}
@@ -90,15 +91,18 @@ export default function Hero() {
           <div className="hero-logo-wrap">
             {/* Ambient glow — behind the logo */}
             <div className="hero-logo-glow" aria-hidden="true" />
-            <img
-              src={logo}
-              alt="MacroForge — Suplementos Originales Costa Rica"
-              className="hero-logo-img"
-              loading="eager"
-              decoding="async"
-              width="1536"
-              height="1024"
-            />
+            {/* Stage clips the metallic shine sweep */}
+            <div className="hero-logo-stage">
+              <img
+                src={logo}
+                alt="MacroForge — Suplementos Originales Costa Rica"
+                className="hero-logo-img"
+                loading="eager"
+                decoding="async"
+                width="1536"
+                height="1024"
+              />
+            </div>
           </div>
         </div>
 

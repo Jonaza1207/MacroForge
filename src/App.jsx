@@ -1,16 +1,19 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { PRODUCTS } from './data/products';
 import { SECTIONS } from './data/catalog';
 import { useTheme } from './hooks/useTheme';
 
-import Hero         from './components/Hero';
-import Controls     from './components/Controls';
-import CatalogHome  from './components/CatalogHome';
-import SectionPage  from './components/SectionPage';
-import CategoryPage from './components/CategoryPage';
-import ProductCard  from './components/ProductCard';
-import ProductModal from './components/ProductModal';
-import WhatsAppFloat from './components/WhatsAppFloat';
+import Hero           from './components/Hero';
+import Controls       from './components/Controls';
+import CatalogHome    from './components/CatalogHome';
+import SectionPage    from './components/SectionPage';
+import CategoryPage   from './components/CategoryPage';
+import ProductCard    from './components/ProductCard';
+import ProductModal   from './components/ProductModal';
+import WhatsAppFloat  from './components/WhatsAppFloat';
+import AccountPreview from './components/AccountPreview';
+import WhySection     from './components/WhySection';
+import { getTopClicked, devLogAnalytics, clearAnalytics } from './hooks/useClickTracking';
 
 function buildSearchStr(p) {
   return [p.n, p.b, p.c, ...(p.f || [])].join(' ').toLowerCase();
@@ -29,6 +32,19 @@ const ALL_GROUPED = (() => {
 
 export default function App() {
   const { theme, toggle } = useTheme();
+
+  // Dev-only: expose analytics helpers in browser console
+  // Usage: __mfAnalytics.log() or __mfAnalytics.top()
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      window.__mfAnalytics = {
+        log:   devLogAnalytics,
+        top:   () => console.table(getTopClicked(20)),
+        clear: clearAnalytics,
+      };
+      devLogAnalytics(); // auto-log on load if data exists
+    }
+  }, []);
 
   // View state: 'home' | 'section' | 'category'
   const [view,           setView]           = useState('home');
@@ -114,7 +130,7 @@ export default function App() {
               <div className="trust-bar-text"><span className="trust-bar-label">Atención por WhatsApp</span><span className="trust-bar-sub">Respuesta en minutos</span></div>
             </div>
             <div className="trust-bar-item"><span className="trust-bar-icon">⭐</span>
-              <div className="trust-bar-text"><span className="trust-bar-label">+500 Clientes Satisfechos</span><span className="trust-bar-sub">+3 años en el mercado</span></div>
+              <div className="trust-bar-text"><span className="trust-bar-label">+100 Clientes Satisfechos</span><span className="trust-bar-sub">En Costa Rica</span></div>
             </div>
           </div>
 
@@ -205,6 +221,9 @@ export default function App() {
         )}
 
       </main>
+
+      {showHero && <WhySection />}
+      {showHero && <AccountPreview />}
 
       {showHero && (
         <footer className="footer">
