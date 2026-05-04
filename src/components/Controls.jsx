@@ -1,9 +1,11 @@
-export default function Controls({ activeFilter, searchQuery, visibleCount, onFilter, onSearch }) {
+import ThemeToggle from './ThemeToggle';
+
+export default function Controls({ activeFilter, searchQuery, visibleCount, onFilter, onSearch, theme, onThemeToggle }) {
   const filters = [
-    { id: 'all',  label: 'Todos' },
-    { id: 'gym',  label: '💪 Gym' },
+    { id: 'all',  label: 'Todos'       },
+    { id: 'gym',  label: '💪 Gym'      },
     { id: 'vita', label: '🌿 Vitaminas' },
-    { id: 'dote', label: '🌸 doTERRA' },
+    { id: 'dote', label: '🌸 doTERRA'  },
   ];
 
   return (
@@ -14,7 +16,7 @@ export default function Controls({ activeFilter, searchQuery, visibleCount, onFi
         <span className="search-icon">🔍</span>
         <input
           type="text"
-          placeholder="Buscar producto, marca, beneficio..."
+          placeholder="Buscar producto, marca..."
           value={searchQuery}
           onChange={e => onSearch(e.target.value)}
         />
@@ -31,6 +33,8 @@ export default function Controls({ activeFilter, searchQuery, visibleCount, onFi
       ))}
 
       <span className="count">{visibleCount} resultado{visibleCount !== 1 ? 's' : ''}</span>
+
+      <ThemeToggle theme={theme} onToggle={onThemeToggle} />
     </div>
   );
 }

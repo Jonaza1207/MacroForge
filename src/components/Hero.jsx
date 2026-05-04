@@ -9,7 +9,7 @@ export default function Hero() {
   return (
     <section className="hero">
 
-      {/* Top bar */}
+      {/* ── Top bar ── */}
       <div className="hero-topbar">
         <div className="hero-logo">MACRO<span>FORGE</span></div>
         <div className="hero-topbar-right">
@@ -20,7 +20,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Main content */}
+      {/* ── Main content ── */}
       <div className="hero-inner">
         <div className="hero-tag">Catálogo Oficial · 2026</div>
 
@@ -34,6 +34,7 @@ export default function Hero() {
           vitaminas y más. Pedí por WhatsApp, respuesta en minutos.
         </p>
 
+        {/* ── CTAs ── */}
         <div className="hero-ctas">
           <a className="btn-primary" href="#sec-gym">Ver Catálogo →</a>
           <a className="btn-ghost" href={waUrl} target="_blank" rel="noopener noreferrer">
@@ -41,6 +42,7 @@ export default function Hero() {
           </a>
         </div>
 
+        {/* ── Stats ── */}
         <div className="hero-stats">
           <div>
             <div className="stat-num">{totalProducts}</div>
@@ -60,11 +62,23 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="hero-trust">
-          <span className="hero-trust-item">Marcas 100% Originales</span>
-          <span className="hero-trust-item">Envío en Costa Rica</span>
-          <span className="hero-trust-item">+3 Años de Confianza</span>
-          <span className="hero-trust-item">Respuesta Inmediata</span>
+        {/* ── Section quick-nav ── */}
+        <div className="hero-sections">
+          <a className="hero-section-link hero-section-gym" href="#sec-gym">
+            <span className="hero-section-icon">💪</span>
+            <span className="hero-section-label">Gym</span>
+            <span className="hero-section-sub">Performance</span>
+          </a>
+          <a className="hero-section-link hero-section-vita" href="#sec-vita">
+            <span className="hero-section-icon">🌿</span>
+            <span className="hero-section-label">Vitaminas</span>
+            <span className="hero-section-sub">Salud</span>
+          </a>
+          <a className="hero-section-link hero-section-dote" href="#sec-dote">
+            <span className="hero-section-icon">🌸</span>
+            <span className="hero-section-label">doTERRA</span>
+            <span className="hero-section-sub">Bienestar</span>
+          </a>
         </div>
       </div>
 

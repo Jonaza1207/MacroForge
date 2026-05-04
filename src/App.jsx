@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { PRODUCTS } from './data/products';
 import { SECTIONS } from './data/catalog';
+import { useTheme } from './hooks/useTheme';
 import Hero from './components/Hero';
 import Controls from './components/Controls';
 import CatalogSection from './components/CatalogSection';
@@ -12,14 +13,16 @@ function buildSearchStr(p) {
 }
 
 export default function App() {
+  const { theme, toggle } = useTheme();
+
   const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery]   = useState('');
   const [openProductId, setOpenProductId] = useState(null);
 
-  const handleFilter = useCallback(f => setActiveFilter(f), []);
-  const handleSearch = useCallback(q => setSearchQuery(q), []);
-  const handleOpen   = useCallback(id => setOpenProductId(id), []);
-  const handleClose  = useCallback(() => setOpenProductId(null), []);
+  const handleFilter = useCallback(f  => setActiveFilter(f),    []);
+  const handleSearch = useCallback(q  => setSearchQuery(q),     []);
+  const handleOpen   = useCallback(id => setOpenProductId(id),  []);
+  const handleClose  = useCallback(()  => setOpenProductId(null), []);
 
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -33,7 +36,7 @@ export default function App() {
   const grouped = useMemo(() => {
     const result = {};
     for (const [id, p] of filtered) {
-      if (!result[p.s]) result[p.s] = {};
+      if (!result[p.s])       result[p.s] = {};
       if (!result[p.s][p.c]) result[p.s][p.c] = [];
       result[p.s][p.c].push([id, p]);
     }
@@ -87,6 +90,8 @@ export default function App() {
         visibleCount={filtered.length}
         onFilter={handleFilter}
         onSearch={handleSearch}
+        theme={theme}
+        onThemeToggle={toggle}
       />
 
       {Object.entries(SECTIONS).map(([sectionId, sectionData]) => {
