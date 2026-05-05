@@ -1,4 +1,4 @@
-import logo from '../assets/Branding/MacroForge-logo.webp';
+import logo from '../assets/Branding/macroforge-logo-icon.png';
 import { PRODUCTS } from '../data/products';
 import { WA_NUMBER } from '../data/catalog';
 
@@ -98,12 +98,10 @@ export default function Hero() {
             <div className="hero-logo-stage">
               <img
                 src={logo}
-                alt="MacroForge — Suplementos Originales Costa Rica"
+                alt="MacroForge"
                 className="hero-logo-img"
                 loading="eager"
                 decoding="async"
-                width="1536"
-                height="1024"
               />
             </div>
           </div>

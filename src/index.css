@@ -13,6 +13,7 @@
   --accent-deep:   #BF0019;
   --accent-dim:    rgba(227, 0, 30, 0.10);
   --accent-glow:   rgba(227, 0, 30, 0.22);
+  --glow-hero:     rgba(227, 0, 30, 0.28);
   --accent-border: rgba(227, 0, 30, 0.34);
 
   /* ── Section palette ─────────────────────────────────────── */
@@ -184,24 +185,27 @@ input  { font-family: inherit; }
   overflow: hidden;
   background: var(--bg);
 }
-/* Dot grid — denser on logo side, quieter on text side */
+/* Dot grid — atmosphere, not pattern. Denser right (logo), quieter left (text). */
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(227,0,30,0.13) 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(227,0,30,0.11) 1.3px, transparent 1.3px);
+  background-size: 26px 26px;
   pointer-events: none; z-index: 0;
-  mask-image: linear-gradient(to right, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.60) 30%, black 55%, black 100%);
-  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.60) 30%, black 55%, black 100%);
+  mask-image: linear-gradient(to right, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.55) 30%, black 55%, black 100%);
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.55) 30%, black 55%, black 100%);
 }
-/* Red corner glows + logo-aligned center-right bloom */
+/* Hero atmospheric layers — unified red energy field */
 .hero::after {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 65% 50% at 95% -5%, rgba(227,0,30,0.16), transparent 55%),
-    radial-gradient(ellipse 45% 38% at 0% 108%, rgba(227,0,30,0.08), transparent 58%),
-    radial-gradient(ellipse 50% 72% at 84% 55%, rgba(227,0,30,0.10), transparent 62%);
+    /* top-right: anchors logo energy to the hero ceiling */
+    radial-gradient(ellipse 60% 46% at 96% -4%, rgba(227,0,30,0.14), transparent 56%),
+    /* right-center: depth behind logo column, subtle fill */
+    radial-gradient(ellipse 40% 64% at 86% 54%, rgba(227,0,30,0.08), transparent 65%),
+    /* left-center: barely-there warmth — ties headline zone into the same energy field */
+    radial-gradient(ellipse 38% 52% at 6% 50%,  rgba(227,0,30,0.04), transparent 70%);
   pointer-events: none; z-index: 0;
 }
 .hero > * { position: relative; z-index: 1; }
@@ -325,18 +329,18 @@ input  { font-family: inherit; }
   font-weight: 800;
   letter-spacing: 0.04em;
   text-decoration: none;
-  box-shadow: 0 6px 28px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.18s;
+  box-shadow: 0 4px 22px var(--glow-hero), 0 2px 8px rgba(0,0,0,0.30);
+  transition: transform 0.18s ease-out, box-shadow 0.22s ease-out, background 0.15s ease-out;
   will-change: transform;
 }
 .btn-consultar:hover {
-  transform: scale(1.03) translateY(-1px);
-  box-shadow: 0 8px 32px var(--accent-glow), 0 3px 10px rgba(0,0,0,0.28);
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: 0 8px 36px rgba(227,0,30,0.38), 0 3px 12px rgba(0,0,0,0.28);
   background: var(--accent-hover);
 }
 .btn-consultar:active {
   transform: scale(0.99) translateY(0);
-  box-shadow: 0 4px 16px var(--accent-glow);
+  box-shadow: 0 3px 14px var(--accent-glow);
 }
 
 /* ── Legacy CTA buttons (kept for other use) ─────────────── */
@@ -451,28 +455,30 @@ input  { font-family: inherit; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   HERO LOGO — INTEGRATED SCENE SYSTEM
+   HERO LOGO — CINEMATIC ATMOSPHERE SYSTEM
+   Built for a transparent PNG icon logo.
+   No masks, no vignette hacks, no rectangle hiding.
+
    Z-index stack (within .hero-logo-wrap):
-     0  ::before  — particle ring (dense near edges, clear center)
-     1  .hero-logo-glow  — large deep red energy cloud
-     2  .hero-logo-stage — the actual logo + its sub-layers
+     0  ::before       — organic particle emission ring
+     1  .hero-logo-glow — layered red energy cloud (shows through PNG transparency)
+     2  .hero-logo-stage — clip container for shine only (no background, no mask)
         Inside stage:
-          1  img      — the logo
-          3  ::before — metallic shine sweep
-          4  ::after  — edge vignette (blends JPEG rect into bg)
+          1  img        — the transparent icon, drop-shadow follows silhouette
+          3  ::before   — metallic shine sweep (warm-white, 11s)
    ══════════════════════════════════════════════════════════ */
 
 @keyframes logoIn {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0);    }
 }
 @keyframes logoFloat {
   0%, 100% { transform: translateY(0);  }
-  50%       { transform: translateY(-6px); }
+  50%       { transform: translateY(-5px); }
 }
 @keyframes glowPulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.60; }
+  0%, 100% { opacity: 1;    }
+  50%       { opacity: 0.80; }
 }
 @keyframes logoShine {
   0%, 16%  { left: -115%; opacity: 0; }
@@ -481,8 +487,8 @@ input  { font-family: inherit; }
   100%      { left: 168%; opacity: 0; }
 }
 @keyframes sparkPulse {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50%       { opacity: 0.92; transform: scale(1.55); }
+  0%, 100% { opacity: 0.30; transform: scale(1);    }
+  50%       { opacity: 0.85; transform: scale(1.30); }
 }
 
 /* Wrapper — entry + float. No overflow:hidden so glow/particles bleed outward */
@@ -491,64 +497,65 @@ input  { font-family: inherit; }
   display: inline-block;
   animation:
     logoIn    0.5s ease-out 0.1s both,
-    logoFloat 5s   ease-in-out 0.62s infinite;
+    logoFloat 7s   ease-in-out 0.62s infinite;
 }
 
-/* ── Layer 0: Particle ring surrounding the logo ──────────
- * Dense red dots positioned around the logo, invisible at
- * the center (clear view of logo), fading inward and outward.
- * Uses mask-image to create the ring shape.
- * Connects local logo atmosphere with global page particles.
+/* ── Layer 0: Particle emission ring ─────────────────────
+ * Red dots bloom outward from the logo zone.
+ * Inner zone clear so badge silhouette reads cleanly.
+ * Outer fade blends into the global hero particle field.
  */
 .hero-logo-wrap::before {
   content: '';
   position: absolute;
-  inset: -60% -50%;
-  background-image: radial-gradient(circle, rgba(227,0,30,0.18) 1.5px, transparent 1.5px);
+  inset: -58% -48%;
+  background-image: radial-gradient(circle, rgba(227,0,30,0.14) 1.5px, transparent 1.5px);
   background-size: 16px 16px;
   pointer-events: none;
   z-index: 0;
-  /* Organic emission: clear at logo center, particles bloom outward, soft outer fade */
   mask-image: radial-gradient(
-    ellipse 84% 82% at 50% 50%,
-    transparent 28%,
-    rgba(0,0,0,0.28) 44%,
-    rgba(0,0,0,0.82) 64%,
-    black 76%,
-    transparent 96%
+    ellipse 82% 80% at 50% 50%,
+    transparent 12%,
+    rgba(0,0,0,0.12) 28%,
+    rgba(0,0,0,0.50) 46%,
+    rgba(0,0,0,0.88) 60%,
+    rgba(0,0,0,0.42) 74%,
+    transparent 92%
   );
   -webkit-mask-image: radial-gradient(
-    ellipse 84% 82% at 50% 50%,
-    transparent 28%,
-    rgba(0,0,0,0.28) 44%,
-    rgba(0,0,0,0.82) 64%,
-    black 76%,
-    transparent 96%
+    ellipse 82% 80% at 50% 50%,
+    transparent 12%,
+    rgba(0,0,0,0.12) 28%,
+    rgba(0,0,0,0.50) 46%,
+    rgba(0,0,0,0.88) 60%,
+    rgba(0,0,0,0.42) 74%,
+    transparent 92%
   );
 }
 
-/* ── Layer 1: Deep ambient energy cloud ───────────────────
- * Three-gradient system:
- *  - Core glow: concentrated energy where the logo sits
- *  - Wide halo: broad atmospheric light connecting to hero
- *  - Ground reflection: subtle under-logo warmth
- * All breathe on the same glowPulse animation.
+/* ── Layer 1: Layered energy cloud ────────────────────────
+ * Transparent PNG lets this glow show through badge edges
+ * and dark areas — logo looks lit from inside the scene.
+ *  Layer A: core — concentrated behind badge center/fire
+ *  Layer B: wide halo — atmospheric red field, hero bridge
+ *  Layer C: ground — grounding ellipse under the badge
  */
 .hero-logo-glow {
   position: absolute;
-  inset: -72% -62%;
+  inset: -68% -58%;
   background:
-    radial-gradient(ellipse 52% 44% at 50% 54%, rgba(227,0,30,0.24), transparent 48%),
-    radial-gradient(ellipse 80% 72% at 50% 52%, rgba(227,0,30,0.11), transparent 65%),
-    radial-gradient(ellipse 44% 22% at 50% 96%, rgba(227,0,30,0.14), transparent 52%);
+    radial-gradient(ellipse 54% 50% at 50% 42%, rgba(227,0,30,0.28), transparent 60%),
+    radial-gradient(ellipse 82% 76% at 50% 52%, rgba(227,0,30,0.11), transparent 68%),
+    radial-gradient(ellipse 48% 20% at 50% 95%, rgba(227,0,30,0.16), transparent 62%);
   pointer-events: none;
   z-index: 1;
-  animation: glowPulse 6s ease-in-out 1s infinite;
+  animation: glowPulse 8s ease-in-out 1s infinite;
 }
 
 /* ── Layer 2: Logo stage ──────────────────────────────────
- * overflow:hidden clips the metallic shine sweep.
- * Elevated z-index places it above glow and particle ring.
+ * Minimal clip container for the shine sweep.
+ * No mask. No vignette. No background. No border-radius.
+ * Transparent PNG handles its own edges.
  */
 .hero-logo-stage {
   position: relative;
@@ -575,51 +582,35 @@ input  { font-family: inherit; }
   transform: skewX(-14deg);
   pointer-events: none;
   z-index: 3;
-  animation: logoShine 11s ease-in-out 3.5s infinite;
-}
-
-/* ── Layer 2→4: Edge vignette (inside stage, topmost) ─────
- * Gradual dissolve — logo emerges from environment, not a frame.
- */
-.hero-logo-stage::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 68% 64% at 50% 48%,
-    transparent 44%,
-    rgba(8, 8, 8, 0.08) 60%,
-    rgba(8, 8, 8, 0.50) 78%,
-    rgba(8, 8, 8, 0.97) 94%
-  );
+  animation: logoShine 13s ease-in-out 4s infinite;
 }
 
 /* ── Logo image ───────────────────────────────────────────
- * Red shadow ties logo into the energy field.
+ * Transparent PNG: drop-shadow follows badge silhouette.
+ * Red glow shadow ties into the energy field.
+ * No mask-image — not needed with a transparent asset.
  */
 .hero-logo-img {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 500px;
+  max-width: 540px;
   height: auto;
   object-fit: contain;
   display: block;
   filter:
-    drop-shadow(0 10px 32px rgba(0, 0, 0, 0.58))
-    drop-shadow(0 2px  6px  rgba(0, 0, 0, 0.30))
-    drop-shadow(0 0   56px rgba(227, 0, 30, 0.22));
+    drop-shadow(0 6px 28px rgba(0, 0, 0, 0.48))
+    drop-shadow(0 2px  5px  rgba(0, 0, 0, 0.25))
+    drop-shadow(0 0   64px rgba(227, 0, 30, 0.24));
   transition: transform 0.3s ease, filter 0.3s ease;
   will-change: transform;
 }
 .hero-logo-wrap:hover .hero-logo-img {
   transform: scale(1.03);
   filter:
-    drop-shadow(0 14px 40px rgba(0, 0, 0, 0.62))
-    drop-shadow(0 3px  8px  rgba(0, 0, 0, 0.32))
-    drop-shadow(0 0   52px rgba(227, 0, 30, 0.30));
+    drop-shadow(0 10px 36px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 3px   7px  rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0    60px rgba(227, 0, 30, 0.32));
 }
 
 /* ── Micro energy sparks ──────────────────────────────────
@@ -635,60 +626,52 @@ input  { font-family: inherit; }
 .hero-logo-spark--a {
   width: 8px; height: 8px;
   top: 17%; left: 52%;
-  background: radial-gradient(circle, rgba(227,0,30,1) 0%, rgba(255,70,20,0.55) 45%, transparent 72%);
+  background: radial-gradient(circle, rgba(227,0,30,1) 0%, rgba(227,0,30,0.45) 45%, transparent 72%);
   animation: sparkPulse 3.6s ease-in-out 0.5s infinite;
 }
 .hero-logo-spark--b {
   width: 5px; height: 5px;
   top: 27%; left: 66%;
-  background: radial-gradient(circle, rgba(255,55,15,0.9) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(227,0,30,0.90) 0%, transparent 70%);
   animation: sparkPulse 5.1s ease-in-out 2.2s infinite;
 }
 
 /* ── Light mode overrides ─────────────────────────────────
- * Particles much softer — no "burning" on warm parchment.
- * Vignette fades to light bg colour instead of near-black.
+ * Particles softer on warm parchment.
+ * Glow reduced — transparent PNG still shows on light bg.
+ * No vignette override needed — vignette was removed.
  */
 [data-theme="light"] .hero-logo-wrap::before {
-  background-image: radial-gradient(circle, rgba(180,0,20,0.10) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(180,0,20,0.08) 1.5px, transparent 1.5px);
 }
 [data-theme="light"] .hero-logo-glow {
   background:
-    radial-gradient(ellipse 52% 44% at 50% 54%, rgba(227,0,30,0.07), transparent 48%),
-    radial-gradient(ellipse 80% 72% at 50% 52%, rgba(227,0,30,0.04), transparent 65%),
-    radial-gradient(ellipse 44% 22% at 50% 96%, rgba(227,0,30,0.05), transparent 52%);
+    radial-gradient(ellipse 54% 50% at 50% 42%, rgba(227,0,30,0.06), transparent 50%),
+    radial-gradient(ellipse 82% 76% at 50% 52%, rgba(227,0,30,0.03), transparent 66%),
+    radial-gradient(ellipse 48% 20% at 50% 95%, rgba(227,0,30,0.05), transparent 54%);
 }
-[data-theme="light"] .hero-logo-stage::after {
-  background: radial-gradient(
-    ellipse 68% 64% at 50% 48%,
-    transparent 44%,
-    rgba(242, 240, 235, 0.08) 60%,
-    rgba(242, 240, 235, 0.52) 78%,
-    rgba(242, 240, 235, 0.96) 94%
-  );
-}
-[data-theme="light"] .hero-logo-spark { opacity: 0.22; }
+[data-theme="light"] .hero-logo-spark { opacity: 0.18; }
 [data-theme="light"] .hero-logo-stage::before {
   background: linear-gradient(
     112deg,
     transparent 38%,
-    rgba(255, 255, 255, 0.10) 46%,
-    rgba(255, 255, 255, 0.22) 51%,
-    rgba(255, 255, 255, 0.10) 57%,
+    rgba(255, 255, 255, 0.08) 46%,
+    rgba(255, 255, 255, 0.18) 51%,
+    rgba(255, 255, 255, 0.08) 57%,
     transparent 64%
   );
 }
 [data-theme="light"] .hero-logo-img {
   filter:
-    drop-shadow(0 8px 22px rgba(0, 0, 0, 0.14))
-    drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.09))
-    drop-shadow(0 0   28px rgba(227, 0, 30, 0.07));
+    drop-shadow(0 8px 24px rgba(0, 0, 0, 0.18))
+    drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.10))
+    drop-shadow(0 0   28px rgba(227, 0, 30, 0.08));
 }
 [data-theme="light"] .hero-logo-wrap:hover .hero-logo-img {
   filter:
-    drop-shadow(0 12px 30px rgba(0, 0, 0, 0.17))
-    drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.11))
-    drop-shadow(0 0   24px rgba(227, 0, 30, 0.10));
+    drop-shadow(0 12px 30px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 2px 6px  rgba(0, 0, 0, 0.12))
+    drop-shadow(0 0   24px rgba(227, 0, 30, 0.11));
 }
 
 /* ── View transition ─────────────────────────────────────── */
@@ -1868,25 +1851,15 @@ input  { font-family: inherit; }
   /* Reduce glow — static, no pulse */
   .hero-logo-glow {
     animation: none;
-    inset: -30% -25%;
+    inset: -28% -22%;
     background:
-      radial-gradient(ellipse 60% 52% at 50% 54%, rgba(227,0,30,0.14), transparent 50%),
-      radial-gradient(ellipse 50% 26% at 50% 96%, rgba(227,0,30,0.09), transparent 52%);
+      radial-gradient(ellipse 62% 56% at 50% 42%, rgba(227,0,30,0.16), transparent 52%),
+      radial-gradient(ellipse 52% 24% at 50% 95%, rgba(227,0,30,0.10), transparent 54%);
   }
   /* Disable metallic shine sweep on mobile */
   .hero-logo-stage::before { display: none; }
-  /* Vignette on mobile — matches desktop proportions, lighter overall */
-  .hero-logo-stage::after {
-    background: radial-gradient(
-      ellipse 68% 64% at 50% 48%,
-      transparent 44%,
-      rgba(8, 8, 8, 0.07) 60%,
-      rgba(8, 8, 8, 0.44) 78%,
-      rgba(8, 8, 8, 0.96) 94%
-    );
-  }
   .hero-logo-img {
-    max-width: 280px;
+    max-width: 300px;
     transform: none;
   }
   /* No hover scale on mobile (no pointer) */
@@ -1899,7 +1872,7 @@ input  { font-family: inherit; }
   }
 }
 @media (max-width: 380px) {
-  .hero-logo-img { max-width: 240px; }
+  .hero-logo-img { max-width: 260px; }
 }
 
 @media (min-width: 640px) {
@@ -1929,7 +1902,7 @@ input  { font-family: inherit; }
   .section-page,
   .category-page,
   .search-page    { padding-left: 64px; padding-right: 64px; }
-  .hero-right     { width: 420px; }
+  .hero-right     { width: 460px; }
 }
 @media (max-width: 420px) {
   .hero h1  { font-size: 42px; }
