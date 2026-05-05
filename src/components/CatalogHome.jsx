@@ -53,7 +53,7 @@ export default function CatalogHome({ sections, sectionCounts, onSelectSection }
               <div className="section-card-footer">
                 <span className="section-card-count">{count} productos</span>
                 <span className="section-card-cta" style={{ color: section.color }}>
-                  Explorar →
+                  Ver productos →
                 </span>
               </div>
               <div

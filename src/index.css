@@ -310,6 +310,27 @@ input  { font-family: inherit; }
 }
 
 /* ── Primary CTA: Consultar ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .btn-consultar { animation: none; }
+}
+
+@keyframes ctaPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      0 4px 22px var(--glow-hero),
+      0 2px 8px rgba(0,0,0,0.32);
+  }
+  50% {
+    transform: scale(1.012);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      0 6px 28px rgba(227,0,30,0.34),
+      0 3px 10px rgba(0,0,0,0.34);
+  }
+}
+
 .hero-cta-wrap { margin-bottom: 32px; }
 .btn-consultar {
   display: inline-flex;
@@ -327,10 +348,12 @@ input  { font-family: inherit; }
     inset 0 1px 0 rgba(255,255,255,0.15),
     0 4px 22px var(--glow-hero),
     0 2px 8px rgba(0,0,0,0.32);
+  animation: ctaPulse 7s ease-in-out infinite;
   transition: transform 0.15s ease-out, box-shadow 0.18s ease-out, background 0.14s ease-out;
   will-change: transform;
 }
 .btn-consultar:hover {
+  animation: none;
   transform: scale(1.02) translateY(-2px);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.18),
@@ -440,7 +463,7 @@ input  { font-family: inherit; }
     0 2px 8px rgba(0,0,0,0.42);
   text-align: center;
   opacity: 0.82;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
   transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, border-color 0.18s ease-out, opacity 0.18s ease-out;
 }
@@ -453,6 +476,11 @@ input  { font-family: inherit; }
     0 6px 18px rgba(0,0,0,0.55),
     0 0 0 1px rgba(227,0,30,0.08);
 }
+.hero-section-indicator:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  opacity: 0.96;
+}
 .hero-section-icon { font-size: 18px; }
 .hero-section-label {
   font-size: 9px;
@@ -462,11 +490,11 @@ input  { font-family: inherit; }
   color: var(--text-1);
 }
 .hero-section-sub {
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   color: var(--text-3);
+  line-height: 1.4;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -774,8 +802,8 @@ input  { font-family: inherit; }
 }
 
 /* ── Catalog home ────────────────────────────────────────── */
-.catalog-home { padding: 40px 24px 56px; }
-.catalog-home-intro { text-align: center; margin-bottom: 36px; }
+.catalog-home { padding: 28px 24px 32px; }
+.catalog-home-intro { text-align: center; margin-bottom: 28px; }
 .catalog-home-eyebrow {
   font-size: 10px; font-weight: 700; letter-spacing: 0.24em;
   text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
@@ -845,6 +873,11 @@ input  { font-family: inherit; }
 .section-card-cta {
   font-size: 12px; font-weight: 800;
   letter-spacing: 0.06em; text-transform: uppercase;
+  transition: transform 0.15s ease-out, color 0.15s ease-out;
+  display: inline-block;
+}
+.section-card:hover .section-card-cta {
+  transform: translateX(4px);
 }
 .section-card-accent {
   position: absolute; bottom: 0; left: 0; right: 0;
@@ -1109,7 +1142,7 @@ input  { font-family: inherit; }
 }
 
 /* ── Section ─────────────────────────────────────────────── */
-.section { padding: 56px 24px 8px; }
+.section { padding: 40px 24px 8px; }
 .section-header {
   display: flex;
   align-items: flex-start;
@@ -1586,7 +1619,7 @@ input  { font-family: inherit; }
 
 /* ── Why MacroForge trust section ───────────────────────── */
 .why-section {
-  padding: 52px 24px 56px;
+  padding: 36px 24px 44px;
   border-top: 1px solid var(--border-2);
 }
 .why-inner { max-width: 920px; margin: 0 auto; }
@@ -1639,12 +1672,12 @@ input  { font-family: inherit; }
 }
 
 /* Responsive padding */
-@media (min-width: 640px)  { .why-section { padding-left: 40px; padding-right: 40px; } }
-@media (min-width: 1024px) { .why-section { padding-left: 64px; padding-right: 64px; } }
+@media (min-width: 640px)  { .why-section { padding-left: 40px; padding-right: 40px; padding-top: 40px; } }
+@media (min-width: 1024px) { .why-section { padding-left: 64px; padding-right: 64px; padding-top: 44px; } }
 
 /* ── Account preview (coming soon) ──────────────────────── */
 .account-preview {
-  padding: 56px 24px 60px;
+  padding: 40px 24px 48px;
   border-top: 1px solid var(--border-2);
   background: var(--surface);
 }
@@ -1872,6 +1905,7 @@ input  { font-family: inherit; }
     justify-content: center;
     font-size: 14px;
     padding: 15px 24px;
+    animation: none;
   }
 }
 @media (max-width: 380px) {
@@ -1899,7 +1933,7 @@ input  { font-family: inherit; }
   .hero-inner     { padding: 0 64px 64px; gap: 56px; }
   .tip            { margin: 10px 64px; }
   .controls       { padding-left: 64px; padding-right: 64px; }
-  .section        { padding-left: 64px; padding-right: 64px; padding-top: 64px; }
+  .section        { padding-left: 64px; padding-right: 64px; padding-top: 48px; }
   .footer         { padding-left: 64px; padding-right: 64px; }
   .catalog-home,
   .section-page,

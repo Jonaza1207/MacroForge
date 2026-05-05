@@ -6,7 +6,7 @@ const totalProducts = Object.keys(PRODUCTS).length;
 const brands = new Set(Object.values(PRODUCTS).map(p => p.b)).size;
 const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola MacroForge! 💪 Quiero consultar el catálogo de suplementos.')}`;
 
-export default function Hero() {
+export default function Hero({ onNavigate }) {
   return (
     <section className="hero">
 
@@ -66,23 +66,23 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Category indicators — visual only, NOT interactive */}
+          {/* Category entry points — navigate to section */}
           <div className="hero-sections">
-            <div className="hero-section-indicator hero-section-gym">
+            <button className="hero-section-indicator hero-section-gym" onClick={() => onNavigate('gym')}>
               <span className="hero-section-icon">💪</span>
               <span className="hero-section-label">Gym</span>
-              <span className="hero-section-sub">Performance</span>
-            </div>
-            <div className="hero-section-indicator hero-section-vita">
+              <span className="hero-section-sub">Proteína, fuerza y rendimiento diario</span>
+            </button>
+            <button className="hero-section-indicator hero-section-vita" onClick={() => onNavigate('vita')}>
               <span className="hero-section-icon">🌿</span>
               <span className="hero-section-label">Vitaminas</span>
-              <span className="hero-section-sub">Salud</span>
-            </div>
-            <div className="hero-section-indicator hero-section-dote">
+              <span className="hero-section-sub">Energía, salud y bienestar esencial</span>
+            </button>
+            <button className="hero-section-indicator hero-section-dote" onClick={() => onNavigate('dote')}>
               <span className="hero-section-icon">🌸</span>
               <span className="hero-section-label">doTERRA</span>
-              <span className="hero-section-sub">Bienestar</span>
-            </div>
+              <span className="hero-section-sub">Aceites esenciales 100% originales</span>
+            </button>
           </div>
         </div>
 
