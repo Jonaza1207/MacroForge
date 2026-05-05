@@ -82,9 +82,7 @@
   background-size: 28px 28px;
 }
 [data-theme="light"] .hero::after {
-  background:
-    radial-gradient(ellipse 65% 45% at 85% -5%, rgba(227,0,30,0.07), transparent 55%),
-    radial-gradient(ellipse 40% 30% at 0% 100%, rgba(227,0,30,0.04), transparent 60%);
+  display: none;
 }
 [data-theme="light"] .card {
   box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
@@ -125,9 +123,7 @@
 }
 [data-theme="light"] .hero-section-link { background: rgba(255,255,255,0.7); }
 [data-theme="light"] .hero-section-indicator {
-  background:
-    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(227,0,30,0.02), transparent 68%),
-    linear-gradient(180deg, #FFFFFF 0%, #F6F4EF 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F4EF 100%);
   border: 1px solid rgba(0,0,0,0.07);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.85),
@@ -194,40 +190,17 @@ input  { font-family: inherit; }
   overflow: hidden;
   background: var(--bg);
 }
-/* Dot grid — same texture across the whole hero. Right is denser, left is present. */
+/* Dot grid — uniform texture across the entire hero */
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(227,0,30,0.11) 1.3px, transparent 1.3px);
+  background-image: radial-gradient(circle, rgba(227,0,30,0.10) 1.3px, transparent 1.3px);
   background-size: 26px 26px;
   pointer-events: none; z-index: 0;
-  mask-image: linear-gradient(to right,
-    rgba(0,0,0,0.58)  0%,
-    rgba(0,0,0,0.76) 25%,
-    rgba(0,0,0,0.92) 52%,
-    black            72%,
-    black           100%
-  );
-  -webkit-mask-image: linear-gradient(to right,
-    rgba(0,0,0,0.58)  0%,
-    rgba(0,0,0,0.76) 25%,
-    rgba(0,0,0,0.92) 52%,
-    black            72%,
-    black           100%
-  );
 }
-/* Hero atmospheric layers — one continuous red energy surface */
+/* Hero — no background atmosphere gradients. Pure black + dot texture only. */
 .hero::after {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    /* Wide base: shared warmth across the entire hero — the unified wall material */
-    radial-gradient(ellipse 150% 90% at 55% 50%, rgba(227,0,30,0.07), transparent 78%),
-    /* Right-center: logo energy source, bridges into the shared field */
-    radial-gradient(ellipse 50% 68% at 85% 52%, rgba(227,0,30,0.08), transparent 65%),
-    /* Top-right: corner depth anchor */
-    radial-gradient(ellipse 52% 42% at 98% -2%, rgba(227,0,30,0.12), transparent 55%);
-  pointer-events: none; z-index: 0;
+  display: none;
 }
 .hero > * { position: relative; z-index: 1; }
 
@@ -452,9 +425,7 @@ input  { font-family: inherit; }
   padding: 12px 8px;
   border-radius: var(--r);
   border: 1px solid rgba(255,255,255,0.055);
-  background:
-    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(227,0,30,0.04), transparent 68%),
-    linear-gradient(180deg, #121212 0%, #0b0b0b 100%);
+  background: linear-gradient(180deg, #121212 0%, #0b0b0b 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.04),
     0 2px 8px rgba(0,0,0,0.42);
@@ -567,15 +538,7 @@ input  { font-family: inherit; }
  *  Layer C: ground — grounding ellipse under the badge
  */
 .hero-logo-glow {
-  position: absolute;
-  inset: -68% -58%;
-  background:
-    radial-gradient(ellipse 54% 50% at 50% 42%, rgba(227,0,30,0.20), transparent 60%),
-    radial-gradient(ellipse 82% 76% at 50% 52%, rgba(227,0,30,0.09), transparent 68%),
-    radial-gradient(ellipse 44% 10% at 50% 95%, rgba(227,0,30,0.07), transparent 70%);
-  pointer-events: none;
-  z-index: 1;
-  animation: glowPulse 8s ease-in-out 1s infinite;
+  display: none;
 }
 
 /* ── Layer 2: Logo stage ──────────────────────────────────
@@ -625,18 +588,18 @@ input  { font-family: inherit; }
   object-fit: contain;
   display: block;
   filter:
-    drop-shadow(0 6px 28px rgba(0, 0, 0, 0.48))
-    drop-shadow(0 2px  5px  rgba(0, 0, 0, 0.25))
-    drop-shadow(0 0   64px rgba(227, 0, 30, 0.24));
+    drop-shadow(0 6px 24px rgba(0, 0, 0, 0.50))
+    drop-shadow(0 2px  5px  rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0   36px rgba(227, 0, 30, 0.16));
   transition: transform 0.3s ease, filter 0.3s ease;
   will-change: transform;
 }
 .hero-logo-wrap:hover .hero-logo-img {
   transform: scale(1.03);
   filter:
-    drop-shadow(0 10px 36px rgba(0, 0, 0, 0.55))
-    drop-shadow(0 3px   7px  rgba(0, 0, 0, 0.28))
-    drop-shadow(0 0    60px rgba(227, 0, 30, 0.32));
+    drop-shadow(0 10px 32px rgba(0, 0, 0, 0.58))
+    drop-shadow(0 3px   7px  rgba(0, 0, 0, 0.30))
+    drop-shadow(0 0    40px rgba(227, 0, 30, 0.22));
 }
 
 /* ── Micro energy sparks ──────────────────────────────────
@@ -1846,13 +1809,7 @@ input  { font-family: inherit; }
     mask-image: none;
     -webkit-mask-image: none;
   }
-  .hero::after {
-    background:
-      /* Mobile: wide centered base — unified surface for stacked layout */
-      radial-gradient(ellipse 130% 80% at 50% 45%, rgba(227,0,30,0.06), transparent 72%),
-      /* Top anchor — connects energy to header */
-      radial-gradient(ellipse 70% 48% at 55% -4%, rgba(227,0,30,0.09), transparent 54%);
-  }
+  .hero::after { display: none; }
 }
 
 /* ── Mobile hero: stack columns ────────────────────────── */
