@@ -42,7 +42,7 @@ export default function Hero() {
           {/* Primary CTA */}
           <div className="hero-cta-wrap">
             <a className="btn-consultar" href={waUrl} target="_blank" rel="noopener noreferrer">
-              💬&nbsp; Consultar
+              💬&nbsp; Consultar por WhatsApp
             </a>
           </div>
 
