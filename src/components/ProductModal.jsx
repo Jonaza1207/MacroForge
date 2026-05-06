@@ -38,7 +38,7 @@ export default function ProductModal({ productId, onClose }) {
   const imgUrl = resolveProductImage(p.u);
 
   const slug  = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
-  const waMsg = `Hola, quiero consultar sobre ${p.n} 💪`;
+  const waMsg = `Hola! 👋 Quiero consultar sobre ${p.n} 💪`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
   const flavors = (p.f || [])
@@ -85,15 +85,30 @@ export default function ProductModal({ productId, onClose }) {
 
         {/* Body */}
         <div className="modal-body">
+
+          {/* 1. Identity */}
           <div className="modal-brand">{p.b}</div>
           <div className="modal-name">{p.n}</div>
           <div className="modal-cat">{p.c}</div>
 
-          <div className="modal-demand" aria-label="Alta demanda">
-            <span className="modal-demand-dot" aria-hidden="true" />
-            Alta demanda · Consultá disponibilidad
+          {/* 2. Primary price — anchors value BEFORE CTA */}
+          <div className="modal-primary-price">
+            <span className="modal-primary-price-val">{prices[0].val}</span>
+            {prices.length > 1 && (
+              <span className="modal-primary-price-note">
+                +{prices.length - 1} {prices.length === 2 ? 'opción' : 'opciones'}
+              </span>
+            )}
           </div>
 
+          {/* 3. Trust signals — calm, factual, no pressure */}
+          <div className="modal-trust-row">
+            <span className="modal-trust-item">✓ Original garantizado</span>
+            <span className="modal-trust-item">🚀 Entrega en CR</span>
+            <span className="modal-trust-item">💬 Consulta gratis</span>
+          </div>
+
+          {/* 4. Primary CTA — full width, immediately after price anchor */}
           <a
             className="modal-wa"
             href={waUrl}
@@ -104,6 +119,7 @@ export default function ProductModal({ productId, onClose }) {
             💬 Consultar este producto
           </a>
 
+          {/* 5. Product information — secondary, for the committed reader */}
           {h.d && (
             <div className="modal-section">
               <h4>¿Qué es y para qué sirve?</h4>
@@ -120,7 +136,7 @@ export default function ProductModal({ productId, onClose }) {
 
           {flavors.length > 0 && (
             <div className="modal-section">
-              <h4>Sabores / Variantes</h4>
+              <h4>Variantes disponibles</h4>
               <div className="flavor-list">
                 {flavors.map((f, i) => <span key={i} className="flavor-tag">{f}</span>)}
               </div>
@@ -134,8 +150,9 @@ export default function ProductModal({ productId, onClose }) {
             </div>
           )}
 
+          {/* 6. Full price breakdown */}
           <div className="modal-section">
-            <h4>Precios disponibles</h4>
+            <h4>{prices.length > 1 ? 'Opciones de compra' : 'Precio'}</h4>
             <div className="modal-prices">
               {prices.map((pr, i) => (
                 <div key={i} className="modal-price-row">

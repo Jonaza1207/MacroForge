@@ -1445,7 +1445,7 @@ input  { font-family: inherit; }
   box-shadow: 0 32px 80px rgba(0,0,0,0.75);
 }
 .modal-img {
-  position: relative; width: 100%; padding-top: 56%; overflow: hidden;
+  position: relative; width: 100%; padding-top: 62%; overflow: hidden;
   background: #111111;
   background-image:
     radial-gradient(ellipse 90% 32% at 50% 100%, rgba(0,0,0,0.7), transparent 52%);
@@ -1475,31 +1475,66 @@ input  { font-family: inherit; }
   transition: background 0.15s, border-color 0.15s;
 }
 .modal-close:hover { background: var(--accent); border-color: var(--accent); }
-.modal-body { padding: 22px 24px 28px; }
+.modal-body { padding: 24px 26px 32px; }
 .modal-brand {
   font-size: 9px; font-weight: 800; letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--text-3); margin-bottom: 4px;
 }
 .modal-name {
   font-size: 22px; font-weight: 900; letter-spacing: -0.02em;
-  line-height: 1.15; color: var(--text-1); margin-bottom: 4px;
+  line-height: 1.18; color: var(--text-1); margin-bottom: 5px;
 }
 .modal-cat {
-  font-size: 11px; font-weight: 600; color: var(--text-3); margin-bottom: 20px;
+  font-size: 11px; font-weight: 600; color: var(--text-3); margin-bottom: 16px;
 }
+
+/* Primary price — visible before CTA for psychological anchoring */
+.modal-primary-price {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 14px;
+}
+.modal-primary-price-val {
+  font-size: 30px; font-weight: 900;
+  letter-spacing: -0.03em; color: var(--text-1);
+  line-height: 1;
+}
+.modal-primary-price-note {
+  font-size: 11px; font-weight: 600; color: var(--text-3);
+  padding: 3px 10px; border-radius: var(--r-pill);
+  background: var(--surface-3); border: 1px solid var(--border-2);
+}
+
+/* Trust signals — calm facts, not badges */
+.modal-trust-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 20px;
+}
+.modal-trust-item {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-pill);
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+/* CTA — full width for maximum tap area and visual prominence */
 .modal-wa {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
   background: #25D366; color: #fff;
-  padding: 13px 22px; border-radius: var(--r-pill);
-  font-weight: 800; font-size: 14px; letter-spacing: 0.02em;
-  margin-bottom: 24px; box-shadow: 0 4px 18px rgba(37,211,102,0.3);
+  padding: 15px 24px; border-radius: var(--r-pill);
+  font-weight: 800; font-size: 15px; letter-spacing: 0.02em;
+  margin-bottom: 28px; box-shadow: 0 4px 18px rgba(37,211,102,0.3);
   transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 .modal-wa:hover {
   background: #1ebe5a;
-  box-shadow: 0 6px 24px rgba(37,211,102,0.5);
+  box-shadow: 0 6px 26px rgba(37,211,102,0.45);
   transform: translateY(-1px);
 }
+.modal-wa:active { transform: translateY(0); box-shadow: 0 3px 12px rgba(37,211,102,0.3); }
 .modal-section { margin-bottom: 20px; }
 .modal-section h4 {
   font-size: 9px; font-weight: 800; letter-spacing: 0.22em;
