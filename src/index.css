@@ -1279,13 +1279,13 @@ input  { font-family: inherit; }
   will-change: transform;
 }
 .card:hover {
-  transform: translateY(-5px) scale(1.01);
-  border-color: var(--accent-border);
+  transform: translateY(-3px);
+  border-color: rgba(227,0,30,0.24);
   box-shadow:
-    0 12px 40px var(--accent-glow),
-    0 4px 16px rgba(0,0,0,0.45);
+    0 8px 30px rgba(0,0,0,0.55),
+    0 2px 8px rgba(0,0,0,0.30);
 }
-.card:active { transform: translateY(-2px) scale(1.005); }
+.card:active { transform: translateY(-1px); }
 
 /* ── Card image — clean neutral stage ───────────────────── */
 .card-img {
@@ -1307,7 +1307,7 @@ input  { font-family: inherit; }
     drop-shadow(0 2px 4px rgba(0,0,0,0.35));
   transition: transform 0.28s ease;
 }
-.card:hover .card-img img { transform: scale(1.05) translateY(-4px); }
+.card:hover .card-img img { transform: scale(1.03) translateY(-2px); }
 
 /* ── Card fallback (no image / error) ───────────────────── */
 .card-fallback {
@@ -1354,7 +1354,7 @@ input  { font-family: inherit; }
 
 /* ── Card body ───────────────────────────────────────────── */
 .card-body {
-  padding: 11px 12px 12px;
+  padding: 13px 14px 13px;
   display: flex; flex-direction: column; flex: 1;
 }
 .card-brand {
@@ -1364,9 +1364,9 @@ input  { font-family: inherit; }
   margin-bottom: 4px;
 }
 .card-name {
-  font-size: 12px; font-weight: 700;
-  color: var(--text-1); line-height: 1.35;
-  flex: 1; letter-spacing: -0.01em; margin-bottom: 9px;
+  font-size: 13px; font-weight: 700;
+  color: var(--text-1); line-height: 1.42;
+  flex: 1; letter-spacing: -0.01em; margin-bottom: 10px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1387,11 +1387,11 @@ input  { font-family: inherit; }
 }
 .card-price-row {
   display: flex; align-items: baseline; gap: 6px;
-  margin-bottom: 9px;
+  margin-top: 4px; margin-bottom: 10px;
 }
 .card-price {
-  font-size: 19px; font-weight: 900;
-  color: var(--text-1); letter-spacing: -0.02em;
+  font-size: 21px; font-weight: 900;
+  color: var(--text-1); letter-spacing: -0.03em;
 }
 .card-multi {
   font-size: 8px; font-weight: 700;
@@ -1706,6 +1706,65 @@ input  { font-family: inherit; }
 /* Responsive padding */
 @media (min-width: 640px)  { .why-section { padding-left: 40px; padding-right: 40px; padding-top: 40px; } }
 @media (min-width: 1024px) { .why-section { padding-left: 64px; padding-right: 64px; padding-top: 44px; } }
+
+/* ── Brand teaser — AlfaVitamins coming soon ─────────────── */
+.brand-teaser {
+  padding: 0 24px 40px;
+  border-top: 1px solid var(--border-2);
+}
+.brand-teaser-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 44px 32px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.brand-teaser-inner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 55% 80% at 50% 0%, rgba(227,0,30,0.04), transparent 62%);
+  pointer-events: none;
+}
+.brand-teaser-eyebrow {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.65;
+  margin-bottom: 14px;
+}
+.brand-teaser-name {
+  font-size: clamp(28px, 5vw, 46px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--text-1);
+  opacity: 0.68;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+.brand-teaser-sub {
+  font-size: 14px; font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 20px;
+  max-width: 320px;
+  margin-left: auto; margin-right: auto;
+  line-height: 1.6;
+}
+.brand-teaser-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-3);
+  padding: 6px 16px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-pill);
+}
+@media (min-width: 640px)  { .brand-teaser { padding-left: 40px; padding-right: 40px; } }
+@media (min-width: 1024px) { .brand-teaser { padding-left: 64px; padding-right: 64px; } }
 
 /* ── Account preview (coming soon) ──────────────────────── */
 .account-preview {

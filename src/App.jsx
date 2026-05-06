@@ -13,6 +13,7 @@ import ProductModal   from './components/ProductModal';
 import WhatsAppFloat  from './components/WhatsAppFloat';
 import AccountPreview from './components/AccountPreview';
 import WhySection     from './components/WhySection';
+import BrandTeaser    from './components/BrandTeaser';
 import { getTopClicked, devLogAnalytics, clearAnalytics } from './hooks/useClickTracking';
 
 function buildSearchStr(p) {
@@ -224,6 +225,7 @@ export default function App() {
 
       {showHero && <WhySection />}
       {showHero && <AccountPreview />}
+      {showHero && <BrandTeaser />}
 
       {showHero && (
         <footer className="footer">
