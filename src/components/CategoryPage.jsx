@@ -49,11 +49,14 @@ const CAT_GUIDE = {
   'Difusores':                   'Difusores para aromaterapia y transformar tu ambiente.',
 };
 
+const CHOICE_THRESHOLD = 8; // products above this count trigger the "¿Cuál elegir?" helper
+
 export default function CategoryPage({ sectionData, categoryName, products, onOpenProduct }) {
   const { color } = sectionData;
-  const waMsg = `Hola MacroForge! 💪 Estoy buscando: ${categoryName}. ¿Qué tienen disponible?`;
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
-  const guide = CAT_GUIDE[categoryName];
+  const waMsg       = `Hola MacroForge! 💪 Estoy viendo ${categoryName} y no sé cuál elegir para mi objetivo. ¿Me pueden recomendar?`;
+  const waUrl       = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+  const guide       = CAT_GUIDE[categoryName];
+  const showHelper  = products.length >= CHOICE_THRESHOLD;
 
   return (
     <div className="category-page">
@@ -78,6 +81,22 @@ export default function CategoryPage({ sectionData, categoryName, products, onOp
           💬
         </a>
       </div>
+
+      {/* Choice-overload helper — appears when category has many products */}
+      {showHelper && (
+        <a
+          className="cat-choice-helper"
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ '--cat-color': color }}
+        >
+          <span className="cat-choice-helper-text">
+            ¿No sabés cuál elegir? <strong>Consultanos por WhatsApp →</strong>
+          </span>
+          <span className="cat-choice-helper-sub">Te recomendamos el ideal para tu objetivo</span>
+        </a>
+      )}
 
       {products.length === 0 ? (
         <div className="empty">

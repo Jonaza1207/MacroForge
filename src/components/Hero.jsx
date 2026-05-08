@@ -61,8 +61,8 @@ export default function Hero({ onNavigate }) {
               <div className="stat-lbl">Líneas</div>
             </div>
             <div>
-              <div className="stat-num">📲</div>
-              <div className="stat-lbl">WhatsApp</div>
+              <div className="stat-num stat-num--pct">100%</div>
+              <div className="stat-lbl">Originales</div>
             </div>
           </div>
 

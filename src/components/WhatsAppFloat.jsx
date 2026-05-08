@@ -1,6 +1,6 @@
 import { WA_NUMBER } from '../data/catalog';
 
-const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, quiero información sobre productos 💪')}`;
+const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola MacroForge! 💪 Quiero consultar sus suplementos. ¿Me pueden ayudar a encontrar el producto ideal para mi objetivo?')}`;
 
 export default function WhatsAppFloat() {
   return (
@@ -17,7 +17,7 @@ export default function WhatsAppFloat() {
           <path d="M12 0C5.373 0 0 5.373 0 12c0 2.112.549 4.1 1.51 5.827L.057 23.82a.5.5 0 0 0 .623.623l5.993-1.453A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.888 0-3.657-.519-5.17-1.42l-.37-.22-3.556.862.862-3.556-.22-.37A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
         </svg>
       </a>
-      <div className="wa-float-label">Consultar</div>
+      <div className="wa-float-label">¿Te ayudo?</div>
     </div>
   );
 }

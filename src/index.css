@@ -801,6 +801,56 @@ input  { font-family: inherit; }
   letter-spacing: -0.02em; color: var(--text-1); line-height: 1.1;
 }
 
+/* ── Featured products section ───────────────────────────── */
+.featured-section {
+  padding: 28px 24px 0;
+  margin-bottom: 8px;
+}
+.featured-header { margin-bottom: 18px; }
+.featured-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+}
+.featured-title {
+  font-size: clamp(18px, 3.5vw, 26px); font-weight: 900;
+  letter-spacing: -0.025em; color: var(--text-1); line-height: 1.15;
+}
+@media (min-width: 640px)  { .featured-section { padding-left: 40px; padding-right: 40px; } }
+@media (min-width: 1024px) { .featured-section { padding-left: 64px; padding-right: 64px; } }
+
+/* ── Category choice-overload helper ─────────────────────── */
+.cat-choice-helper {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 13px 18px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--cat-color, var(--accent)) 28%, transparent);
+  border-radius: var(--r);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cat-choice-helper:hover {
+  background: var(--surface-2);
+  border-color: color-mix(in srgb, var(--cat-color, var(--accent)) 52%, transparent);
+}
+.cat-choice-helper-text {
+  font-size: 13px; font-weight: 600; color: var(--text-1);
+}
+.cat-choice-helper-text strong {
+  color: color-mix(in srgb, var(--cat-color, var(--accent)) 90%, var(--text-1));
+  font-weight: 800;
+}
+.cat-choice-helper-sub {
+  font-size: 11px; font-weight: 500; color: var(--text-3);
+}
+
+/* ── Hero stat — percentage variant (100%) ───────────────── */
+.stat-num--pct {
+  font-size: 28px; /* tighter than the large number stats */
+}
+
 /* ── Catalog home ────────────────────────────────────────── */
 .catalog-home { padding: 28px 24px 32px; }
 .catalog-home-intro { text-align: center; margin-bottom: 28px; }

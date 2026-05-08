@@ -128,17 +128,17 @@ export default function App() {
           <Hero onNavigate={goSection} />
 
           <div className="trust-bar">
-            <div className="trust-bar-item"><span className="trust-bar-icon">🚀</span>
-              <div className="trust-bar-text"><span className="trust-bar-label">Envíos en Costa Rica</span><span className="trust-bar-sub">Entrega rápida</span></div>
-            </div>
             <div className="trust-bar-item"><span className="trust-bar-icon">✅</span>
-              <div className="trust-bar-text"><span className="trust-bar-label">Marcas 100% Originales</span><span className="trust-bar-sub">Garantía de autenticidad</span></div>
+              <div className="trust-bar-text"><span className="trust-bar-label">Productos 100% Originales</span><span className="trust-bar-sub">Garantía de autenticidad</span></div>
             </div>
-            <div className="trust-bar-item"><span className="trust-bar-icon">💬</span>
-              <div className="trust-bar-text"><span className="trust-bar-label">Atención por WhatsApp</span><span className="trust-bar-sub">Respuesta en minutos</span></div>
+            <div className="trust-bar-item"><span className="trust-bar-icon">🚀</span>
+              <div className="trust-bar-text"><span className="trust-bar-label">Envíos en Costa Rica</span><span className="trust-bar-sub">A todo el país</span></div>
             </div>
-            <div className="trust-bar-item"><span className="trust-bar-icon">⭐</span>
-              <div className="trust-bar-text"><span className="trust-bar-label">+100 Clientes Satisfechos</span><span className="trust-bar-sub">En Costa Rica</span></div>
+            <div className="trust-bar-item"><span className="trust-bar-icon">⚡</span>
+              <div className="trust-bar-text"><span className="trust-bar-label">Respuesta en minutos</span><span className="trust-bar-sub">Atención directa por WhatsApp</span></div>
+            </div>
+            <div className="trust-bar-item"><span className="trust-bar-icon">🎯</span>
+              <div className="trust-bar-text"><span className="trust-bar-label">Asesoría personalizada</span><span className="trust-bar-sub">Sin costo · Sin compromiso</span></div>
             </div>
           </div>
 
@@ -208,12 +208,13 @@ export default function App() {
           </div>
         )}
 
-        {/* Home: 3 section cards */}
+        {/* Home: featured products + 3 section cards */}
         {!searchResults && view === 'home' && (
           <CatalogHome
             sections={SECTIONS}
             sectionCounts={sectionCounts}
             onSelectSection={goSection}
+            onOpenProduct={handleOpen}
           />
         )}
 

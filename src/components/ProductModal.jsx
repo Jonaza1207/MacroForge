@@ -39,7 +39,7 @@ export default function ProductModal({ productId, onClose }) {
   const imgUrl = resolveProductImage(p.u);
 
   const slug  = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
-  const waMsg = `Hola! 👋 Quiero consultar sobre ${p.n} 💪`;
+  const waMsg = `Hola MacroForge! 💪 Quiero comprar ${p.n}. ¿Tienen disponible y cuánto cuesta el envío a mi zona?`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
   const flavors = (p.f || [])
@@ -121,7 +121,7 @@ export default function ProductModal({ productId, onClose }) {
             rel="noopener noreferrer"
             onClick={() => trackCta(slug)}
           >
-            💬 Consultar este producto
+            💬 Quiero este producto
           </a>
 
           {/* 5. Product information — secondary, for the committed reader */}

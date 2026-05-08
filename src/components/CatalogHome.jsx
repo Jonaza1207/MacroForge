@@ -1,4 +1,8 @@
+import { lazy, Suspense } from 'react';
 import { PRODUCTS } from '../data/products';
+
+// Lazy — loads only after hero renders. Adds zero cost to first paint.
+const FeaturedProducts = lazy(() => import('./FeaturedProducts'));
 
 const SECTION_META = {
   gym: {
@@ -18,15 +22,22 @@ const SECTION_META = {
   },
 };
 
-export default function CatalogHome({ sections, sectionCounts, onSelectSection }) {
+export default function CatalogHome({ sections, sectionCounts, onSelectSection, onOpenProduct }) {
   return (
     <div className="catalog-home">
 
+      {/* Featured / recommended products — zero-click product discovery */}
+      {onOpenProduct && (
+        <Suspense fallback={null}>
+          <FeaturedProducts onOpenProduct={onOpenProduct} />
+        </Suspense>
+      )}
+
       <div className="catalog-home-intro">
-        <div className="catalog-home-eyebrow">Compra por categoría</div>
+        <div className="catalog-home-eyebrow">Explorar por categoría</div>
         <h2 className="catalog-home-title">¿Qué estás buscando?</h2>
         <p className="catalog-home-sub">
-          Encontrá rápido lo que ocupás — más de {Object.keys(PRODUCTS).length} productos originales.
+          {Object.keys(PRODUCTS).length} productos originales — Gym, Vitaminas y doTERRA.
         </p>
       </div>
 

@@ -43,8 +43,8 @@ function ProductCard({ product, badge: badgeProp, onClick }) {
   const slug  = useMemo(() => slugFrom(u), [u]);
   const badge = badgeProp ?? useMemo(() => computeBadge(slug), [slug]); // eslint-disable-line
 
-  // WhatsApp CTA — direct, personal message
-  const waMsg = `Hola, quiero consultar sobre ${n} 💪`;
+  // WhatsApp CTA — specific product + purchase signal
+  const waMsg = `Hola MacroForge! 🔥 Me interesa el ${n}. ¿Tienen disponible y cuánto cuesta el envío?`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
   /** Card click → open modal + track view */
