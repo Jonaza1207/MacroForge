@@ -1,7 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { PRODUCTS } from '../data/products';
+import GoalNav from './GoalNav';
 
-// Lazy — loads only after hero renders. Adds zero cost to first paint.
+// All lazy — render only after the hero frame has painted.
+// Zero cost to first contentful paint for new visitors.
+const RecentlyViewed  = lazy(() => import('./RecentlyViewed'));
+const FavoritesList   = lazy(() => import('./FavoritesList'));
 const FeaturedProducts = lazy(() => import('./FeaturedProducts'));
 
 const SECTION_META = {
@@ -22,16 +26,33 @@ const SECTION_META = {
   },
 };
 
-export default function CatalogHome({ sections, sectionCounts, onSelectSection, onOpenProduct }) {
+export default function CatalogHome({ sections, sectionCounts, onSelectSection, onOpenProduct, onGoal }) {
   return (
     <div className="catalog-home">
 
-      {/* Featured / recommended products — zero-click product discovery */}
+      {/* Returning visitors: personal history first — highest relevance */}
+      {onOpenProduct && (
+        <Suspense fallback={null}>
+          <RecentlyViewed onOpenProduct={onOpenProduct} />
+        </Suspense>
+      )}
+
+      {/* Saved products — user's own curated intent list */}
+      {onOpenProduct && (
+        <Suspense fallback={null}>
+          <FavoritesList onOpenProduct={onOpenProduct} />
+        </Suspense>
+      )}
+
+      {/* Editorial: curated picks — always shown */}
       {onOpenProduct && (
         <Suspense fallback={null}>
           <FeaturedProducts onOpenProduct={onOpenProduct} />
         </Suspense>
       )}
+
+      {/* Goal-based navigation — 1-tap path to the right category */}
+      {onGoal && <GoalNav onNavigate={onGoal} />}
 
       <div className="catalog-home-intro">
         <div className="catalog-home-eyebrow">Explorar por categoría</div>

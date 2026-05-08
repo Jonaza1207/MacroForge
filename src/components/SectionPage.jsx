@@ -1,3 +1,18 @@
+import { analytics } from '../lib/analytics';
+
+// Categories with the lowest entry barrier — ideal for customers new to supplementation.
+// Shown with a subtle "Para empezar" confidence signal on the category tile.
+const BEGINNER_CATEGORIES = new Set([
+  'Creatinas',
+  'Proteínas Whey',
+  'Glutamina',
+  'Vitaminas Esenciales',
+  'Magnesio',
+  'Multivitamínicos',
+  'Omega y Grasas Saludables',
+  'Kits Especiales',
+]);
+
 const CAT_ICONS = {
   'Creatinas': '⚡', 'Proteínas Whey': '🥛', 'Pre-Entrenamientos': '🔥',
   'Proteínas Isoladas': '💎', 'Gainers de Masa': '🏋️', 'Quemadores de Grasa': '🔥',
@@ -61,6 +76,13 @@ export default function SectionPage({ sectionId, sectionData, productsByCategory
     ...populated.filter(({ cat }) => !featuredSet.has(cat)),
   ];
 
+  function handleCategoryClick(cat) {
+    if (BEGINNER_CATEGORIES.has(cat)) {
+      analytics.beginnerPath(cat, sectionId);
+    }
+    onSelectCategory(cat);
+  }
+
   return (
     <div className="section-page">
 
@@ -79,20 +101,24 @@ export default function SectionPage({ sectionId, sectionData, productsByCategory
 
       <div className="cat-grid">
         {sorted.map(({ cat, count }) => {
-          const isFeatured = featuredSet.has(cat);
-          const hint       = CATEGORY_HINTS[cat];
+          const isFeatured  = featuredSet.has(cat);
+          const isBeginner  = BEGINNER_CATEGORIES.has(cat);
+          const hint        = CATEGORY_HINTS[cat];
           return (
             <button
               key={cat}
               className={`cat-tile${isFeatured ? ' cat-tile--featured' : ''}`}
               style={{ '--sc': color }}
-              onClick={() => onSelectCategory(cat)}
+              onClick={() => handleCategoryClick(cat)}
               aria-label={`Ver ${cat}`}
             >
               <div className="cat-tile-icon">{CAT_ICONS[cat] || '📦'}</div>
               <div className="cat-tile-name">{cat}</div>
               {isFeatured && hint && (
                 <div className="cat-tile-hint">{hint}</div>
+              )}
+              {isBeginner && !isFeatured && (
+                <div className="cat-tile-beginner">Ideal para empezar</div>
               )}
               <div className="cat-tile-footer">
                 <span className="cat-tile-count">{count} productos</span>

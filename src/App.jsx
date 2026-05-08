@@ -1,7 +1,10 @@
 import { useState, useMemo, useCallback, useEffect, lazy, Suspense, useDeferredValue } from 'react';
 import { PRODUCTS } from './data/products';
 import { SECTIONS } from './data/catalog';
+import { PRODUCT_LABELS } from './data/labels';
+import { WA_NUMBER } from './data/catalog';
 import { useTheme } from './hooks/useTheme';
+import { analytics } from './lib/analytics';
 
 import Hero           from './components/Hero';
 import Controls       from './components/Controls';
@@ -11,18 +14,26 @@ import CategoryPage   from './components/CategoryPage';
 import ProductCard    from './components/ProductCard';
 import WhatsAppFloat  from './components/WhatsAppFloat';
 import { getTopClicked, devLogAnalytics, clearAnalytics } from './hooks/useClickTracking';
+import { addRecentlyViewed } from './hooks/useRecentlyViewed';
 
 // Below-fold & interaction-gated components — lazy loaded
-// ProductModal pulls in HEALTH data (~28KB) — only needed on product click
 const ProductModal   = lazy(() => import('./components/ProductModal'));
-// Home-only sections — loaded after hero renders
 const WhySection     = lazy(() => import('./components/WhySection'));
+const StackSelling   = lazy(() => import('./components/StackSelling'));
 const AccountPreview = lazy(() => import('./components/AccountPreview'));
 const BrandTeaser    = lazy(() => import('./components/BrandTeaser'));
 
-function buildSearchStr(p) {
-  return [p.n, p.b, p.c, ...(p.f || [])].join(' ').toLowerCase();
-}
+// ── Module-level constants (computed once) ────────────────────
+
+// Slug → product ID reverse map (used for deep links)
+const SLUG_TO_ID = (() => {
+  const m = {};
+  for (const [id, p] of Object.entries(PRODUCTS)) {
+    const slug = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1];
+    if (slug) m[slug] = id;
+  }
+  return m;
+})();
 
 // Group ALL products once at module level — immutable
 const ALL_GROUPED = (() => {
@@ -35,21 +46,72 @@ const ALL_GROUPED = (() => {
   return g;
 })();
 
+// ── Smart search ──────────────────────────────────────────────
+
+// Accent-normalize + lowercase for typo-tolerant search
+// Handles: creatina / creatína, proteina / proteína, etc.
+function norm(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+// Score a product against a normalized query.
+// Returns -1 if no match, else a positive relevance score.
+// Higher score = more relevant = ranked earlier.
+function scoreSearch(p, nq) {
+  const nn = norm(p.n);
+  const nb = norm(p.b);
+  const nc = norm(p.c);
+  const nf = norm((p.f || []).join(' '));
+
+  if (!nn.includes(nq) && !nb.includes(nq) && !nc.includes(nq) && !nf.includes(nq)) return -1;
+
+  let s = 0;
+  if (nn.startsWith(nq))   s += 16; // name prefix — highest confidence
+  else if (nn.includes(nq)) s += 10;
+  if (nb.startsWith(nq))   s += 9;  // brand prefix
+  else if (nb.includes(nq)) s += 6;
+  if (nc.includes(nq))     s += 4;  // category
+  if (nf.includes(nq))     s += 2;  // flavor
+
+  // Curated boost — recommended/popular products rank slightly higher
+  const slug = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || '';
+  if (PRODUCT_LABELS[slug] === 'recommended') s += 3;
+  if (PRODUCT_LABELS[slug] === 'popular')     s += 2;
+
+  return s;
+}
+
+// ── Deep link helpers ─────────────────────────────────────────
+
+function parseProductHash() {
+  const m = window.location.hash.match(/^#product\/([^/?&]+)/);
+  if (!m) return null;
+  return SLUG_TO_ID[decodeURIComponent(m[1])] || null;
+}
+
+function slugFromId(id) {
+  const p = PRODUCTS[String(id)];
+  return p?.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
+}
+
+// ── App ───────────────────────────────────────────────────────
+
+// Return-visitor detection: reads/sets a localStorage flag on first visit.
+// Used to adapt messaging for returning customers.
+function detectVisitType() {
+  const key = 'mf_visited';
+  try {
+    const seen = Boolean(localStorage.getItem(key));
+    if (!seen) localStorage.setItem(key, '1');
+    return seen ? 'returning' : 'new';
+  } catch { return 'new'; }
+}
+
 export default function App() {
   const { theme, toggle } = useTheme();
 
-  // Dev-only: expose analytics helpers in browser console
-  // Usage: __mfAnalytics.log() or __mfAnalytics.top()
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      window.__mfAnalytics = {
-        log:   devLogAnalytics,
-        top:   () => console.table(getTopClicked(20)),
-        clear: clearAnalytics,
-      };
-      devLogAnalytics(); // auto-log on load if data exists
-    }
-  }, []);
+  // Stable across renders — computed once on mount
+  const visitType = useMemo(() => detectVisitType(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // View state: 'home' | 'section' | 'category'
   const [view,           setView]           = useState('home');
@@ -60,6 +122,72 @@ export default function App() {
   const [openProductId,  setOpenProductId]  = useState(null);
 
   const scrollTop = () => window.scrollTo({ top: 0, behavior: 'instant' });
+
+  // ── Return-visitor analytics (fires once on mount) ───────────
+  useEffect(() => {
+    if (visitType === 'returning') analytics.returnVisit();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Deep link: read initial hash ─────────────────────────────
+  useEffect(() => {
+    const id = parseProductHash();
+    if (id) {
+      setOpenProductId(id);
+      analytics.deepLink(slugFromId(id) || '');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Deep link: browser back/forward ──────────────────────────
+  useEffect(() => {
+    function handlePop() {
+      const id = parseProductHash();
+      setOpenProductId(id);
+    }
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, []);
+
+  // ── Dynamic page title + meta description ────────────────────
+  useEffect(() => {
+    const BASE_TITLE = 'MacroForge — Suplementos Originales en Costa Rica';
+    const BASE_DESC  = 'Más de 600 suplementos originales en Costa Rica. Proteínas, creatinas, vitaminas, aceites doTERRA y más. Entrega en todo el país. Consultá por WhatsApp.';
+
+    let title = BASE_TITLE;
+    let desc  = BASE_DESC;
+
+    if (openProductId && PRODUCTS[openProductId]) {
+      const p = PRODUCTS[openProductId];
+      title = `${p.n} — ${p.b} | MacroForge`;
+      desc  = `${p.n} de ${p.b}. Suplemento original en Costa Rica — categoría ${p.c}. Disponible en MacroForge. Consultá precio y envío por WhatsApp.`;
+    } else if (view === 'category' && activeCategory) {
+      title = `${activeCategory} en Costa Rica | MacroForge`;
+      desc  = `${activeCategory} originales en Costa Rica. Marcas verificadas con entrega directa. Consultá precios y disponibilidad por WhatsApp.`;
+    } else if (view === 'section' && activeSection) {
+      const sl = SECTIONS[activeSection]?.label || '';
+      title = `${sl} | MacroForge`;
+      desc  = `${sl} en Costa Rica. Productos originales de marcas reconocidas. Entrega en todo el país — consultá por WhatsApp.`;
+    }
+
+    document.title = title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', desc);
+  }, [view, activeSection, activeCategory, openProductId]);
+
+  // ── Dev analytics helpers ─────────────────────────────────────
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      window.__mfAnalytics = {
+        log:    devLogAnalytics,
+        top:    () => console.table(getTopClicked(20)),
+        clear:  clearAnalytics,
+        events: () => console.table(analytics.getBuffer().slice(-30)),
+        clearEvents: analytics.clearBuffer,
+      };
+      devLogAnalytics();
+    }
+  }, []);
+
+  // ── Navigation ────────────────────────────────────────────────
 
   const goHome = useCallback(() => {
     setView('home');
@@ -75,6 +203,7 @@ export default function App() {
     setActiveCategory(null);
     setSearchQuery('');
     scrollTop();
+    analytics.sectionView(sectionId, SECTIONS[sectionId]?.label || '');
   }, []);
 
   const goCategory = useCallback((catName) => {
@@ -82,6 +211,17 @@ export default function App() {
     setActiveCategory(catName);
     setSearchQuery('');
     scrollTop();
+    analytics.categoryView(catName, activeSection || '');
+  }, [activeSection]);
+
+  // Used by GoalNav — navigates directly to a section + category
+  const goSectionCategory = useCallback((sectionId, catName) => {
+    setView('category');
+    setActiveSection(sectionId);
+    setActiveCategory(catName);
+    setSearchQuery('');
+    scrollTop();
+    analytics.categoryView(catName, sectionId);
   }, []);
 
   const goBack = useCallback(() => {
@@ -94,10 +234,22 @@ export default function App() {
     }
   }, [view, goHome]);
 
-  const handleOpen  = useCallback(id => setOpenProductId(id),   []);
-  const handleClose = useCallback(()  => setOpenProductId(null), []);
+  // ── Product modal with deep-link hash sync ────────────────────
 
-  // Section product counts
+  const handleOpen = useCallback((id) => {
+    const slug = slugFromId(id);
+    if (slug) history.pushState({ productId: id }, '', `#product/${slug}`);
+    setOpenProductId(id);
+    addRecentlyViewed(id);                     // persist for return-visit retention
+    analytics.productView(id, PRODUCTS[String(id)]);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    history.pushState(null, '', window.location.pathname + window.location.search);
+    setOpenProductId(null);
+  }, []);
+
+  // ── Section product counts ────────────────────────────────────
   const sectionCounts = useMemo(() => {
     const c = {};
     for (const [sId, cats] of Object.entries(ALL_GROUPED))
@@ -105,20 +257,34 @@ export default function App() {
     return c;
   }, []);
 
-  // Search: scoped to current view context.
-  // Uses deferredQuery so the input stays responsive while the
-  // O(n) filter over 500+ products runs at lower priority.
+  // ── Smart search — normalized + ranked ────────────────────────
   const searchResults = useMemo(() => {
-    const q = deferredQuery.toLowerCase().trim();
+    const q = deferredQuery.trim();
     if (!q) return null;
-    return Object.entries(PRODUCTS).filter(([, p]) => {
-      if (view === 'section'  && p.s !== activeSection)  return false;
-      if (view === 'category' && p.c !== activeCategory)  return false;
-      return buildSearchStr(p).includes(q);
-    });
+    const nq = norm(q);
+
+    return Object.entries(PRODUCTS)
+      .filter(([, p]) => {
+        if (view === 'section'  && p.s !== activeSection)  return false;
+        if (view === 'category' && p.c !== activeCategory)  return false;
+        return true;
+      })
+      .map(entry => [entry, scoreSearch(entry[1], nq)])
+      .filter(([, score]) => score > 0)
+      .sort(([, a], [, b]) => b - a)
+      .map(([entry]) => entry);
   }, [deferredQuery, view, activeSection, activeCategory]);
 
+  // ── Search analytics — fires on stable search term ───────────
+  useEffect(() => {
+    if (!deferredQuery.trim()) return;
+    analytics.search(deferredQuery.trim(), searchResults?.length ?? 0);
+  }, [deferredQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const showHero = view === 'home' && !searchResults && !deferredQuery;
+
+  const searchEmptyWaMsg = `Hola MacroForge! Busqué "${searchQuery}" en el catálogo y no lo encontré. ¿Tienen algo similar o pueden conseguirlo?`;
+  const searchEmptyWaUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(searchEmptyWaMsg)}`;
 
   return (
     <>
@@ -175,7 +341,7 @@ export default function App() {
         }
       >
 
-        {/* Search results (overrides view) */}
+        {/* Search results — with ranked results and empty-state recovery */}
         {searchResults && (
           <div className="search-page">
             <div className="search-page-header">
@@ -195,8 +361,17 @@ export default function App() {
             {searchResults.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">🔍</div>
-                <div className="empty-title">Sin resultados</div>
-                <div className="empty-sub">Probá con otro término o explorá por categoría.</div>
+                <div className="empty-title">Sin resultados para "{searchQuery}"</div>
+                <div className="empty-sub">Probá otro término — o consultanos y lo buscamos por vos.</div>
+                <a
+                  className="empty-wa"
+                  href={searchEmptyWaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => analytics.whatsappClick('search_empty', null, searchQuery)}
+                >
+                  💬 Consultar por WhatsApp
+                </a>
               </div>
             ) : (
               <div className="product-grid">
@@ -208,13 +383,14 @@ export default function App() {
           </div>
         )}
 
-        {/* Home: featured products + 3 section cards */}
+        {/* Home: featured products + goal nav + 3 section cards */}
         {!searchResults && view === 'home' && (
           <CatalogHome
             sections={SECTIONS}
             sectionCounts={sectionCounts}
             onSelectSection={goSection}
             onOpenProduct={handleOpen}
+            onGoal={goSectionCategory}
           />
         )}
 
@@ -243,6 +419,7 @@ export default function App() {
       {showHero && (
         <Suspense fallback={null}>
           <WhySection />
+          <StackSelling />
           <AccountPreview />
           <BrandTeaser />
         </Suspense>
@@ -266,7 +443,11 @@ export default function App() {
 
       {openProductId && (
         <Suspense fallback={null}>
-          <ProductModal productId={openProductId} onClose={handleClose} />
+          <ProductModal
+            productId={openProductId}
+            onClose={handleClose}
+            onOpen={handleOpen}
+          />
         </Suspense>
       )}
 

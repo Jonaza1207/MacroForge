@@ -1800,6 +1800,170 @@ input  { font-family: inherit; }
 @media (min-width: 640px)  { .why-section { padding-left: 40px; padding-right: 40px; padding-top: 40px; } }
 @media (min-width: 1024px) { .why-section { padding-left: 64px; padding-right: 64px; padding-top: 44px; } }
 
+/* ══════════════════════════════════════════════════════════════
+   STACK SELLING — "Armemos tu stack"
+   Consultative multi-product system. Converts single-product
+   buyers into full-system buyers via WhatsApp consultation.
+   Positioned between WhySection (trust) and AccountPreview
+   (future retention) — perfect psychological placement.
+   ══════════════════════════════════════════════════════════════ */
+.stack-section {
+  padding: 44px 24px 52px;
+  border-top: 1px solid var(--border-2);
+}
+.stack-inner { max-width: 980px; margin: 0 auto; }
+
+.stack-header { text-align: center; margin-bottom: 36px; }
+.stack-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.stack-eyebrow::before, .stack-eyebrow::after {
+  content: ''; display: block; width: 18px; height: 2px;
+  background: var(--accent); border-radius: 2px;
+}
+.stack-title {
+  font-size: clamp(22px, 4vw, 32px); font-weight: 900;
+  letter-spacing: -0.03em; color: var(--text-1);
+  text-transform: uppercase; margin-bottom: 10px;
+}
+.stack-desc {
+  font-size: 14px; font-weight: 500; color: var(--text-2);
+  max-width: 400px; margin: 0 auto; line-height: 1.7;
+}
+
+/* Stack grid: 4-column desktop, 2-col tablet, 1-col mobile */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 960px) { .stack-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .stack-grid { grid-template-columns: 1fr; gap: 10px; } }
+
+/* Individual stack card */
+.stack-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 18px 18px;
+  display: flex; flex-direction: column; gap: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.stack-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: 0 4px 24px var(--accent-glow);
+}
+
+.stack-card-header {
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.stack-card-icon {
+  font-size: 22px; line-height: 1;
+  flex-shrink: 0; margin-top: 1px;
+}
+.stack-card-goal {
+  font-size: 14px; font-weight: 900;
+  letter-spacing: -0.02em; color: var(--text-1);
+}
+.stack-card-sub {
+  font-size: 11px; font-weight: 500; color: var(--text-3);
+  margin-top: 2px; line-height: 1.4;
+}
+
+/* Product list within each stack card */
+.stack-product-list {
+  display: flex; flex-direction: column; gap: 10px;
+  flex: 1;
+}
+.stack-product-item {
+  display: flex; align-items: center; gap: 10px;
+}
+.stack-product-img {
+  width: 40px; height: 40px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.stack-product-img img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.stack-product-initial {
+  font-size: 16px; font-weight: 900;
+  color: var(--accent); opacity: 0.55;
+}
+.stack-product-info { flex: 1; min-width: 0; }
+.stack-product-brand {
+  font-size: 7px; font-weight: 800;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.stack-product-name {
+  font-size: 11px; font-weight: 700;
+  color: var(--text-1); line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Stack CTA — WhatsApp green, full width, premium pill */
+.stack-card-cta {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 11px 16px;
+  background: rgba(37,211,102,0.1);
+  border: 1px solid rgba(37,211,102,0.28);
+  border-radius: var(--r-pill);
+  color: #25D366;
+  font-size: 12px; font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.stack-card-cta:hover {
+  background: rgba(37,211,102,0.18);
+  border-color: rgba(37,211,102,0.5);
+  box-shadow: 0 4px 14px rgba(37,211,102,0.2);
+}
+
+.stack-footer-note {
+  text-align: center;
+  font-size: 11px; font-weight: 500; color: var(--text-3);
+  max-width: 380px; margin: 0 auto;
+  line-height: 1.6; letter-spacing: 0.01em;
+}
+
+/* Light mode */
+[data-theme="light"] .stack-card {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+[data-theme="light"] .stack-product-img {
+  background: #F0EDE7;
+}
+
+/* Responsive padding */
+@media (min-width: 640px)  { .stack-section { padding-left: 40px; padding-right: 40px; } }
+@media (min-width: 1024px) { .stack-section { padding-left: 64px; padding-right: 64px; } }
+
+/* ══════════════════════════════════════════════════════════════
+   BEGINNER CONFIDENCE LABEL
+   Subtle "Ideal para empezar" signal on category tiles.
+   Only shown on non-featured beginner-appropriate categories
+   to avoid overloading the featured tile hierarchy.
+   ══════════════════════════════════════════════════════════════ */
+.cat-tile-beginner {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--vita);
+  opacity: 0.85;
+  margin-top: -2px;
+}
+
 /* ── Brand teaser — AlfaVitamins coming soon ─────────────── */
 .brand-teaser {
   padding: 0 24px 40px;
@@ -2159,4 +2323,335 @@ input  { font-family: inherit; }
   .card,
   .card-img img,
   .hero-logo-img        { transition: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GOAL NAVIGATION STRIP
+   Horizontal goal pill scroller below FeaturedProducts.
+   Goal = outcome language vs supplement taxonomy.
+   ══════════════════════════════════════════════════════════════ */
+.goal-nav {
+  padding: 0 24px 28px;
+}
+.goal-nav-header { margin-bottom: 14px; }
+.goal-nav-eyebrow {
+  display: block;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 6px;
+}
+.goal-nav-title {
+  font-size: clamp(15px, 3vw, 19px); font-weight: 800;
+  letter-spacing: -0.02em; color: var(--text-1);
+}
+
+.goal-nav-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px; /* prevent clipping of box-shadow */
+}
+.goal-nav-strip::-webkit-scrollbar { display: none; }
+
+.goal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s, border-color 0.14s, transform 0.14s;
+}
+.goal-pill:hover {
+  background: var(--surface-2);
+  border-color: var(--accent-border);
+  transform: translateY(-1px);
+}
+.goal-pill:active { transform: scale(0.97); }
+
+.goal-pill-icon {
+  font-size: 16px; line-height: 1; flex-shrink: 0;
+}
+.goal-pill-label {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-1); letter-spacing: 0.01em;
+}
+
+@media (min-width: 640px)  { .goal-nav { padding-left: 40px; padding-right: 40px; } }
+@media (min-width: 1024px) { .goal-nav { padding-left: 64px; padding-right: 64px; } }
+
+/* ── Light mode ──────────────────────────────────────────────── */
+[data-theme="light"] .goal-pill {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+[data-theme="light"] .goal-pill:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODAL HEADER ACTIONS — share + close row
+   ══════════════════════════════════════════════════════════════ */
+/* The existing .modal-close was positioned absolute.
+ * We introduce a .modal-header-actions wrapper to contain
+ * both the share button and close button in a flex row. */
+.modal-header-actions {
+  position: absolute;
+  top: 12px; right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Override the existing solo .modal-close positioning
+ * since it now lives inside .modal-header-actions */
+.modal-close {
+  position: static !important; /* override absolute from base style */
+}
+
+/* Share button — same geometry as close */
+.modal-share {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.modal-share:hover {
+  background: var(--surface-3);
+  border-color: rgba(255,255,255,0.28);
+}
+.modal-share--copied {
+  background: rgba(0,200,150,0.22);
+  border-color: rgba(0,200,150,0.45);
+  color: var(--vita);
+}
+[data-theme="light"] .modal-share {
+  background: rgba(0,0,0,0.12);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--text-1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RELATED PRODUCTS — "También te puede interesar"
+   ══════════════════════════════════════════════════════════════ */
+.modal-related-section h4 {
+  /* Inherits from .modal-section h4 */
+}
+.modal-related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+@media (max-width: 400px) {
+  .modal-related-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.modal-related-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.modal-related-card:hover {
+  border-color: rgba(227,0,30,0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+.modal-related-card:active { transform: scale(0.97); }
+
+.modal-related-img {
+  position: relative;
+  padding-top: 80%;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.modal-related-img img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+}
+.modal-related-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900;
+  color: var(--accent); opacity: 0.5;
+}
+
+.modal-related-body {
+  padding: 8px 9px 10px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.modal-related-brand {
+  font-size: 7px; font-weight: 800;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.modal-related-name {
+  font-size: 10px; font-weight: 700;
+  color: var(--text-1); line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.modal-related-price {
+  font-size: 10px; font-weight: 800;
+  color: var(--text-2); letter-spacing: -0.01em;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SEARCH EMPTY STATE — WhatsApp recovery CTA
+   ══════════════════════════════════════════════════════════════ */
+.empty-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 20px;
+  padding: 12px 22px;
+  background: #25D366;
+  color: #fff;
+  border-radius: var(--r-pill);
+  font-size: 13px; font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(37,211,102,0.35);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.empty-wa:hover {
+  background: #1ebe5a;
+  box-shadow: 0 6px 24px rgba(37,211,102,0.5);
+  transform: translateY(-1px);
+}
+.empty-wa:active { transform: scale(0.97); }
+
+/* ══════════════════════════════════════════════════════════════
+   RETENTION ENGINE — Recently Viewed + Favorites
+   Both sections follow the same design language as FeaturedProducts:
+   same eyebrow size, same grid, same card hierarchy.
+   The visual consistency signals that all three are part of one
+   intelligent discovery system, not isolated features.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Recently Viewed ─────────────────────────────────────────── */
+.recently-viewed {
+  padding: 0 24px 24px;
+}
+.recently-viewed-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 14px;
+}
+
+/* ── Favorites Section ───────────────────────────────────────── */
+.favorites-section {
+  padding: 0 24px 24px;
+}
+.favorites-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.favorites-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 5px;
+}
+.favorites-title {
+  font-size: clamp(15px, 2.8vw, 20px); font-weight: 800;
+  letter-spacing: -0.02em; color: var(--text-1);
+  display: flex; align-items: center; gap: 8px;
+}
+.favorites-count {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: var(--r-pill);
+  background: var(--accent-dim); color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+.favorites-consult {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: var(--r-pill);
+  background: rgba(37,211,102,0.09);
+  border: 1px solid rgba(37,211,102,0.22);
+  color: #25D366;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.04em;
+  text-decoration: none; white-space: nowrap;
+  flex-shrink: 0; margin-top: 2px;
+  transition: background 0.14s, border-color 0.14s;
+}
+.favorites-consult:hover {
+  background: rgba(37,211,102,0.18);
+  border-color: rgba(37,211,102,0.45);
+}
+
+/* Responsive padding for both sections */
+@media (min-width: 640px)  {
+  .recently-viewed  { padding-left: 40px; padding-right: 40px; }
+  .favorites-section { padding-left: 40px; padding-right: 40px; }
+}
+@media (min-width: 1024px) {
+  .recently-viewed  { padding-left: 64px; padding-right: 64px; }
+  .favorites-section { padding-left: 64px; padding-right: 64px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODAL HEART / FAVORITE BUTTON
+   Same geometry as modal-share. Three states:
+   — Default:  dim glass, outline heart icon
+   — Active:   accent-red fill, filled heart icon
+   — Hover:    slightly lighter glass
+   The color transition is immediate — no animation needed.
+   Animated scale would add delight but violate prefers-reduced-motion.
+   ══════════════════════════════════════════════════════════════ */
+.modal-favorite {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+}
+.modal-favorite:hover {
+  background: var(--surface-3);
+  border-color: rgba(255,255,255,0.28);
+  color: #fff;
+}
+.modal-favorite:active { transform: scale(0.92); }
+.modal-favorite--active {
+  background: rgba(227,0,30,0.18);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+.modal-favorite--active:hover {
+  background: rgba(227,0,30,0.28);
+  border-color: var(--accent);
+}
+
+/* Light mode */
+[data-theme="light"] .modal-favorite {
+  background: rgba(0,0,0,0.1);
+  border-color: rgba(0,0,0,0.1);
+  color: var(--text-2);
+}
+[data-theme="light"] .modal-favorite--active {
+  background: rgba(227,0,30,0.1);
+  border-color: rgba(227,0,30,0.25);
+  color: var(--accent);
 }
