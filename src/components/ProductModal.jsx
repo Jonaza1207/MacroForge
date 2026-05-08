@@ -4,6 +4,7 @@ import { HEALTH } from '../data/health';
 import { resolveProductImage } from '../data/images';
 import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
 import { trackCta } from '../hooks/useClickTracking';
+import ProductSchema from './ProductSchema';
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#E3001E', vita: '#00C896', dote: '#D4A843' };
@@ -48,6 +49,8 @@ export default function ProductModal({ productId, onClose }) {
   const prices = parsePrices(p.p);
 
   return (
+    <>
+    <ProductSchema product={p} />
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
 
@@ -94,6 +97,7 @@ export default function ProductModal({ productId, onClose }) {
           {/* 2. Primary price — anchors value BEFORE CTA */}
           <div className="modal-primary-price">
             <span className="modal-primary-price-val">{prices[0].val}</span>
+            <span className="price-iva">+iva</span>
             {prices.length > 1 && (
               <span className="modal-primary-price-note">
                 +{prices.length - 1} {prices.length === 2 ? 'opción' : 'opciones'}
@@ -157,7 +161,10 @@ export default function ProductModal({ productId, onClose }) {
               {prices.map((pr, i) => (
                 <div key={i} className="modal-price-row">
                   <span className="modal-price-opt">{pr.rest}</span>
-                  <span className="modal-price-val">{pr.val}</span>
+                  <span className="modal-price-right">
+                    <span className="modal-price-val">{pr.val}</span>
+                    <span className="price-iva">+iva</span>
+                  </span>
                 </div>
               ))}
             </div>
@@ -172,5 +179,6 @@ export default function ProductModal({ productId, onClose }) {
         </div>
       </div>
     </div>
+    </>
   );
 }

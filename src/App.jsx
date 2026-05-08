@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { PRODUCTS } from './data/products';
 import { SECTIONS } from './data/catalog';
 import { useTheme } from './hooks/useTheme';
@@ -9,12 +9,16 @@ import CatalogHome    from './components/CatalogHome';
 import SectionPage    from './components/SectionPage';
 import CategoryPage   from './components/CategoryPage';
 import ProductCard    from './components/ProductCard';
-import ProductModal   from './components/ProductModal';
 import WhatsAppFloat  from './components/WhatsAppFloat';
-import AccountPreview from './components/AccountPreview';
-import WhySection     from './components/WhySection';
-import BrandTeaser    from './components/BrandTeaser';
 import { getTopClicked, devLogAnalytics, clearAnalytics } from './hooks/useClickTracking';
+
+// Below-fold & interaction-gated components — lazy loaded
+// ProductModal pulls in HEALTH data (~28KB) — only needed on product click
+const ProductModal   = lazy(() => import('./components/ProductModal'));
+// Home-only sections — loaded after hero renders
+const WhySection     = lazy(() => import('./components/WhySection'));
+const AccountPreview = lazy(() => import('./components/AccountPreview'));
+const BrandTeaser    = lazy(() => import('./components/BrandTeaser'));
 
 function buildSearchStr(p) {
   return [p.n, p.b, p.c, ...(p.f || [])].join(' ').toLowerCase();
@@ -157,7 +161,16 @@ export default function App() {
       />
 
       {/* ── Main content ── */}
-      <main className="view-content" key={`${view}|${activeSection}|${activeCategory}`}>
+      <main
+        className="view-content"
+        key={`${view}|${activeSection}|${activeCategory}`}
+        aria-label={
+          view === 'home'     ? 'Catálogo de suplementos MacroForge' :
+          view === 'section'  ? `Sección ${SECTIONS[activeSection]?.label || ''}` :
+          view === 'category' ? `Categoría: ${activeCategory || ''}` :
+          'Catálogo'
+        }
+      >
 
         {/* Search results (overrides view) */}
         {searchResults && (
@@ -223,23 +236,34 @@ export default function App() {
 
       </main>
 
-      {showHero && <WhySection />}
-      {showHero && <AccountPreview />}
-      {showHero && <BrandTeaser />}
+      {showHero && (
+        <Suspense fallback={null}>
+          <WhySection />
+          <AccountPreview />
+          <BrandTeaser />
+        </Suspense>
+      )}
 
       {showHero && (
-        <footer className="footer">
+        <footer className="footer" role="contentinfo" aria-label="MacroForge — pie de página">
           <div className="footer-brand">MACRO<span>FORGE</span></div>
-          <div className="footer-meta">
-            <div>Catálogo 2026 · SJ, CR</div>
+          <address className="footer-meta" style={{ fontStyle: 'normal' }}>
+            <div>
+              <span itemProp="addressLocality">San José</span>
+              {', '}
+              <span itemProp="addressCountry">CR</span>
+              {' · Catálogo 2026'}
+            </div>
             <div>Todos los precios +IVA</div>
             <div><em>✦ Salud · Performance · Bienestar ✦</em></div>
-          </div>
+          </address>
         </footer>
       )}
 
       {openProductId && (
-        <ProductModal productId={openProductId} onClose={handleClose} />
+        <Suspense fallback={null}>
+          <ProductModal productId={openProductId} onClose={handleClose} />
+        </Suspense>
       )}
 
       <WhatsAppFloat />

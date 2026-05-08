@@ -39,6 +39,39 @@ export const SECTIONS = {
 
 export const WA_NUMBER = '50684436311';
 
+// ══════════════════════════════════════════════════════════════════
+// ALFAVITAMINS ACTIVATION BLUEPRINT — ready to enable
+//
+// When the full AlfaVitamins inventory is confirmed, activate by:
+//
+//   1. Add to SECTIONS:
+//      alfa: {
+//        label: 'ALFAVITAMINS',
+//        sublabel: 'Sección 04 · Nutrición Avanzada',
+//        color: '#C0392B',       ← brand-aligned deep red
+//        categories: [
+//          'Vitaminas Alfa', 'Minerales Alfa', 'Colágeno Alfa',
+//          'Omega Alfa', 'Probióticos Alfa', 'Multivitamínicos Alfa',
+//          // ... confirmed categories from inventory
+//        ],
+//      },
+//
+//   2. Set section key 's': 'alfa' for AlfaVitamins products in products.js
+//
+//   3. Update BrandTeaser.jsx to link to goSection('alfa')
+//      instead of showing static teaser
+//
+//   4. Add to FEATURED in SectionPage.jsx:
+//      alfa: ['...top categories...']
+//
+//   5. Update sitemap.xml with new section URL structure
+//
+//   6. ProductSchema will auto-include alfa products via existing system
+//
+// DO NOT activate until: full inventory confirmed, images present,
+// categories finalized. Teaser-mode preserved until then.
+// ══════════════════════════════════════════════════════════════════
+
 export const CATEGORY_TYPES = {
   'Creatinas':'CREATINE','Shakers y Botellas':'SHAKER',
   'Proteínas Whey':'PROTEIN POWDER','Pre-Entrenamientos':'PRE-WORKOUT',

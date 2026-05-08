@@ -105,6 +105,7 @@ function ProductCard({ product, badge: badgeProp, onClick }) {
 
         <div className="card-price-row">
           <span className="card-price">{priceVal}</span>
+          <span className="price-iva">+iva</span>
           {p.length > 1 && (
             <span className="card-multi">+{p.length - 1} opciones</span>
           )}
