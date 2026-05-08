@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useState, useMemo, useCallback, useEffect, lazy, Suspense, useDeferredValue } from 'react';
 import { PRODUCTS } from './data/products';
 import { SECTIONS } from './data/catalog';
 import { useTheme } from './hooks/useTheme';
@@ -56,6 +56,7 @@ export default function App() {
   const [activeSection,  setActiveSection]  = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [searchQuery,    setSearchQuery]    = useState('');
+  const deferredQuery = useDeferredValue(searchQuery);
   const [openProductId,  setOpenProductId]  = useState(null);
 
   const scrollTop = () => window.scrollTo({ top: 0, behavior: 'instant' });
@@ -104,18 +105,20 @@ export default function App() {
     return c;
   }, []);
 
-  // Search: scoped to current view context
+  // Search: scoped to current view context.
+  // Uses deferredQuery so the input stays responsive while the
+  // O(n) filter over 500+ products runs at lower priority.
   const searchResults = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
+    const q = deferredQuery.toLowerCase().trim();
     if (!q) return null;
     return Object.entries(PRODUCTS).filter(([, p]) => {
       if (view === 'section'  && p.s !== activeSection)  return false;
       if (view === 'category' && p.c !== activeCategory)  return false;
       return buildSearchStr(p).includes(q);
     });
-  }, [searchQuery, view, activeSection, activeCategory]);
+  }, [deferredQuery, view, activeSection, activeCategory]);
 
-  const showHero = view === 'home' && !searchResults;
+  const showHero = view === 'home' && !searchResults && !deferredQuery;
 
   return (
     <>

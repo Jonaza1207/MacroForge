@@ -60,7 +60,8 @@ export default function ProductModal({ productId, onClose }) {
             <img
               src={imgUrl}
               alt={`${p.n} | ${p.b}`}
-              loading="lazy"
+              loading="eager"
+              fetchPriority="high"
               decoding="async"
               onError={e => {
                 e.currentTarget.style.display = 'none';

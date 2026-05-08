@@ -78,20 +78,6 @@ export default function AccountPreview() {
               </div>
 
               {/* Password field — decorative only, never stored */}
-              <div className="account-field">
-                <label className="account-label" htmlFor="ap-pass">
-                  Contraseña
-                  <span className="account-label-note"> (para cuando esté listo)</span>
-                </label>
-                <input
-                  id="ap-pass"
-                  className="account-input"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                />
-              </div>
-
               <button
                 type="submit"
                 className="account-submit"

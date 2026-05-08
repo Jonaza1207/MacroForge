@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+/* Font loaded via <link rel="stylesheet"> in index.html for earlier browser discovery */
 
 /* ═══════════════════════════════════════════════════════════
    MACROFORGE — DESIGN SYSTEM
@@ -2078,4 +2078,35 @@ input  { font-family: inherit; }
 @media (max-width: 420px) {
   .hero h1  { font-size: 42px; }
   .stat-num { font-size: 28px; }
+}
+
+/* ── prefers-reduced-motion: disable all decorative animations ──
+ * Covers: hero logo float, CTA pulse, logo shine, sparks,
+ * WhatsApp bounce/pulse, view transitions, demand dot pulse,
+ * and the card/modal image hover transitions.
+ * Keeps opacity-based transitions (theme switch) intact —
+ * those are instant and not vestibular triggers.
+ * ─────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Hero logo: no float, no shine, no sparks */
+  .hero-logo-wrap       { animation: none; }
+  .hero-logo-stage::before { display: none; }
+  .hero-logo-spark      { display: none; }
+
+  /* Hero CTA: no pulse */
+  .btn-consultar        { animation: none; }
+
+  /* WhatsApp float: no bounce, no pulse ripple */
+  .wa-float             { animation: none; }
+
+  /* View enter: instant — no slide-in */
+  .view-content         { animation: none; }
+
+  /* Demand dot: static — no pulse */
+  .modal-demand-dot     { animation: none; }
+
+  /* Image / card transitions: keep but instant */
+  .card,
+  .card-img img,
+  .hero-logo-img        { transition: none; }
 }
