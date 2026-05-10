@@ -336,6 +336,35 @@ export function getLoyaltySignals() {
 }
 
 /**
+ * AI Stack Builder funnel metrics — integrated into the main intelligence layer.
+ * Detailed analysis lives in src/lib/stackIntelligence.js.
+ * This provides a summary for the unified report.
+ */
+export function getStackBuilderSummary() {
+  const stackSteps = eventsByName('stack_step');
+  const opens      = getEvents().filter(e => e.n === 'stack_cta_click' && e.p?.goal === 'ai_builder_open').length;
+  const completions = stackSteps.filter(e => e.p?.action === 'wa_clicked').length;
+  const abandonments = stackSteps.filter(e => e.p?.action === 'abandoned').length;
+  const waFromBuilder = eventsByName('whatsapp_click').filter(e => e.p?.source === 'ai_stack_builder').length;
+
+  const goalCounts = {};
+  for (const e of stackSteps.filter(e => e.p?.step === 'goal' && e.p?.action === 'step_complete')) {
+    const g = e.p?.value;
+    if (g) goalCounts[g] = (goalCounts[g] || 0) + 1;
+  }
+
+  return {
+    opens,
+    completions,
+    abandonments,
+    waFromBuilder,
+    conversionRate:   opens > 0 ? Math.round((waFromBuilder / opens) * 100) : 0,
+    topGoal:          Object.entries(goalCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || null,
+    goalBreakdown:    goalCounts,
+  };
+}
+
+/**
  * Full intelligence report — a single object with all signals.
  * Use in the browser console: window.__mfIntel.report()
  */
@@ -360,6 +389,8 @@ export function getIntelReport() {
     inventoryGaps:        getInventoryGaps(),
     sessionDepth:         getSessionDepth(),
     loyaltySignals:       getLoyaltySignals(),
+    // Phase 3 — AI Stack Builder intelligence
+    stackBuilderSummary:  getStackBuilderSummary(),
     // Meta
     eventCount:           getEvents().length,
   };
@@ -392,6 +423,9 @@ export function logIntelReport() {
   h('🕳️  Inventory Gaps (missing demand)'); console.table(r.inventoryGaps);
   h('📊 Session Depth');                   console.log(r.sessionDepth);
   h('🏆 Loyalty Signals');                 console.log(r.loyaltySignals);
+
+  console.log('%c── AI STACK BUILDER (Phase 3)', 'color:#D4A843;font-weight:700;font-size:13px');
+  h('⚡ Stack Builder Summary');           console.log(r.stackBuilderSummary);
 
   console.log(`Total buffered events: ${r.eventCount}`);
   console.groupEnd();

@@ -365,11 +365,22 @@ export default function AIStackBuilder() {
     setStepIndex(0);
     setSelections(INITIAL_SELECTIONS);
     analytics.stackCTA('ai_builder_open', 'AI Stack Builder');
-    // Prevent body scroll while overlay is open
     document.body.style.overflow = 'hidden';
   }
 
   function close() {
+    // Track abandonment if user closes before reaching results (step 5)
+    // Only meaningful if they've progressed past the first step
+    if (stepIndex >= 1 && stepIndex < 5) {
+      const stepNames = ['goal', 'experience', 'budget', 'frequency', 'analyzing'];
+      analytics.stackStep('abandoned', {
+        step_reached:    stepNames[stepIndex] || 'goal',
+        step_index:      stepIndex,
+        goal:            selections.goal,
+        experience:      selections.experience,
+        selections_made: Object.values(selections).filter(Boolean).length,
+      });
+    }
     setIsOpen(false);
     document.body.style.overflow = '';
   }
@@ -379,15 +390,26 @@ export default function AIStackBuilder() {
   }
 
   function next() {
-    const fields   = ['goal', 'experience', 'budget', 'frequency'];
-    const current  = fields[stepIndex];
+    const fields  = ['goal', 'experience', 'budget', 'frequency'];
+    const current = fields[stepIndex];
     if (!selections[current]) return; // guard: don't advance without selection
+
+    // Track each step completion — powers funnel dropout analysis
+    analytics.stackStep('step_complete', {
+      step:       current,
+      step_index: stepIndex,
+      value:      selections[current],
+    });
+
     if (stepIndex < 3) {
       setStepIndex(i => i + 1);
     } else {
-      // Trigger analyzing → results
+      // Final step → trigger analyzing → results
       setStepIndex(4);
-      analytics.stackCTA('ai_builder_generate', `${selections.goal}|${selections.experience}|${selections.budget}`);
+      analytics.stackCTA(
+        'ai_builder_generate',
+        `${selections.goal}|${selections.experience}|${selections.budget}`
+      );
     }
   }
 
@@ -396,12 +418,26 @@ export default function AIStackBuilder() {
   }
 
   function restart() {
+    analytics.stackStep('restarted', {
+      goal:       selections.goal,
+      experience: selections.experience,
+      budget:     selections.budget,
+    });
     setStepIndex(0);
     setSelections(INITIAL_SELECTIONS);
   }
 
   function handleWAClick() {
+    // Primary WA conversion event
     analytics.whatsappClick('ai_stack_builder', null, `${GOAL_LABELS[selections.goal]} stack`);
+    // Full stack context for intelligence layer
+    analytics.stackStep('wa_clicked', {
+      goal:       selections.goal,
+      experience: selections.experience,
+      budget:     selections.budget,
+      frequency:  selections.frequency,
+      stack_size: stack.length,
+    });
   }
 
   // Current step data

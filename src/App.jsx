@@ -16,6 +16,8 @@ import WhatsAppFloat  from './components/WhatsAppFloat';
 import { getTopClicked, devLogAnalytics, clearAnalytics } from './hooks/useClickTracking';
 import { addRecentlyViewed } from './hooks/useRecentlyViewed';
 import { logIntelReport, getIntelReport } from './lib/intelligence';
+import { logStackReport, getStackReport } from './lib/stackIntelligence';
+import { logSegmentReport, getCrmProfile, getPrimarySegment, getLeadScore } from './lib/segmentation';
 
 // Below-fold & interaction-gated components — lazy loaded
 const ProductModal    = lazy(() => import('./components/ProductModal'));
@@ -314,6 +316,29 @@ export default function App() {
         categoryHeat:  () => console.table(getIntelReport().categoryHeat),
         goalHeat:      () => console.table(getIntelReport().goalHeat),
       };
+
+      // Phase 3 — AI Stack Builder intelligence
+      window.__mfStack = {
+        report:         () => logStackReport(),
+        data:           () => getStackReport(),
+        funnel:         () => console.table(getStackReport().funnelDropout),
+        goals:          () => console.table(getStackReport().goalDistribution),
+        budgets:        () => console.table(getStackReport().budgetDistribution),
+        abandonment:    () => console.table(getStackReport().abandonmentPatterns),
+        conversion:     () => console.log(getStackReport().waConversion),
+        combos:         () => console.table(getStackReport().popularCombinations),
+      };
+
+      // Phase 3 — Customer segmentation + CRM profile
+      window.__mfSegment = {
+        report:    () => logSegmentReport(),
+        profile:   () => getCrmProfile(),
+        segment:   () => console.log(`Segment: ${getPrimarySegment()} | Lead score: ${getLeadScore()}/100`),
+        triggers:  () => console.table(getCrmProfile().triggers),
+        goals:     () => console.log(getCrmProfile().goals),
+        affinity:  () => console.table(getCrmProfile().category_affinity),
+      };
+
       devLogAnalytics();
     }
   }, []);

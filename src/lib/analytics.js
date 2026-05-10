@@ -254,6 +254,23 @@ export const analytics = {
     });
   },
 
+  /**
+   * AI Stack Builder step event — tracks every meaningful moment in the funnel.
+   *
+   * actions:
+   *   'step_complete'  — user advanced from a step (includes which value they selected)
+   *   'abandoned'      — user closed the builder before reaching results
+   *   'wa_clicked'     — user sent the stack to WhatsApp (conversion event)
+   *   'restarted'      — user clicked "Armar otro stack"
+   *
+   * Future: when Supabase is active, fire these to:
+   *   POST /api/analytics/stack-step
+   *   Persisted in table: behavioral_tracking(session_id, action, payload, created_at)
+   */
+  stackStep(action, params = {}) {
+    _fire('stack_step', { action, ...params });
+  },
+
   // ── Dev helpers ──────────────────────────────────────────────────
   getBuffer() {
     try { return JSON.parse(localStorage.getItem(BUFFER_KEY) || '[]'); } catch { return []; }
