@@ -18,12 +18,13 @@ import { addRecentlyViewed } from './hooks/useRecentlyViewed';
 import { logIntelReport, getIntelReport } from './lib/intelligence';
 
 // Below-fold & interaction-gated components — lazy loaded
-const ProductModal   = lazy(() => import('./components/ProductModal'));
-const WhySection     = lazy(() => import('./components/WhySection'));
-const StackSelling   = lazy(() => import('./components/StackSelling'));
-const AccountPreview = lazy(() => import('./components/AccountPreview'));
-const BrandTeaser    = lazy(() => import('./components/BrandTeaser'));
-const GuidePage      = lazy(() => import('./components/GuidePage'));
+const ProductModal    = lazy(() => import('./components/ProductModal'));
+const WhySection      = lazy(() => import('./components/WhySection'));
+const StackSelling    = lazy(() => import('./components/StackSelling'));
+const AIStackBuilder  = lazy(() => import('./components/AIStackBuilder'));
+const AccountPreview  = lazy(() => import('./components/AccountPreview'));
+const BrandTeaser     = lazy(() => import('./components/BrandTeaser'));
+const GuidePage       = lazy(() => import('./components/GuidePage'));
 
 // ── Module-level constants (computed once) ────────────────────
 
@@ -596,6 +597,7 @@ export default function App() {
         <Suspense fallback={null}>
           <WhySection />
           <StackSelling />
+          <AIStackBuilder />
           <AccountPreview />
           <BrandTeaser />
         </Suspense>
