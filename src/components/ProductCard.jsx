@@ -1,29 +1,23 @@
 import { memo, useState, useMemo } from 'react';
 import { resolveProductImage } from '../data/images';
-import { WA_NUMBER } from '../data/catalog';
 import { PRODUCT_LABELS, CLICK_THRESHOLD_POPULAR } from '../data/labels';
 import { isDynamicPopular, trackView, trackCta } from '../hooks/useClickTracking';
+import { analytics } from '../lib/analytics';
+import { buildWaUrl } from '../lib/whatsapp';
 
-/** Extract the URL slug from a product URL */
 function slugFrom(url) {
   return url?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
 }
 
-/** Compute badge — dynamic (click-based) takes priority over static label */
 function computeBadge(slug) {
   if (!slug) return null;
-
-  // Dynamic: product has been clicked enough to earn "Popular" organically
   if (isDynamicPopular(slug, CLICK_THRESHOLD_POPULAR)) {
     return { label: 'Popular', cls: 'badge-hot' };
   }
-
-  // Static: curated label from labels.js
   const label = PRODUCT_LABELS[slug];
-  if (label === 'recommended') return { label: 'Recomendado', cls: 'badge-new'        };
-  if (label === 'popular')     return { label: 'Popular',     cls: 'badge-bestseller'  };
+  if (label === 'recommended') return { label: 'Recomendado',  cls: 'badge-new'       };
+  if (label === 'popular')     return { label: 'Popular',      cls: 'badge-bestseller' };
   if (label === 'beginner')    return { label: 'Para empezar', cls: 'badge-limited'    };
-
   return null;
 }
 
@@ -43,20 +37,18 @@ function ProductCard({ product, badge: badgeProp, onClick }) {
   const slug  = useMemo(() => slugFrom(u), [u]);
   const badge = badgeProp ?? useMemo(() => computeBadge(slug), [slug]); // eslint-disable-line
 
-  // WhatsApp CTA — specific product + purchase signal
-  const waMsg = `Hola MacroForge! 🔥 Me interesa el ${n}. ¿Tienen disponible y cuánto cuesta el envío?`;
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+  // Consultative CTA copy — not a purchase pressure signal
+  const waUrl = buildWaUrl('product', { name: n, brand: b });
 
-  /** Card click → open modal + track view */
   function handleCardClick() {
     trackView(slug);
     onClick();
   }
 
-  /** CTA click → open WhatsApp + track CTA (prevent modal) */
   function handleCtaClick(e) {
     e.stopPropagation();
     trackCta(slug);
+    analytics.whatsappClick('card', slug || '', n);
   }
 
   return (

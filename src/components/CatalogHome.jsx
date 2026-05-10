@@ -2,27 +2,28 @@ import { lazy, Suspense } from 'react';
 import { PRODUCTS } from '../data/products';
 import GoalNav from './GoalNav';
 
-// All lazy — render only after the hero frame has painted.
-// Zero cost to first contentful paint for new visitors.
-const RecentlyViewed  = lazy(() => import('./RecentlyViewed'));
-const FavoritesList   = lazy(() => import('./FavoritesList'));
+// All lazy — zero cost to first contentful paint.
+const RefillSection    = lazy(() => import('./RefillSection'));
+const RecentlyViewed   = lazy(() => import('./RecentlyViewed'));
+const FavoritesList    = lazy(() => import('./FavoritesList'));
+const EditorialSection = lazy(() => import('./EditorialSection'));
 const FeaturedProducts = lazy(() => import('./FeaturedProducts'));
 
 const SECTION_META = {
   gym: {
-    icon: '💪',
+    icon:    '💪',
     tagline: 'Performance',
-    desc: 'Proteínas, creatinas, pre-entrenos y todo para tu entrenamiento.',
+    desc:    'Proteínas, creatinas, pre-entrenos y todo para tu entrenamiento.',
   },
   vita: {
-    icon: '🌿',
+    icon:    '🌿',
     tagline: 'Salud',
-    desc: 'Vitaminas, minerales, magnesio y suplementos para tu bienestar.',
+    desc:    'Vitaminas, minerales, magnesio y suplementos para tu bienestar.',
   },
   dote: {
-    icon: '🌸',
+    icon:    '🌸',
     tagline: 'Bienestar',
-    desc: 'Aceites esenciales y productos naturales doTERRA originales.',
+    desc:    'Aceites esenciales y productos naturales doTERRA originales.',
   },
 };
 
@@ -30,21 +31,35 @@ export default function CatalogHome({ sections, sectionCounts, onSelectSection, 
   return (
     <div className="catalog-home">
 
-      {/* Returning visitors: personal history first — highest relevance */}
+      {/* Refill reminder — top priority for returning users with purchase history */}
+      {onOpenProduct && (
+        <Suspense fallback={null}>
+          <RefillSection onOpenProduct={onOpenProduct} />
+        </Suspense>
+      )}
+
+      {/* Personal history — highest relevance for returning visitors */}
       {onOpenProduct && (
         <Suspense fallback={null}>
           <RecentlyViewed onOpenProduct={onOpenProduct} />
         </Suspense>
       )}
 
-      {/* Saved products — user's own curated intent list */}
+      {/* Saved products — high purchase intent */}
       {onOpenProduct && (
         <Suspense fallback={null}>
           <FavoritesList onOpenProduct={onOpenProduct} />
         </Suspense>
       )}
 
-      {/* Editorial: curated picks — always shown */}
+      {/* Editorial groups — for new/exploring visitors with no personal history */}
+      {onOpenProduct && (
+        <Suspense fallback={null}>
+          <EditorialSection onOpenProduct={onOpenProduct} />
+        </Suspense>
+      )}
+
+      {/* Store-curated featured products — always shown */}
       {onOpenProduct && (
         <Suspense fallback={null}>
           <FeaturedProducts onOpenProduct={onOpenProduct} />
@@ -64,8 +79,8 @@ export default function CatalogHome({ sections, sectionCounts, onSelectSection, 
 
       <div className="section-cards">
         {Object.entries(sections).map(([id, section]) => {
-          const meta    = SECTION_META[id] || {};
-          const count   = sectionCounts[id] || 0;
+          const meta  = SECTION_META[id] || {};
+          const count = sectionCounts[id] || 0;
           return (
             <button
               key={id}

@@ -2,9 +2,9 @@ import { useState, useMemo, useCallback, useEffect, lazy, Suspense, useDeferredV
 import { PRODUCTS } from './data/products';
 import { SECTIONS } from './data/catalog';
 import { PRODUCT_LABELS } from './data/labels';
-import { WA_NUMBER } from './data/catalog';
 import { useTheme } from './hooks/useTheme';
 import { analytics } from './lib/analytics';
+import { buildWaUrl } from './lib/whatsapp';
 
 import Hero           from './components/Hero';
 import Controls       from './components/Controls';
@@ -15,6 +15,7 @@ import ProductCard    from './components/ProductCard';
 import WhatsAppFloat  from './components/WhatsAppFloat';
 import { getTopClicked, devLogAnalytics, clearAnalytics } from './hooks/useClickTracking';
 import { addRecentlyViewed } from './hooks/useRecentlyViewed';
+import { logIntelReport, getIntelReport } from './lib/intelligence';
 
 // Below-fold & interaction-gated components — lazy loaded
 const ProductModal   = lazy(() => import('./components/ProductModal'));
@@ -22,6 +23,7 @@ const WhySection     = lazy(() => import('./components/WhySection'));
 const StackSelling   = lazy(() => import('./components/StackSelling'));
 const AccountPreview = lazy(() => import('./components/AccountPreview'));
 const BrandTeaser    = lazy(() => import('./components/BrandTeaser'));
+const GuidePage      = lazy(() => import('./components/GuidePage'));
 
 // ── Module-level constants (computed once) ────────────────────
 
@@ -54,24 +56,122 @@ function norm(s) {
   return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
+// Synonym map: maps common terms / abbreviations / goal words →
+// category keywords that boost products in those categories.
+// This lets customers search in the way they THINK, not the way
+// the catalog is structured.
+// Keys are normalized (accent-free, lowercase).
+const SEARCH_SYNONYMS = {
+  // abbreviations / shorthands
+  'whey':        'proteinas whey',
+  'iso':         'proteinas isoladas',
+  'pre':         'pre-entrenamientos',
+  'preworkout':  'pre-entrenamientos',
+  'pre workout': 'pre-entrenamientos',
+  'gainer':      'gainers de masa',
+  'bcaa':        'bcaa',
+  'eaa':         'aminoacidos esenciales',
+  'crea':        'creatinas',
+  'multi':       'multivitaminicos',
+  'omega':       'omega y grasas saludables',
+  'fish oil':    'omega y grasas saludables',
+  'colageno':    'colageno y belleza',
+  'melatonina':  'sueno y relajacion',
+
+  // goal words — customers think in outcomes
+  'fuerza':      'creatinas',
+  'masa':        'gainers de masa',
+  'musculo':     'proteinas whey',
+  'volumen':     'gainers de masa',
+  'definicion':  'quemadores de grasa',
+  'bajar':       'quemadores de grasa',
+  'adelgazar':   'quemadores de grasa',
+  'quemar':      'quemadores de grasa',
+  'energia':     'pre-entrenamientos',
+  'energía':     'pre-entrenamientos',
+  'dormir':      'sueno y relajacion',
+  'sueño':       'sueno y relajacion',
+  'sueno':       'sueno y relajacion',
+  'descanso':    'sueno y relajacion',
+  'ansiedad':    'sueno y relajacion',
+  'estres':      'adaptogenos y hormonas',
+  'estros':      'adaptogenos y hormonas',
+  'cortisol':    'adaptogenos y hormonas',
+  'pelo':        'cuidado del cabello',
+  'cabello':     'cuidado del cabello',
+  'piel':        'cuidado de la piel',
+  'articulacion':'articulaciones',
+  'rodilla':     'articulaciones',
+  'colesterol':  'omega y grasas saludables',
+  'intestino':   'probioticos',
+  'digestion':   'digestion y enzimas',
+  'higado':      'detox y salud hepatica',
+  'calambres':   'electrolitos',
+  'hidratacion': 'electrolitos',
+  'cerebro':     'salud mental y cognitiva',
+  'enfoque':     'salud mental y cognitiva',
+  'concentracion':'salud mental y cognitiva',
+  'memoria':     'salud mental y cognitiva',
+  'corazon':     'salud cardiovascular',
+  'natural':     'aceites esenciales individuales',
+  'aromaterapia':'aromaterapia emocional',
+  'aceite':      'aceites esenciales individuales',
+  'esencial':    'aceites esenciales individuales',
+  'doterra':     'aceites esenciales individuales',
+  'testosterone':'precursores hormonales',
+  'testosterona':'precursores hormonales',
+  'hormonal':    'precursores hormonales',
+  'recuperacion':'glutamina',
+  'recuperación':'glutamina',
+  'longevidad':  'longevidad celular',
+  'nad':         'longevidad celular',
+  'huesos':      'articulaciones',
+  'vitamina c':  'vitaminas esenciales',
+  'vitamina d':  'vitaminas esenciales',
+  'zinc':        'minerales',
+  'hierro':      'minerales',
+  'calcio':      'minerales',
+  'magnesio':    'magnesio',
+  'beginner':    'creatinas',  // english fallback
+  'protein':     'proteinas whey',
+  'creatine':    'creatinas',
+};
+
+// Resolve a query to its canonical form (synonym expansion)
+// Returns: { resolvedQuery, categoryBoost | null }
+function resolveQuery(rawQuery) {
+  const nq = norm(rawQuery.trim());
+  const mapped = SEARCH_SYNONYMS[nq];
+  return {
+    resolvedQuery: nq,
+    categoryBoost: mapped ? norm(mapped) : null,
+  };
+}
+
 // Score a product against a normalized query.
 // Returns -1 if no match, else a positive relevance score.
 // Higher score = more relevant = ranked earlier.
-function scoreSearch(p, nq) {
+function scoreSearch(p, nq, categoryBoost) {
   const nn = norm(p.n);
   const nb = norm(p.b);
   const nc = norm(p.c);
   const nf = norm((p.f || []).join(' '));
 
-  if (!nn.includes(nq) && !nb.includes(nq) && !nc.includes(nq) && !nf.includes(nq)) return -1;
+  // Category boost match (synonym-driven): boost products in the mapped category
+  const hasCategoryBoost = categoryBoost && nc.includes(categoryBoost);
+
+  if (!nn.includes(nq) && !nb.includes(nq) && !nc.includes(nq) && !nf.includes(nq) && !hasCategoryBoost) return -1;
 
   let s = 0;
-  if (nn.startsWith(nq))   s += 16; // name prefix — highest confidence
+  if (nn.startsWith(nq))    s += 16; // name prefix — highest confidence
   else if (nn.includes(nq)) s += 10;
-  if (nb.startsWith(nq))   s += 9;  // brand prefix
+  if (nb.startsWith(nq))    s += 9;  // brand prefix
   else if (nb.includes(nq)) s += 6;
-  if (nc.includes(nq))     s += 4;  // category
-  if (nf.includes(nq))     s += 2;  // flavor
+  if (nc.includes(nq))      s += 4;  // category exact
+  if (nf.includes(nq))      s += 2;  // flavor
+
+  // Synonym-driven category boost: goal words surface the right products
+  if (hasCategoryBoost)     s += 5;
 
   // Curated boost — recommended/popular products rank slightly higher
   const slug = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || '';
@@ -94,17 +194,25 @@ function slugFromId(id) {
   return p?.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
 }
 
+// ── Guide deep-link helpers ───────────────────────────────────
+
+function parseGuideHash() {
+  const m = window.location.hash.match(/^#guia\/([^/?&]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
 // ── App ───────────────────────────────────────────────────────
 
-// Return-visitor detection: reads/sets a localStorage flag on first visit.
-// Used to adapt messaging for returning customers.
+// Return-visitor detection: tracks visit count in localStorage.
+// Returns { type: 'new'|'returning', count: number }
 function detectVisitType() {
-  const key = 'mf_visited';
+  const key = 'mf_visit_count';
   try {
-    const seen = Boolean(localStorage.getItem(key));
-    if (!seen) localStorage.setItem(key, '1');
-    return seen ? 'returning' : 'new';
-  } catch { return 'new'; }
+    const prev  = parseInt(localStorage.getItem(key) || '0', 10);
+    const next  = prev + 1;
+    localStorage.setItem(key, String(next));
+    return { type: prev > 0 ? 'returning' : 'new', count: next };
+  } catch { return { type: 'new', count: 1 }; }
 }
 
 export default function App() {
@@ -120,28 +228,34 @@ export default function App() {
   const [searchQuery,    setSearchQuery]    = useState('');
   const deferredQuery = useDeferredValue(searchQuery);
   const [openProductId,  setOpenProductId]  = useState(null);
+  const [activeGuide,    setActiveGuide]    = useState(null);
 
   const scrollTop = () => window.scrollTo({ top: 0, behavior: 'instant' });
 
   // ── Return-visitor analytics (fires once on mount) ───────────
   useEffect(() => {
-    if (visitType === 'returning') analytics.returnVisit();
+    if (visitType.type === 'returning') analytics.returnVisit(visitType.count);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Deep link: read initial hash ─────────────────────────────
   useEffect(() => {
-    const id = parseProductHash();
-    if (id) {
-      setOpenProductId(id);
-      analytics.deepLink(slugFromId(id) || '');
+    const productId = parseProductHash();
+    const guideSlug = parseGuideHash();
+    if (productId) {
+      setOpenProductId(productId);
+      analytics.deepLink(slugFromId(productId) || '');
+    } else if (guideSlug) {
+      setActiveGuide(guideSlug);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Deep link: browser back/forward ──────────────────────────
   useEffect(() => {
     function handlePop() {
-      const id = parseProductHash();
-      setOpenProductId(id);
+      const productId = parseProductHash();
+      const guideSlug = parseGuideHash();
+      setOpenProductId(productId);
+      setActiveGuide(guideSlug);
     }
     window.addEventListener('popstate', handlePop);
     return () => window.removeEventListener('popstate', handlePop);
@@ -183,6 +297,22 @@ export default function App() {
         events: () => console.table(analytics.getBuffer().slice(-30)),
         clearEvents: analytics.clearBuffer,
       };
+      window.__mfEvents = Object.assign(
+        () => console.table(analytics.getBuffer().slice(-30)),
+        {
+          all:   () => console.table(analytics.getBuffer()),
+          clear: () => analytics.clearBuffer(),
+        }
+      );
+      window.__mfIntel = {
+        report:        () => logIntelReport(),
+        data:          () => getIntelReport(),
+        desires:       () => console.table(getIntelReport().productDesires),
+        barriers:      () => console.table(getIntelReport().desireBarriers),
+        searchFailures:() => console.table(getIntelReport().searchFailures),
+        categoryHeat:  () => console.table(getIntelReport().categoryHeat),
+        goalHeat:      () => console.table(getIntelReport().goalHeat),
+      };
       devLogAnalytics();
     }
   }, []);
@@ -194,8 +324,29 @@ export default function App() {
     setActiveSection(null);
     setActiveCategory(null);
     setSearchQuery('');
+    setActiveGuide(null);
+    history.pushState(null, '', window.location.pathname + window.location.search);
     scrollTop();
   }, []);
+
+  // Open an authority guide — hash-synced for shareability
+  const goGuide = useCallback((slug) => {
+    history.pushState({ guide: slug }, '', `#guia/${slug}`);
+    setActiveGuide(slug);
+    setOpenProductId(null);
+    scrollTop();
+  }, []);
+
+  // Close guide — called by GuidePage "Volver" or to navigate to a related guide
+  const closeGuide = useCallback((nextSlug) => {
+    if (nextSlug && typeof nextSlug === 'string') {
+      goGuide(nextSlug);
+    } else {
+      history.pushState(null, '', window.location.pathname + window.location.search);
+      setActiveGuide(null);
+      scrollTop();
+    }
+  }, [goGuide]);
 
   const goSection = useCallback((sectionId) => {
     setView('section');
@@ -257,11 +408,15 @@ export default function App() {
     return c;
   }, []);
 
-  // ── Smart search — normalized + ranked ────────────────────────
+  // ── Smart search — normalized + synonym-aware + behaviorally ranked ──
   const searchResults = useMemo(() => {
     const q = deferredQuery.trim();
     if (!q) return null;
-    const nq = norm(q);
+    const { resolvedQuery: nq, categoryBoost } = resolveQuery(q);
+
+    // Behavioral boost: products this user has personally clicked rank higher.
+    // Reads from localStorage — cheap, synchronous, no rerenders.
+    const clickedSlugs = new Set(getTopClicked(20).map(c => c.slug));
 
     return Object.entries(PRODUCTS)
       .filter(([, p]) => {
@@ -269,7 +424,14 @@ export default function App() {
         if (view === 'category' && p.c !== activeCategory)  return false;
         return true;
       })
-      .map(entry => [entry, scoreSearch(entry[1], nq)])
+      .map(entry => {
+        const base  = scoreSearch(entry[1], nq, categoryBoost);
+        if (base < 0) return [entry, -1];
+        // Personal behavioral boost — products this visitor has clicked before
+        const slug  = entry[1].u?.match(/\/tienda\/([^/?#]+)/)?.[1] || '';
+        const boost = clickedSlugs.has(slug) ? 2 : 0;
+        return [entry, base + boost];
+      })
       .filter(([, score]) => score > 0)
       .sort(([, a], [, b]) => b - a)
       .map(([entry]) => entry);
@@ -283,8 +445,7 @@ export default function App() {
 
   const showHero = view === 'home' && !searchResults && !deferredQuery;
 
-  const searchEmptyWaMsg = `Hola MacroForge! Busqué "${searchQuery}" en el catálogo y no lo encontré. ¿Tienen algo similar o pueden conseguirlo?`;
-  const searchEmptyWaUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(searchEmptyWaMsg)}`;
+  const searchEmptyWaUrl = buildWaUrl('searchMiss', { query: searchQuery });
 
   return (
     <>
@@ -329,7 +490,21 @@ export default function App() {
         onThemeToggle={toggle}
       />
 
+      {/* ── Guide page — authority content, full-view overlay ── */}
+      {activeGuide && (
+        <main className="view-content" key={`guide|${activeGuide}`} aria-label={`Guía: ${activeGuide}`}>
+          <Suspense fallback={null}>
+            <GuidePage
+              slug={activeGuide}
+              onClose={closeGuide}
+              onOpenProduct={handleOpen}
+            />
+          </Suspense>
+        </main>
+      )}
+
       {/* ── Main content ── */}
+      {!activeGuide && (
       <main
         className="view-content"
         key={`${view}|${activeSection}|${activeCategory}`}
@@ -415,8 +590,9 @@ export default function App() {
         )}
 
       </main>
+      )} {/* end !activeGuide */}
 
-      {showHero && (
+      {showHero && !activeGuide && (
         <Suspense fallback={null}>
           <WhySection />
           <StackSelling />
@@ -425,7 +601,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {showHero && (
+      {showHero && !activeGuide && (
         <footer className="footer" role="contentinfo" aria-label="MacroForge — pie de página">
           <div className="footer-brand">MACRO<span>FORGE</span></div>
           <address className="footer-meta" style={{ fontStyle: 'normal' }}>

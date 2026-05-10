@@ -11,9 +11,10 @@
  *
  * Updates reactively via custom event when favorites are toggled.
  */
-import { WA_NUMBER } from '../data/catalog';
 import { useFavorites } from '../hooks/useFavorites';
 import { PRODUCTS } from '../data/products';
+import { analytics } from '../lib/analytics';
+import { buildWaUrl } from '../lib/whatsapp';
 import ProductCard from './ProductCard';
 
 export default function FavoritesList({ onOpenProduct }) {
@@ -22,8 +23,12 @@ export default function FavoritesList({ onOpenProduct }) {
 
   if (ids.length === 0) return null;
 
-  const waMsg = `Hola MacroForge! 💪 Tengo varios productos guardados en mis favoritos y quiero consultarlos. ¿Me pueden ayudar con precios y disponibilidad?`;
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+  const waUrl = buildWaUrl('favoritesConsult', { count: ids.length });
+
+  function handleConsult() {
+    analytics.favoritesConsult(ids.length);
+    analytics.whatsappClick('favorites_consult', null, `${ids.length} favoritos`);
+  }
 
   return (
     <section className="favorites-section">
@@ -41,6 +46,7 @@ export default function FavoritesList({ onOpenProduct }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Consultar mis favoritos por WhatsApp"
+          onClick={handleConsult}
         >
           💬 Consultar todos
         </a>

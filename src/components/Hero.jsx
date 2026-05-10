@@ -1,12 +1,30 @@
+import { useMemo } from 'react';
 import logo from '../assets/Branding/macroforge-logo-icon.png';
 import { PRODUCTS } from '../data/products';
-import { WA_NUMBER } from '../data/catalog';
+import { buildWaUrl } from '../lib/whatsapp';
+import { getCustomerState } from '../lib/customerState';
 
 const totalProducts = Object.keys(PRODUCTS).length;
 const brands = new Set(Object.values(PRODUCTS).map(p => p.b)).size;
-const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola MacroForge! 💪 Quiero consultar el catálogo de suplementos.')}`;
+
+// Returning-visitor recognition copy — subtle, premium, not invasive.
+// Goal: the customer feels recognized without knowing they're being recognized.
+const RETURN_SUBTITLES = {
+  exploring: 'Tus favoritos y productos vistos están esperándote.',
+  returning: 'Continuá donde lo dejaste.',
+  regular:   'Bienvenido de vuelta.',
+  loyal:     'Tu espacio. Tus suplementos.',
+};
 
 export default function Hero({ onNavigate }) {
+  const waUrl = buildWaUrl('welcome');
+
+  // Pure read — no side effects, computed once on mount
+  const returnSubtitle = useMemo(() => {
+    const state = getCustomerState();
+    return state.isReturning ? (RETURN_SUBTITLES[state.segment] || null) : null;
+  }, []);
+
   return (
     <section className="hero">
 
@@ -33,11 +51,18 @@ export default function Hero({ onNavigate }) {
             MEJOR <em>FÍSICO.</em>
           </h1>
 
-          <p className="hero-sub">
-            Suplementos originales para mejorar tu rendimiento,
-            ganar masa y alcanzar tu mejor físico.
-            Disponibles en Costa Rica — pedí por WhatsApp.
-          </p>
+          {/* Recognition subtitle for returning visitors — or default for new */}
+          {returnSubtitle ? (
+            <p className="hero-sub hero-sub--returning">
+              {returnSubtitle}
+            </p>
+          ) : (
+            <p className="hero-sub">
+              Suplementos originales para mejorar tu rendimiento,
+              ganar masa y alcanzar tu mejor físico.
+              Disponibles en Costa Rica — pedí por WhatsApp.
+            </p>
+          )}
 
           {/* Primary CTA */}
           <div className="hero-cta-wrap">
@@ -66,7 +91,7 @@ export default function Hero({ onNavigate }) {
             </div>
           </div>
 
-          {/* Category entry points — navigate to section */}
+          {/* Category entry points */}
           <div className="hero-sections">
             <button className="hero-section-indicator hero-section-gym" onClick={() => onNavigate('gym')}>
               <span className="hero-section-icon">💪</span>
@@ -89,12 +114,9 @@ export default function Hero({ onNavigate }) {
         {/* RIGHT: Brand logo */}
         <div className="hero-right">
           <div className="hero-logo-wrap">
-            {/* Ambient glow — behind the logo */}
             <div className="hero-logo-glow" aria-hidden="true" />
-            {/* Micro energy sparks */}
             <div className="hero-logo-spark hero-logo-spark--a" aria-hidden="true" />
             <div className="hero-logo-spark hero-logo-spark--b" aria-hidden="true" />
-            {/* Stage clips the metallic shine sweep */}
             <div className="hero-logo-stage">
               <img
                 src={logo}

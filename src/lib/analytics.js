@@ -2,27 +2,53 @@
  * MacroForge — Centralized Analytics Layer
  *
  * ALL event tracking routes through this module.
- * Currently writes to a localStorage event buffer (zero dependencies).
+ * Writes to a localStorage event buffer (zero dependencies) AND
+ * forwards to GA4 + Meta Pixel when IDs are present.
  *
- * To activate GA4:
- *   1. Add your Measurement ID to GA4_ID below
- *   2. Add the gtag script to index.html
- *   3. Events fire automatically — no other code changes needed.
+ * ── GA4 activation ──────────────────────────────────────────────
+ * Set VITE_GA4_ID in your .env file:
+ *   VITE_GA4_ID=G-XXXXXXXXXX
  *
- * To activate Meta Pixel:
- *   1. Add your Pixel ID to PIXEL_ID below
- *   2. Add the fbq script to index.html
- *   3. Key events (ViewContent, Lead) fire automatically.
+ * Then add to index.html <head> (replace YOUR_ID with the same value):
+ *   <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_ID"></script>
+ *   <script>
+ *     window.dataLayer = window.dataLayer || [];
+ *     function gtag(){dataLayer.push(arguments);}
+ *     gtag('js', new Date());
+ *     gtag('config', 'YOUR_ID', { send_page_view: false });
+ *   </script>
  *
- * Event buffer is available in browser dev tools:
- *   JSON.parse(localStorage.getItem('mf_events'))
+ * page_view is sent manually via analytics.pageView() to prevent
+ * duplicate fires from the SPA router + gtag auto-collection.
+ *
+ * ── Meta Pixel activation ────────────────────────────────────────
+ * Set VITE_PIXEL_ID in your .env file:
+ *   VITE_PIXEL_ID=1234567890123456
+ *
+ * Then add to index.html <head>:
+ *   <script>
+ *     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+ *     n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+ *     n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+ *     t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+ *     document,'script','https://connect.facebook.net/en_US/fbevents.js');
+ *     fbq('init', 'YOUR_PIXEL_ID');
+ *     // Do NOT call fbq('track','PageView') here — analytics.pageView() handles it
+ *   </script>
+ *
+ * ── Dev console helpers ──────────────────────────────────────────
+ *   window.__mfEvents()        → last 30 buffered events
+ *   window.__mfEvents.all()    → full buffer
+ *   window.__mfEvents.clear()  → clear buffer
  */
 
-// ── Plug in your IDs here when accounts are ready ────────────
-const GA4_ID   = null; // e.g. 'G-XXXXXXXXXX'
-const PIXEL_ID = null; // e.g. '1234567890123456'
+// ── IDs: read from Vite env vars, fall back to null ──────────────
+// In production: set VITE_GA4_ID and VITE_PIXEL_ID in your .env
+// In GitHub Pages: set them as repository secrets and inject via CI
+const GA4_ID   = import.meta.env?.VITE_GA4_ID   || null;
+const PIXEL_ID = import.meta.env?.VITE_PIXEL_ID  || null;
 
-// ── Internal buffer ───────────────────────────────────────────
+// ── Internal buffer ───────────────────────────────────────────────
 const BUFFER_KEY = 'mf_events';
 const BUFFER_MAX = 300;
 
@@ -36,33 +62,64 @@ function _buffer(name, params) {
   } catch { /* storage full or disabled — silent */ }
 }
 
-// Pixel event name mapping
+// ── GA4 safe wrapper ──────────────────────────────────────────────
+function _ga4(name, params) {
+  if (!GA4_ID) return;
+  try {
+    if (typeof gtag !== 'undefined') gtag('event', name, params);
+  } catch {}
+}
+
+// ── Meta Pixel event map ──────────────────────────────────────────
+// Maps internal event names → standard Meta Pixel event names.
+// Standard events unlock Meta's optimization algorithms (conversion,
+// purchase intent, lookalike audiences).
 const FB_MAP = {
-  product_view:    'ViewContent',
-  whatsapp_click:  'InitiateCheckout',
-  whatsapp_float:  'Lead',
-  goal_nav_click:  'Lead',
+  product_view:    { event: 'ViewContent',       standard: true  },
+  whatsapp_click:  { event: 'InitiateCheckout',  standard: true  },
+  whatsapp_float:  { event: 'Contact',           standard: true  },
+  goal_nav_click:  { event: 'Lead',              standard: true  },
+  search:          { event: 'Search',            standard: true  },
+  favorite:        { event: 'AddToWishlist',     standard: true  },
+  share:           { event: 'CustomizeProduct',  standard: false },
+  stack_cta_click: { event: 'InitiateCheckout',  standard: true  },
+  return_visit:    { event: 'CustomAudience',    standard: false },
 };
 
+function _pixel(name, params) {
+  if (!PIXEL_ID) return;
+  const mapping = FB_MAP[name];
+  if (!mapping) return;
+  try {
+    if (typeof fbq !== 'undefined') {
+      const method = mapping.standard ? 'track' : 'trackCustom';
+      fbq(method, mapping.event, params);
+    }
+  } catch {}
+}
+
+// ── Core fire ─────────────────────────────────────────────────────
 function _fire(name, params = {}) {
   _buffer(name, params);
-
-  if (GA4_ID && typeof gtag !== 'undefined') {
-    try { gtag('event', name, params); } catch {}
-  }
-  if (PIXEL_ID && typeof fbq !== 'undefined') {
-    const fb = FB_MAP[name];
-    if (fb) try { fbq('track', fb, params); } catch {}
-  }
+  _ga4(name, params);
+  _pixel(name, params);
 
   if (import.meta.env?.DEV) {
-    console.debug(`%c[MF Analytics] ${name}`, 'color:#E3001E;font-weight:700', params);
+    // eslint-disable-next-line no-console
+    console.debug(`%c[MF] ${name}`, 'color:#E3001E;font-weight:700', params);
   }
 }
 
-// ── Public API ────────────────────────────────────────────────
+// ── Public API ────────────────────────────────────────────────────
 
 export const analytics = {
+
+  /** SPA page view — call once on mount and on view changes if needed */
+  pageView(path, title) {
+    _ga4('page_view', { page_path: path || window.location.pathname, page_title: title || document.title });
+    try { if (PIXEL_ID && typeof fbq !== 'undefined') fbq('track', 'PageView'); } catch {}
+    _buffer('page_view', { path, title });
+  },
 
   /** Product modal opened */
   productView(id, product) {
@@ -77,7 +134,7 @@ export const analytics = {
     });
   },
 
-  /** Any WhatsApp CTA clicked */
+  /** Any product WhatsApp CTA clicked (modal, search empty, etc.) */
   whatsappClick(source, productId, productName) {
     _fire('whatsapp_click', {
       source,
@@ -87,8 +144,8 @@ export const analytics = {
   },
 
   /** WhatsApp float button clicked */
-  whatsappFloat() {
-    _fire('whatsapp_float', {});
+  whatsappFloat(source) {
+    _fire('whatsapp_float', { source: source || 'float_button' });
   },
 
   /** Category page entered */
@@ -106,7 +163,7 @@ export const analytics = {
 
   /** Search query submitted */
   search(term, resultCount) {
-    if (!term.trim()) return;
+    if (!term?.trim()) return;
     _fire('search', { search_term: term, results: resultCount });
   },
 
@@ -120,7 +177,7 @@ export const analytics = {
     _fire('share', { item_id: String(productId), item_name: productName, method });
   },
 
-  /** Related product clicked in modal */
+  /** Related product clicked inside modal */
   relatedClick(fromId, toId, toName) {
     _fire('select_item', {
       item_list_name: 'related',
@@ -140,7 +197,7 @@ export const analytics = {
     });
   },
 
-  /** Deep link URL used (#product/slug) */
+  /** Deep link URL consumed (#product/slug) */
   deepLink(slug) {
     _fire('deep_link', { slug });
   },
@@ -150,7 +207,7 @@ export const analytics = {
     _fire('stack_cta_click', { goal: goalId, label: goalLabel });
   },
 
-  /** Beginner "Para empezar" category path used */
+  /** Beginner discovery path used */
   beginnerPath(categoryName, sectionId) {
     _fire('beginner_path_click', { category: categoryName, section: sectionId });
   },
@@ -165,8 +222,8 @@ export const analytics = {
   },
 
   /** Returning visitor detected on app mount */
-  returnVisit() {
-    _fire('return_visit', { ts: Date.now() });
+  returnVisit(visitCount) {
+    _fire('return_visit', { visit_count: visitCount || 1, ts: Date.now() });
   },
 
   /** Recently viewed product clicked on home */
@@ -178,12 +235,26 @@ export const analytics = {
     });
   },
 
-  /** Favorites list "Consultar todos" clicked */
+  /** Favorites list "Consultar todos" WhatsApp button clicked */
   favoritesConsult(count) {
     _fire('favorites_consult', { count });
   },
 
-  // ── Dev helpers (exposed via __mfEvents in browser console) ─
+  /** Authority guide page opened (#guia/slug) */
+  guideView(slug, title) {
+    _fire('guide_view', { slug, title });
+  },
+
+  /** Refill hint acted on — user clicked WhatsApp from the refill reminder */
+  refillHintClick(productId, category, daysSince) {
+    _fire('refill_hint_click', {
+      item_id:  String(productId),
+      category,
+      days_since_purchase: daysSince,
+    });
+  },
+
+  // ── Dev helpers ──────────────────────────────────────────────────
   getBuffer() {
     try { return JSON.parse(localStorage.getItem(BUFFER_KEY) || '[]'); } catch { return []; }
   },

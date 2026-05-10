@@ -3,10 +3,12 @@ import { PRODUCTS } from '../data/products';
 import { PRODUCT_LABELS } from '../data/labels';
 import { HEALTH } from '../data/health';
 import { resolveProductImage } from '../data/images';
-import { CATEGORY_TYPES, WA_NUMBER } from '../data/catalog';
+import { CATEGORY_TYPES } from '../data/catalog';
 import { trackCta } from '../hooks/useClickTracking';
 import { useFavorites } from '../hooks/useFavorites';
 import { analytics } from '../lib/analytics';
+import { buildWaUrl } from '../lib/whatsapp';
+import { recordPurchaseIntent } from '../lib/retention';
 import ProductSchema from './ProductSchema';
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
@@ -83,8 +85,7 @@ export default function ProductModal({ productId, onClose, onOpen }) {
   const imgUrl       = resolveProductImage(p.u);
   const slug         = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
 
-  const waMsg = `Hola MacroForge! 💪 Quiero comprar ${p.n}. ¿Tienen disponible y cuánto cuesta el envío a mi zona?`;
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+  const waUrl = buildWaUrl('product', { name: p.n, brand: p.b });
 
   const flavors = (p.f || [])
     .flatMap(f => f.split(',').map(s => s.trim()).filter(Boolean))
@@ -226,6 +227,7 @@ export default function ProductModal({ productId, onClose, onOpen }) {
             onClick={() => {
               trackCta(slug);
               analytics.whatsappClick('modal', productId, p.n);
+              recordPurchaseIntent(productId, p.c);
             }}
           >
             💬 Quiero este producto

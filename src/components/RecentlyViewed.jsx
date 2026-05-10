@@ -11,21 +11,21 @@
  */
 import { useState, useEffect } from 'react';
 import { PRODUCTS } from '../data/products';
+import { analytics } from '../lib/analytics';
 import {
   getRecentlyViewedIds,
   RECENTLY_VIEWED_EVENT,
 } from '../hooks/useRecentlyViewed';
 import ProductCard from './ProductCard';
 
-const SHOW_MIN  = 2; // don't render for fewer than 2 items
-const SHOW_MAX  = 4;
+const SHOW_MIN = 2;
+const SHOW_MAX = 4;
 
 export default function RecentlyViewed({ onOpenProduct }) {
   const [ids, setIds] = useState(() =>
     getRecentlyViewedIds(SHOW_MAX).filter(id => PRODUCTS[id])
   );
 
-  // Re-read when a new product is viewed (modal opens and dispatches event)
   useEffect(() => {
     function refresh() {
       setIds(getRecentlyViewedIds(SHOW_MAX).filter(id => PRODUCTS[id]));
@@ -36,6 +36,12 @@ export default function RecentlyViewed({ onOpenProduct }) {
 
   if (ids.length < SHOW_MIN) return null;
 
+  function handleOpen(id) {
+    const p = PRODUCTS[id];
+    if (p) analytics.recentlyViewedClick(id, p.n);
+    onOpenProduct(id);
+  }
+
   return (
     <section className="recently-viewed">
       <div className="recently-viewed-eyebrow">Retomá donde lo dejaste</div>
@@ -44,7 +50,7 @@ export default function RecentlyViewed({ onOpenProduct }) {
           <ProductCard
             key={id}
             product={PRODUCTS[id]}
-            onClick={() => onOpenProduct(id)}
+            onClick={() => handleOpen(id)}
           />
         ))}
       </div>

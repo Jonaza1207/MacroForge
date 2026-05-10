@@ -2611,6 +2611,261 @@ input  { font-family: inherit; }
 }
 
 /* ══════════════════════════════════════════════════════════════
+   EDITORIAL SECTION — Curated product groups for new/exploring visitors
+   Tone: knowledgeable friend, not algorithm.
+   Appears ONLY when user has no personal history (no favorites / recently viewed).
+   ══════════════════════════════════════════════════════════════ */
+.editorial-section {
+  padding: 32px 20px 8px;
+  border-bottom: 1px solid var(--border-2);
+}
+.editorial-header {
+  margin-bottom: 20px;
+}
+.editorial-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.editorial-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-1);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+.editorial-subtitle {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.5;
+}
+.editorial-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-2);
+}
+.editorial-consult {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.editorial-consult:hover { opacity: 0.8; }
+
+@media (min-width: 640px) {
+  .editorial-section { padding-left: 40px; padding-right: 40px; }
+}
+@media (min-width: 1024px) {
+  .editorial-section { padding-left: 64px; padding-right: 64px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HERO — returning user recognition subtitle
+   Subtle difference — same visual weight, different emotional register.
+   ══════════════════════════════════════════════════════════════ */
+.hero-sub--returning {
+  font-style: italic;
+  color: var(--text-2);
+  font-size: 15px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFILL SECTION — Passive replenishment intelligence
+   Warm, calm, never alarm-like. Recognition, not urgency.
+   ══════════════════════════════════════════════════════════════ */
+.refill-section {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--border-2);
+}
+.refill-header { margin-bottom: 16px; }
+.refill-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--dote); margin-bottom: 4px;
+}
+.refill-title {
+  font-size: 18px; font-weight: 800; color: var(--text-1);
+  margin: 0 0 4px; line-height: 1.2;
+}
+.refill-sub { font-size: 12px; color: var(--text-2); margin: 0; }
+
+.refill-cards {
+  display: flex; gap: 12px; overflow-x: auto;
+  scroll-snap-type: x mandatory; padding-bottom: 4px;
+}
+.refill-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px; min-width: 260px;
+  scroll-snap-align: start; flex-shrink: 0;
+}
+.refill-card--overdue { border-color: rgba(212,168,67,0.3); }
+.refill-card-img {
+  width: 60px; height: 60px; border-radius: 8px;
+  overflow: hidden; background: var(--surface-3);
+  flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.refill-card-img img { width: 100%; height: 100%; object-fit: contain; }
+.refill-card-initial { font-size: 22px; font-weight: 800; color: var(--text-3); }
+.refill-card-body { flex: 1; min-width: 0; }
+.refill-card-brand { font-size: 10px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; }
+.refill-card-name { font-size: 13px; font-weight: 700; color: var(--text-1); line-height: 1.3; margin: 2px 0 4px; }
+.refill-card-meta { font-size: 11px; color: var(--text-3); margin-bottom: 8px; }
+.refill-card-cta {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  color: var(--accent); text-decoration: none;
+  transition: opacity 0.15s;
+}
+.refill-card-cta:hover { opacity: 0.8; }
+
+@media (min-width: 640px)  { .refill-section { padding-left: 40px; padding-right: 40px; } }
+@media (min-width: 1024px) { .refill-section { padding-left: 64px; padding-right: 64px; } }
+
+/* ══════════════════════════════════════════════════════════════
+   COMPARISON STRIP — Category-level decision accelerator
+   Appears below the category header when key tradeoffs exist.
+   Calm, expert, zero pressure.
+   ══════════════════════════════════════════════════════════════ */
+.cat-comparison-strip {
+  margin: 0 20px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--cat-color, var(--border));
+  border-opacity: 0.2;
+  border-color: rgba(from var(--cat-color) r g b / 0.2);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.cat-comparison-question {
+  font-size: 13px; font-weight: 700; color: var(--text-1);
+  margin-bottom: 12px;
+}
+.cat-comparison-options {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 12px;
+}
+.cat-comparison-option {
+  background: var(--surface-3); border-radius: var(--r-sm);
+  padding: 10px 12px;
+}
+.cat-comparison-opt-label { font-size: 12px; font-weight: 700; color: var(--text-1); margin-bottom: 4px; }
+.cat-comparison-opt-desc  { font-size: 11px; color: var(--text-2); line-height: 1.4; margin-bottom: 6px; }
+.cat-comparison-opt-tag   { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+.cat-comparison-cta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  text-decoration: none; transition: opacity 0.15s;
+}
+.cat-comparison-cta:hover { opacity: 0.8; }
+
+@media (min-width: 640px) {
+  .cat-comparison-strip { margin-left: 40px; margin-right: 40px; }
+}
+@media (min-width: 1024px) {
+  .cat-comparison-strip { margin-left: 64px; margin-right: 64px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GUIDE PAGE — Authority content renderer
+   Premium editorial feel. Like a high-quality editorial magazine,
+   not a blog post. Clean, wide margins, strong typographic hierarchy.
+   ══════════════════════════════════════════════════════════════ */
+.guide-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+.guide-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+  background: none; border: none; cursor: pointer;
+  padding: 0; margin-bottom: 28px;
+  transition: color 0.15s;
+}
+.guide-back:hover { color: var(--text-1); }
+
+.guide-header { margin-bottom: 36px; }
+.guide-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+.guide-title {
+  font-size: clamp(22px, 5vw, 32px); font-weight: 900;
+  color: var(--text-1); line-height: 1.15; margin: 0 0 12px;
+}
+.guide-subtitle {
+  font-size: 16px; color: var(--text-2); line-height: 1.6; margin: 0;
+}
+
+.guide-content { margin-bottom: 40px; }
+.guide-section { margin-bottom: 32px; }
+.guide-section-heading {
+  font-size: 17px; font-weight: 800; color: var(--text-1);
+  margin: 0 0 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-2);
+}
+.guide-section-body p {
+  font-size: 14px; color: var(--text-2); line-height: 1.75;
+  margin: 0 0 12px;
+}
+.guide-section-body p:last-child { margin-bottom: 0; }
+
+.guide-cta-block {
+  background: var(--surface-2);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r-lg);
+  padding: 24px; margin-bottom: 40px; text-align: center;
+}
+.guide-cta-label { font-size: 16px; font-weight: 800; color: var(--text-1); margin-bottom: 6px; }
+.guide-cta-sub   { font-size: 13px; color: var(--text-2); margin: 0 0 18px; }
+.guide-cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #fff;
+  font-size: 14px; font-weight: 700;
+  padding: 12px 24px; border-radius: var(--r-pill);
+  text-decoration: none; transition: background 0.15s, transform 0.12s;
+}
+.guide-cta-btn:hover  { background: var(--accent-hover); }
+.guide-cta-btn:active { transform: scale(0.97); }
+
+.guide-products { margin-bottom: 40px; }
+.guide-products-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+}
+.guide-products-title {
+  font-size: 18px; font-weight: 800; color: var(--text-1);
+  margin: 0 0 20px;
+}
+
+.guide-related { border-top: 1px solid var(--border-2); padding-top: 28px; }
+.guide-related-label {
+  font-size: 12px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px;
+}
+.guide-related-cards { display: flex; flex-direction: column; gap: 10px; }
+.guide-related-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; text-align: left;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+.guide-related-card:hover { border-color: var(--accent-border); background: var(--surface-3); }
+.guide-related-title { font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 4px; }
+.guide-related-sub   { font-size: 12px; color: var(--text-2); margin-bottom: 8px; line-height: 1.4; }
+.guide-related-arrow { font-size: 12px; font-weight: 700; color: var(--accent); }
+
+@media (min-width: 640px)  { .guide-page { padding-left: 40px; padding-right: 40px; } }
+@media (min-width: 1024px) { .guide-page { padding-left: 64px; padding-right: 64px; } }
+
+/* ══════════════════════════════════════════════════════════════
    MODAL HEART / FAVORITE BUTTON
    Same geometry as modal-share. Three states:
    — Default:  dim glass, outline heart icon

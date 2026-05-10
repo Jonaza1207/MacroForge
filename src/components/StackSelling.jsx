@@ -11,8 +11,8 @@
  */
 import { PRODUCTS } from '../data/products';
 import { resolveProductImage } from '../data/images';
-import { WA_NUMBER } from '../data/catalog';
 import { analytics } from '../lib/analytics';
+import { buildWaUrl } from '../lib/whatsapp';
 
 // Build slug → [id, product] reverse map once
 const SLUG_MAP = (() => {
@@ -66,8 +66,7 @@ function StackCard({ stack }) {
     .map(slug => SLUG_MAP[slug])
     .filter(Boolean);
 
-  const waMsg = `Hola MacroForge! 💪 Quiero consultar el stack de ${stack.waGoal}. ¿Qué productos incluyen y cuál sería el precio total?`;
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+  const waUrl = buildWaUrl('stackConsult', { goal: stack.waGoal });
 
   function handleClick() {
     analytics.stackCTA(stack.id, stack.goal);

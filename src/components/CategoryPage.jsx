@@ -1,7 +1,8 @@
-import { WA_NUMBER } from '../data/catalog';
+import { analytics } from '../lib/analytics';
+import { buildWaUrl } from '../lib/whatsapp';
+import { COMPARISONS } from '../data/comparisons';
 import ProductCard from './ProductCard';
 
-// Category guidance — reduces decision paralysis, improves conversion
 const CAT_GUIDE = {
   'Creatinas':                  'Elegí la mejor creatina para fuerza, volumen y rendimiento.',
   'Proteínas Whey':             'Proteínas de suero ideales para ganar masa muscular.',
@@ -9,20 +10,19 @@ const CAT_GUIDE = {
   'Proteínas Isoladas':         'Proteína de máxima pureza para resultados serios.',
   'Gainers de Masa':            'Ganadores de peso y masa con alta densidad calórica.',
   'BCAA':                       'Aminoácidos esenciales para recuperación y resistencia.',
-  'Glutamina':                   'Recuperación muscular y refuerzo del sistema inmune.',
+  'Glutamina':                  'Recuperación muscular y refuerzo del sistema inmune.',
   'Quemadores de Grasa':        'Acelera tu metabolismo y quema grasa más rápido.',
   'Aminoácidos Esenciales':     'EAA completos para rendimiento y recuperación óptimos.',
   'Precursores Hormonales':     'Aumenta testosterona y rendimiento de forma natural.',
   'Proteínas Veganas':          'Nutrición de alto valor sin ingredientes animales.',
   'Bebidas Energéticas':        'Energía instantánea para el gym y el día a día.',
   'Vasodilatadores / Pump':     'Maximizá el pump y el flujo sanguíneo muscular.',
-  'Electrolitos':                'Hidratación óptima durante y después del ejercicio.',
+  'Electrolitos':               'Hidratación óptima durante y después del ejercicio.',
   'Proteínas de Carne':         'Proteína bovina de alta biodisponibilidad.',
   'Shakers y Botellas':         'Accesorios premium para preparar tus suplementos.',
   'Accesorios de Gym':          'Cinturones, straps y equipo para entrenar con seguridad.',
   'Magnesio para Agarre':       'Magnesio en polvo y bloques para mejor agarre.',
   'Snacks Proteicos':           'Barras y snacks con alto contenido proteico.',
-  // Vita
   'Magnesio':                   'Relajá músculos, mejorá el sueño y reducí el estrés.',
   'Vitaminas Esenciales':       'Cobertura nutricional completa para tu salud diaria.',
   'Adaptógenos y Hormonas':     'Equilibrá tus hormonas y reducí el estrés naturalmente.',
@@ -31,32 +31,39 @@ const CAT_GUIDE = {
   'Omega y Grasas Saludables':  'Corazón sano, cerebro activo y menos inflamación.',
   'Sueño y Relajación':         'Dormí mejor y despertá con energía renovada.',
   'Digestión y Enzimas':        'Mejorá tu digestión y absorción de nutrientes.',
-  'Probióticos':                 'Fortalecé tu microbiota intestinal y sistema inmune.',
+  'Probióticos':                'Fortalecé tu microbiota intestinal y sistema inmune.',
   'Longevidad Celular':         'Antienvejecimiento y salud celular avanzada.',
   'Salud Mental y Cognitiva':   'Enfoque, memoria y rendimiento cerebral.',
   'Control Metabólico':         'Apoyo para la gestión de peso y metabolismo saludable.',
-  'Articulaciones':              'Protegé y fortalecé tus articulaciones naturalmente.',
+  'Articulaciones':             'Protegé y fortalecé tus articulaciones naturalmente.',
   'Salud Cardiovascular':       'Los mejores suplementos para cuidar tu corazón.',
   'Detox y Salud Hepática':     'Depuración hepática y desintoxicación natural.',
-  'Minerales':                   'Minerales esenciales para funciones vitales del cuerpo.',
+  'Minerales':                  'Minerales esenciales para funciones vitales del cuerpo.',
   'Vitaminas y Suplementos':    'Suplementación completa para tu bienestar.',
-  // doTERRA
   'Aceites Esenciales Individuales': 'Aceites 100% puros y naturales de grado terapéutico.',
   'Mezclas doTERRA':            'Mezclas formuladas por expertos para usos específicos.',
   'Bienestar Interno doTERRA':  'Suplementos naturales para tu salud diaria.',
   'Cuidado Personal':           'Productos naturales para piel y cuerpo.',
   'Kits Especiales':            'Kits completos para empezar tu bienestar con doTERRA.',
-  'Difusores':                   'Difusores para aromaterapia y transformar tu ambiente.',
+  'Difusores':                  'Difusores para aromaterapia y transformar tu ambiente.',
 };
 
-const CHOICE_THRESHOLD = 8; // products above this count trigger the "¿Cuál elegir?" helper
+const CHOICE_THRESHOLD = 8;
 
 export default function CategoryPage({ sectionData, categoryName, products, onOpenProduct }) {
   const { color } = sectionData;
-  const waMsg       = `Hola MacroForge! 💪 Estoy viendo ${categoryName} y no sé cuál elegir para mi objetivo. ¿Me pueden recomendar?`;
-  const waUrl       = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
-  const guide       = CAT_GUIDE[categoryName];
-  const showHelper  = products.length >= CHOICE_THRESHOLD;
+  const guide      = CAT_GUIDE[categoryName];
+  const showHelper = products.length >= CHOICE_THRESHOLD;
+  const comparison = COMPARISONS[categoryName] || null;
+
+  const waUrl = buildWaUrl('comparisonConsult', {
+    optionA: categoryName,
+    optionB: 'otra opción',
+  });
+
+  function handleHelperClick() {
+    analytics.whatsappClick('category_helper', null, categoryName);
+  }
 
   return (
     <div className="category-page">
@@ -77,19 +84,46 @@ export default function CategoryPage({ sectionData, categoryName, products, onOp
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Consultar por WhatsApp"
+          onClick={handleHelperClick}
         >
           💬
         </a>
       </div>
 
+      {/* Comparison strip — accelerates certainty for categories with key decision tradeoffs */}
+      {comparison && (
+        <div className="cat-comparison-strip" style={{ '--cat-color': color }}>
+          <div className="cat-comparison-question">{comparison.question}</div>
+          <div className="cat-comparison-options">
+            {comparison.options.map((opt, i) => (
+              <div key={i} className="cat-comparison-option">
+                <div className="cat-comparison-opt-label">{opt.label}</div>
+                <div className="cat-comparison-opt-desc">{opt.desc}</div>
+                {opt.tag && <div className="cat-comparison-opt-tag">{opt.tag}</div>}
+              </div>
+            ))}
+          </div>
+          <a
+            className="cat-comparison-cta"
+            href={buildWaUrl('comparisonConsult', { optionA: comparison.options[0]?.label, optionB: comparison.options[1]?.label })}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => analytics.whatsappClick('comparison_strip', null, categoryName)}
+          >
+            💬 Ayudame a elegir →
+          </a>
+        </div>
+      )}
+
       {/* Choice-overload helper — appears when category has many products */}
-      {showHelper && (
+      {showHelper && !comparison && (
         <a
           className="cat-choice-helper"
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           style={{ '--cat-color': color }}
+          onClick={handleHelperClick}
         >
           <span className="cat-choice-helper-text">
             ¿No sabés cuál elegir? <strong>Consultanos por WhatsApp →</strong>
