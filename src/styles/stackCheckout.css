@@ -1,0 +1,358 @@
+/*
+ * MacroForge — Stack Checkout Layer Styles
+ * Phase 4 — Revenue Infrastructure
+ *
+ * The premium order summary that sits between stack creation and WhatsApp.
+ * Increases buyer seriousness, trust, and conversion probability.
+ * All class names prefixed with 'sc-' to avoid conflicts.
+ */
+
+/* ══════════════════════════════════════════════════════════════
+   CHECKOUT CONTAINER — fills the modal body
+   ══════════════════════════════════════════════════════════════ */
+.sc-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ai-step-in 0.22s ease;
+}
+.sc-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 20px 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HEADER SECTION — badge + context badges
+   ══════════════════════════════════════════════════════════════ */
+.sc-header {
+  margin-bottom: 18px;
+}
+.sc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(227, 0, 30, 0.1);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.sc-context {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sc-goal-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+}
+.sc-quality {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+}
+.sc-quality--básico {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+.sc-quality--completo {
+  background: rgba(0, 200, 150, 0.1);
+  color: #00C896;
+  border: 1px solid rgba(0, 200, 150, 0.25);
+}
+.sc-quality--premium {
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--dote);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PRODUCT LIST — numbered items with images + prices
+   ══════════════════════════════════════════════════════════════ */
+.sc-products {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.sc-product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 12px;
+  animation: ai-card-in 0.28s ease both;
+}
+.sc-product:nth-child(1) { animation-delay: 0.04s; }
+.sc-product:nth-child(2) { animation-delay: 0.08s; }
+.sc-product:nth-child(3) { animation-delay: 0.12s; }
+.sc-product:nth-child(4) { animation-delay: 0.16s; }
+.sc-product:nth-child(5) { animation-delay: 0.20s; }
+.sc-product:nth-child(6) { animation-delay: 0.24s; }
+.sc-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sc-img {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.sc-img img { width: 100%; height: 100%; object-fit: contain; }
+.sc-img-fallback { font-size: 16px; font-weight: 800; color: var(--text-3); }
+.sc-info { flex: 1; min-width: 0; }
+.sc-brand {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 1px;
+}
+.sc-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sc-supply {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.sc-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-1);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOTAL SUMMARY — estimated cost + supply
+   ══════════════════════════════════════════════════════════════ */
+.sc-total {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sc-total-left { flex: 1; }
+.sc-total-label {
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.sc-total-sub {
+  font-size: 10px;
+  color: var(--text-3);
+}
+.sc-total-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.sc-total-value small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-3);
+  margin-left: 3px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TRUST SIGNALS — four trust items in a compact grid
+   ══════════════════════════════════════════════════════════════ */
+.sc-trust {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.sc-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 600;
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  padding: 6px 8px;
+}
+.sc-trust-check {
+  color: #00C896;
+  font-weight: 900;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONVERSION COPY — goal-specific messaging
+   ══════════════════════════════════════════════════════════════ */
+.sc-conversion {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+  text-align: center;
+  padding: 8px 4px;
+  margin-bottom: 8px;
+  border-top: 1px solid var(--border-2);
+  padding-top: 12px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CTA BLOCK — sticky at the bottom of the modal
+   ══════════════════════════════════════════════════════════════ */
+.sc-cta-block {
+  flex-shrink: 0;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--border-2);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sc-cta-note {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.4;
+}
+.sc-wa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #25D366;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.12s;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.25);
+  letter-spacing: 0.01em;
+  width: 100%;
+  box-sizing: border-box;
+}
+.sc-wa-btn:hover  { background: #20bd5a; }
+.sc-wa-btn:active { transform: scale(0.97); }
+.sc-secondary-btns {
+  display: flex;
+  gap: 8px;
+}
+.sc-edit-btn {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sc-edit-btn:hover { border-color: var(--text-2); color: var(--text-1); }
+.sc-save-btn {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.sc-save-btn:hover { border-color: var(--accent-border); color: var(--accent); background: rgba(227,0,30,0.04); }
+.sc-save-btn--saved {
+  border-color: #00C896;
+  color: #00C896;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SAVED STACK NOTICE — in the trigger section
+   ══════════════════════════════════════════════════════════════ */
+.ai-trigger-restore {
+  margin-top: 12px;
+  animation: ai-step-in 0.3s ease;
+}
+.ai-trigger-restore button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212, 168, 67, 0.08);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: var(--r-pill);
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dote);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ai-trigger-restore button:hover {
+  background: rgba(212, 168, 67, 0.14);
+  border-color: rgba(212, 168, 67, 0.4);
+}
+
+/* ── Light mode ─────────────────────────────────────────── */
+[data-theme="light"] .sc-product { background: var(--surface); }
+[data-theme="light"] .sc-total   { background: var(--surface); }
+[data-theme="light"] .sc-trust-item { background: var(--surface-2); }

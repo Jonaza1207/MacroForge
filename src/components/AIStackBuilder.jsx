@@ -24,6 +24,8 @@ import { PRODUCT_LABELS } from '../data/labels';
 import { resolveProductImage } from '../data/images';
 import { analytics } from '../lib/analytics';
 import { WA_NUMBER } from '../data/catalog';
+import { saveStack, getSavedStack, hasSavedStack, STACK_SAVED_EVENT } from '../lib/stackPersistence';
+import StackCheckoutLayer from './StackCheckoutLayer';
 import '../styles/aiStackBuilder.css';
 import '../styles/stackCommerce.css';
 
@@ -227,17 +229,28 @@ const INITIAL_SELECTIONS = { goal: null, experience: null, budget: null, frequen
 export default function AIStackBuilder() {
   // ── Shared state ──────────────────────────────────────────
   const [isOpen,     setIsOpen]     = useState(false);
-  const [mode,       setMode]       = useState(null); // 'gateway' | 'guided' | 'manual'
+  const [mode,       setMode]       = useState(null); // 'gateway'|'guided'|'manual'|'checkout'
 
   // ── Guided-flow state (Phase 2, unchanged) ────────────────
   const [stepIndex,  setStepIndex]  = useState(0);
   const [selections, setSelections] = useState(INITIAL_SELECTIONS);
 
   // ── Manual-builder state (Phase 3.5) ─────────────────────
-  const [manualStack,       setManualStack]       = useState([]); // ordered product ID array
+  const [manualStack,       setManualStack]       = useState([]);
   const [manualSearch,      setManualSearch]      = useState('');
-  const [manualFilter,      setManualFilter]      = useState('all'); // 'all'|'gym'|'vita'|'dote'
+  const [manualFilter,      setManualFilter]      = useState('all');
   const [showStackReview,   setShowStackReview]   = useState(false);
+
+  // ── Phase 4: Checkout + persistence state ─────────────────
+  const [checkoutSource,  setCheckoutSource]  = useState(null); // which path entered checkout
+  const [hasSaved,        setHasSaved]        = useState(() => hasSavedStack());
+
+  // Re-read saved stack state when it changes (cross-tab or after save)
+  useEffect(() => {
+    const handler = () => setHasSaved(hasSavedStack());
+    window.addEventListener(STACK_SAVED_EVENT, handler);
+    return () => window.removeEventListener(STACK_SAVED_EVENT, handler);
+  }, []);
 
   // ── Auto-advance analyzing → results ─────────────────────
   useEffect(() => {
@@ -305,12 +318,33 @@ export default function AIStackBuilder() {
     setManualSearch('');
     setManualFilter('all');
     setShowStackReview(false);
+    setCheckoutSource(null);
     analytics.stackCTA('ai_builder_open', 'Stack Commerce Gateway');
     document.body.style.overflow = 'hidden';
   }
 
+  /** Open the builder directly to checkout with a saved stack */
+  function openSaved() {
+    const data = getSavedStack();
+    if (!data) { setHasSaved(false); return; }
+
+    setIsOpen(true);
+    setCheckoutSource(data.type);
+    setMode('checkout');
+    document.body.style.overflow = 'hidden';
+
+    if (data.type === 'guided' && data.selections) {
+      setSelections(data.selections);
+      setStepIndex(5);
+    } else if (data.type === 'manual' && Array.isArray(data.productIds)) {
+      // Filter out any product IDs that no longer exist in the catalog
+      setManualStack(data.productIds.filter(id => Boolean(PRODUCTS[id])));
+    }
+    analytics.stackStep('saved_stack_restored', { type: data.type });
+  }
+
   function close() {
-    // Track guided abandonment
+    // Track guided abandonment (not checkout — that's a serious moment)
     if (mode === 'guided' && stepIndex >= 1 && stepIndex < 5) {
       const stepNames = ['goal','experience','budget','frequency','analyzing'];
       analytics.stackStep('abandoned', { step_reached: stepNames[stepIndex]||'goal', step_index: stepIndex, goal: selections.goal, selections_made: Object.values(selections).filter(Boolean).length });
@@ -322,6 +356,27 @@ export default function AIStackBuilder() {
     setIsOpen(false);
     setMode(null);
     document.body.style.overflow = '';
+  }
+
+  /** Transition to the checkout layer from guided or manual */
+  function enterCheckout(source) {
+    setCheckoutSource(source);
+    setMode('checkout');
+    const sz = source === 'guided' ? guidedStack.length : manualStack.length;
+    analytics.checkoutLayer('viewed', { source, stack_size: sz });
+  }
+
+  /** Save the current stack to localStorage */
+  function handleSaveStack() {
+    const data = checkoutSource === 'guided'
+      ? { type: 'guided', selections, productIds: guidedStack.map(i => i.id) }
+      : { type: 'manual', productIds: [...manualStack] };
+    saveStack(data);
+    analytics.checkoutLayer('save', {
+      source:     checkoutSource,
+      stack_size: checkoutSource === 'guided' ? guidedStack.length : manualStack.length,
+    });
+    // hasSaved state updates via STACK_SAVED_EVENT listener
   }
 
   function goGateway() {
@@ -424,6 +479,16 @@ export default function AIStackBuilder() {
           <div className="ai-trigger-meta-item"><span>✓</span> Sin registro</div>
           <div className="ai-trigger-meta-item"><span>✓</span> A WhatsApp en segundos</div>
         </div>
+
+        {/* Saved stack restore — shown when user has a previously saved stack */}
+        {hasSaved && (
+          <div className="ai-trigger-restore">
+            <button onClick={openSaved} type="button">
+              <span>📦</span>
+              <span>Tenés un stack guardado — <strong>Restaurar →</strong></span>
+            </button>
+          </div>
+        )}
       </section>
 
       {/* ── Full-screen overlay ── */}
@@ -437,6 +502,12 @@ export default function AIStackBuilder() {
               <div style={{ display:'flex', alignItems:'center', gap: 10 }}>
                 {(mode === 'guided' || mode === 'manual') && (
                   <button className="sb-mode-back" onClick={goGateway} type="button">← Cambiar</button>
+                )}
+                {mode === 'checkout' && (
+                  <button className="sb-mode-back" onClick={() => {
+                    setMode(checkoutSource);
+                    analytics.checkoutLayer('edit', { source: checkoutSource });
+                  }} type="button">← Editar</button>
                 )}
                 <button className="ai-modal-close" onClick={close} aria-label="Cerrar" type="button">✕</button>
               </div>
@@ -452,6 +523,30 @@ export default function AIStackBuilder() {
                   {stepIndex < 4 ? `Paso ${stepIndex + 1} de 4 — ${STEP_LABELS[stepIndex]}` : 'Generando tu stack...'}
                 </div>
               </div>
+            )}
+
+            {/* ════════════════════════════════════════════
+                CHECKOUT LAYER — Phase 4 Revenue Infrastructure
+                ════════════════════════════════════════════ */}
+            {mode === 'checkout' && checkoutSource && (
+              <StackCheckoutLayer
+                source={checkoutSource}
+                guidedStack={guidedStack}
+                manualProductIds={manualStack}
+                guidedSelections={selections}
+                onEdit={() => {
+                  setMode(checkoutSource);
+                  analytics.checkoutLayer('edit', { source: checkoutSource });
+                }}
+                onSave={handleSaveStack}
+                onContinue={(sz, total) => {
+                  analytics.checkoutLayer('continue', {
+                    source:          checkoutSource,
+                    stack_size:      sz,
+                    estimated_total: total,
+                  });
+                }}
+              />
             )}
 
             {/* ════════════════════════════════════════════
@@ -625,22 +720,16 @@ export default function AIStackBuilder() {
                       )}
                       {manualStack.length > 0 && (
                         <div className="sb-stack-hint">
-                          Mandá tu stack y confirmamos disponibilidad y precio final al instante.
+                          Revisá el resumen y confirmá disponibilidad al instante.
                         </div>
                       )}
-                      <a
+                      <button
                         className="sb-stack-wa-btn"
-                        href={manualWaUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={handleManualWA}
+                        onClick={() => enterCheckout('manual')}
+                        type="button"
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.112.549 4.1 1.51 5.827L.057 23.82a.5.5 0 0 0 .623.623l5.993-1.453A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.888 0-3.657-.519-5.17-1.42l-.37-.22-3.556.862.862-3.556-.22-.37A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                        </svg>
-                        Enviar stack por WhatsApp
-                      </a>
+                        📋 Ver resumen y confirmar →
+                      </button>
                     </div>
                   )}
 
@@ -670,20 +759,13 @@ export default function AIStackBuilder() {
                         </button>
                       </div>
                       {!showStackReview && (
-                        <a
+                        <button
                           className="sb-stack-wa-btn"
-                          href={manualWaUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={handleManualWA}
-                          aria-disabled={manualStack.length === 0}
+                          onClick={() => enterCheckout('manual')}
+                          type="button"
                         >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.112.549 4.1 1.51 5.827L.057 23.82a.5.5 0 0 0 .623.623l5.993-1.453A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.888 0-3.657-.519-5.17-1.42l-.37-.22-3.556.862.862-3.556-.22-.37A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                          </svg>
-                          Enviar stack por WhatsApp
-                        </a>
+                          📋 Ver resumen y confirmar →
+                        </button>
                       )}
                     </div>
                   )}
@@ -757,14 +839,10 @@ export default function AIStackBuilder() {
                   </div>
                 </div>
                 <div className="ai-results-cta">
-                  <div className="ai-results-cta-label">Consultá disponibilidad y precio total del stack</div>
-                  <a className="ai-results-wa-btn" href={guidedWaUrl} target="_blank" rel="noopener noreferrer" onClick={handleGuidedWA}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.112.549 4.1 1.51 5.827L.057 23.82a.5.5 0 0 0 .623.623l5.993-1.453A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.888 0-3.657-.519-5.17-1.42l-.37-.22-3.556.862.862-3.556-.22-.37A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                    </svg>
-                    Consultar este stack por WhatsApp
-                  </a>
+                  <div className="ai-results-cta-label">Tu stack está listo — revisá el resumen antes de confirmar</div>
+                  <button className="ai-results-wa-btn" onClick={() => enterCheckout('guided')} type="button">
+                    📋 Ver resumen y confirmar →
+                  </button>
                   <button className="ai-results-restart" onClick={restart} type="button">
                     ↺ Armar otro stack
                   </button>

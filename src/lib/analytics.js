@@ -159,6 +159,30 @@ function _pixel(name, params) {
       window.fbq('trackCustom', 'DoTerraInterested', { section: 'dote' });
     }
 
+    // Checkout layer — Phase 4 Revenue Infrastructure
+    // 'continue' = highest-intent signal before purchase (maps to InitiateCheckout)
+    // 'viewed'   = pre-purchase consideration audience
+    if (name === 'checkout_layer') {
+      if (params.action === 'continue') {
+        window.fbq('track', 'InitiateCheckout', {
+          content_type: 'product_group',
+          num_items:    params.stack_size || 1,
+          value:        params.estimated_total || 0,
+          currency:     'CRC',
+        });
+      }
+      if (params.action === 'viewed') {
+        window.fbq('trackCustom', 'CheckoutSummaryViewed', {
+          source:     params.source,
+          stack_size: params.stack_size || 0,
+          quality:    params.quality    || 'básico',
+        });
+      }
+      if (params.action === 'save') {
+        window.fbq('trackCustom', 'StackSavedForLater', { source: params.source });
+      }
+    }
+
   } catch {}
 }
 
@@ -336,6 +360,20 @@ export const analytics = {
    */
   manualStack(action, params = {}) {
     _fire('manual_stack', { action, ...params });
+  },
+
+  /**
+   * Stack Checkout Layer interaction — Phase 4 Revenue Infrastructure.
+   * actions: 'viewed' | 'continue' | 'edit' | 'save'
+   *
+   * 'continue' fires InitiateCheckout in Meta Pixel — the highest-intent
+   * standard event before an actual purchase. Use this for conversion tracking.
+   *
+   * Future: 'continue' will also create a Shopify draft order via
+   * POST /api/checkout/create (Vercel Edge Function, never frontend).
+   */
+  checkoutLayer(action, params = {}) {
+    _fire('checkout_layer', { action, ...params });
   },
 
   /**
