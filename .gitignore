@@ -3,3 +3,12 @@ dist/
 extracted.css
 extract-data.mjs
 *.lnk
+
+# Environment variables — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Vercel local config
+.vercel

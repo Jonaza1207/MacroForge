@@ -120,6 +120,28 @@ export const WA_TEMPLATES = {
   searchMiss: ({ query = '' } = {}) =>
     `Hola MacroForge! Busqué "${query}" en el catálogo y no apareció. ¿Lo tienen disponible o pueden conseguirlo?`,
 
+  // ── Subscription templates (Phase 11) ────────────────────────────
+
+  /** Subscription offer — for refill-to-subscription upsell */
+  subscriptionOffer: ({ stackName = '', discount = '10%', intervalLabel = '30 días' } = {}) =>
+    `Hola MacroForge! Me interesa suscribirme para recibir mi ${stackName || 'stack'} cada ${intervalLabel} y ahorrar el ${discount}. ¿Cómo funciona y cómo lo activo?`,
+
+  /** Subscription renewal reminder — upcoming billing */
+  subscriptionRenewalReminder: ({ stackName = '', nextDate = '', intervalLabel = '' } = {}) =>
+    `Hola MacroForge! Quiero confirmar la renovación de mi suscripción${stackName ? ` de ${stackName}` : ''}${nextDate ? ` programada para el ${nextDate}` : ''}. ¿Todo está bien con el pedido?`,
+
+  /** Subscription payment failed — recovery support */
+  subscriptionPaymentFailed: ({ stackName = '' } = {}) =>
+    `Hola MacroForge! Tuve un problema con el pago de mi suscripción${stackName ? ` de ${stackName}` : ''}. ¿Pueden ayudarme a resolverlo para no perder mi plan?`,
+
+  /** Subscription cancellation save — churn prevention */
+  subscriptionCancellationSave: ({ stackName = '', discount = '' } = {}) =>
+    `Hola MacroForge! Estaba considerando cancelar mi suscripción${stackName ? ` de ${stackName}` : ''}. ¿Tienen alguna opción para pausarla o ajustar el plan antes de cancelar?`,
+
+  /** Subscription pause request */
+  subscriptionPause: ({ stackName = '' } = {}) =>
+    `Hola MacroForge! Quisiera pausar temporalmente mi suscripción${stackName ? ` de ${stackName}` : ''} por un mes. ¿Es posible hacerlo sin cancelar el plan?`,
+
   // ── Lifecycle / reactivation templates (Phase 7) ────────────────
 
   /**

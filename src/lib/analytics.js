@@ -363,6 +363,43 @@ export const analytics = {
   },
 
   /**
+   * Community + Loyalty + Referral events — Phase 13.
+   * actions: 'loyalty_badge_shown' | 'referral_code_captured' | 'referral_link_copied' |
+   *          'challenge_joined' | 'review_submitted' | 'transformation_submitted' |
+   *          'referral_card_shown' | 'loyalty_card_shown'
+   *
+   * Future: feed into community analytics dashboard for retention + referral attribution.
+   */
+  communityEvent(action, params = {}) {
+    _fire('community', { action, ...params });
+  },
+
+  /**
+   * Subscription + Recurring Revenue events — Phase 11.
+   * actions: 'subscription_cta_viewed' | 'subscription_cta_clicked' |
+   *          'subscription_checkout_created' | 'subscription_checkout_completed' |
+   *          'subscription_abandoned' | 'subscription_interval_selected'
+   *
+   * Future: feed into subscription_offer_logs table for conversion analytics.
+   * Key metric: subscription CTA → checkout conversion rate by stack tier.
+   */
+  subscriptionEvent(action, params = {}) {
+    _fire('subscription', { action, ...params });
+    // Subscription checkout → Meta InitiateCheckout with subscription signal
+    if (action === 'subscription_checkout_created' && PIXEL_ID) {
+      try {
+        if (typeof window.fbq === 'function') {
+          window.fbq('trackCustom', 'SubscriptionCheckoutCreated', {
+            tier:          params.stack_tier || 'esencial',
+            interval_days: params.interval_days || 30,
+            discount_pct:  params.discount_pct || 0,
+          });
+        }
+      } catch {}
+    }
+  },
+
+  /**
    * WhatsApp Automation Queue events — Phase 8.
    * Tracks intent lifecycle without exposing PII or sending messages.
    * actions: 'automation_intent_created' | 'automation_intent_deduped' |

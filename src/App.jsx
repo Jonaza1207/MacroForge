@@ -18,6 +18,7 @@ import { addRecentlyViewed } from './hooks/useRecentlyViewed';
 import { logIntelReport, getIntelReport } from './lib/intelligence';
 import { logStackReport, getStackReport } from './lib/stackIntelligence';
 import { logSegmentReport, getCrmProfile, getPrimarySegment, getLeadScore } from './lib/segmentation';
+import { captureReferralFromUrl } from './lib/referralCode';
 import {
   initAutomation,
   getAutomationStatus,
@@ -248,6 +249,8 @@ export default function App() {
     if (visitType.type === 'returning') analytics.returnVisit(visitType.count);
     // Phase 8: evaluate automation eligibility on every visit (safe, deduped)
     initAutomation();
+    // Phase 13: capture referral codes from URL params (safe localStorage write)
+    captureReferralFromUrl();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Deep link: read initial hash ─────────────────────────────

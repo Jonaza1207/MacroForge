@@ -1,0 +1,180 @@
+/*
+ * MacroForge — Loyalty + Community Styles
+ * Phase 13 — Scale + Media + Community Ecosystem
+ * Class prefixes: loy- (loyalty), ref- (referral)
+ *
+ * Design principles:
+ *   - Subtle, not gamey
+ *   - Premium, not cheap
+ *   - Motivating, not manipulative
+ *   - Earned feel, not participation-trophy feel
+ */
+
+/* ══════════════════════════════════════════════════════════════
+   LOYALTY BADGE — compact level indicator
+   ══════════════════════════════════════════════════════════════ */
+.loy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 5px 12px 5px 8px;
+  animation: ai-step-in 0.25s ease;
+}
+.loy-badge-icon { font-size: 15px; line-height: 1; }
+.loy-badge-body { display: flex; flex-direction: column; }
+.loy-badge-level {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.loy-badge-sub {
+  font-size: 9px;
+  color: var(--text-3);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOYALTY CARD — expanded card in ReactivationCenter
+   ══════════════════════════════════════════════════════════════ */
+.loy-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: ai-card-in 0.3s ease both;
+}
+.loy-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.loy-card-icon { font-size: 22px; flex-shrink: 0; }
+.loy-card-meta { flex: 1; }
+.loy-card-level {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+.loy-card-desc { font-size: 12px; color: var(--text-2); line-height: 1.4; }
+
+/* Progress bar */
+.loy-progress { display: flex; flex-direction: column; gap: 4px; }
+.loy-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 600;
+}
+.loy-progress-track {
+  height: 4px;
+  background: var(--surface-3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.loy-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Perks list */
+.loy-perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.loy-perk {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-3);
+  border-radius: var(--r-pill);
+  padding: 3px 8px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFERRAL CARD — referral code display in ReactivationCenter
+   ══════════════════════════════════════════════════════════════ */
+.ref-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  animation: ai-card-in 0.3s ease 0.1s both;
+}
+.ref-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ref-card-icon { font-size: 20px; flex-shrink: 0; }
+.ref-card-body { flex: 1; }
+.ref-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 3px;
+}
+.ref-card-desc { font-size: 12px; color: var(--text-2); line-height: 1.4; }
+
+.ref-code-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-3);
+  border-radius: var(--r);
+  padding: 8px 12px;
+}
+.ref-code {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--text-1);
+  font-family: 'Courier New', monospace;
+}
+.ref-copy-btn {
+  flex-shrink: 0;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.ref-copy-btn:hover  { background: var(--accent-hover); }
+.ref-copy-btn:active { transform: scale(0.95); }
+.ref-copy-btn--copied {
+  background: #00C896;
+  pointer-events: none;
+}
+
+.ref-discount-note {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 6px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Light mode ────────────────────────────────────────────── */
+[data-theme="light"] .loy-card,
+[data-theme="light"] .ref-card { background: var(--surface); }
+[data-theme="light"] .loy-perk  { background: var(--surface-2); }
+[data-theme="light"] .ref-code-row { background: var(--surface-2); }

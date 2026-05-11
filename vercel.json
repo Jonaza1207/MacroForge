@@ -42,7 +42,15 @@
     "api/shopify/order-sync.js": {
       "maxDuration": 20,
       "memory": 128
-    }
+    },
+    "api/shopify/subscription.js": {
+      "maxDuration": 20,
+      "memory": 256
+    },
+    "api/loyalty/points.js":       { "maxDuration": 10, "memory": 128 },
+    "api/referral/generate.js":    { "maxDuration": 10, "memory": 128 },
+    "api/referral/validate.js":    { "maxDuration": 10, "memory": 128 },
+    "api/community/review.js":     { "maxDuration": 10, "memory": 128 }
   },
 
   "headers": [
