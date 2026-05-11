@@ -136,7 +136,13 @@
   border-radius: var(--r-lg) var(--r-lg) 0 0;
   width: 100%;
   max-width: 520px;
-  min-height: 100svh;
+  /* Fixed viewport height on mobile — prevents overlay from scrolling instead of
+     inner content areas (sc-scroll / msb-step). Content scrolls inside the modal,
+     not the backdrop. Safe-area handled by child CTA padding. */
+  height: 100svh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   animation: ai-modal-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -145,7 +151,8 @@
 @media (min-width: 640px) {
   .ai-modal {
     border-radius: var(--r-lg);
-    min-height: auto;
+    height: auto;
+    max-height: calc(100dvh - 48px);
     align-self: center;
     margin: 24px 0;
   }
