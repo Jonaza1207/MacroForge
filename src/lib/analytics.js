@@ -255,6 +255,24 @@ export const analytics = {
   },
 
   /**
+   * Stack Commerce Gateway path selected.
+   * Fires when the user chooses between Manual and AI-guided flows.
+   * Future: feed into segmentation (manual = advanced buyer, guided = undecided)
+   */
+  gatewaySelect(choice) {
+    _fire('gateway_select', { choice }); // 'manual' | 'guided'
+  },
+
+  /**
+   * Manual Stack Builder interaction.
+   * actions: 'product_added' | 'product_removed' | 'wa_clicked' | 'abandoned'
+   * Future: persist to behavioral_tracking table in Supabase
+   */
+  manualStack(action, params = {}) {
+    _fire('manual_stack', { action, ...params });
+  },
+
+  /**
    * AI Stack Builder step event — tracks every meaningful moment in the funnel.
    *
    * actions:
