@@ -22,6 +22,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
 import { resolveProductImage } from '../data/images';
 import { analytics } from '../lib/analytics';
+import { parseCRCPrice, formatCRC, normalizePriceDisplay } from '../lib/priceFormatter';
 import { WA_NUMBER } from '../data/catalog';
 import { saveStack, getSavedStack, hasSavedStack, STACK_SAVED_EVENT } from '../lib/stackPersistence';
 import { getFavoriteStacks, openFavoriteStack, FAVORITE_STACKS_EVENT } from '../lib/favoriteStacks';
@@ -153,28 +154,19 @@ function buildGuidedWAMessage({ goal, experience, budget, frequency, stack }) {
 }
 
 // ── Manual stack helpers ──────────────────────────────────────
-function extractPrice(priceStr) {
-  const m = (priceStr || '').match(/([\d,]+)/);
-  return m ? parseFloat(m[1].replace(/,/g, '')) || 0 : 0;
-}
-
-function formatTotal(num) {
-  return num > 0 ? `₡${num.toLocaleString('es-CR')}` : null;
-}
-
 function buildManualWAMessage(stackIds) {
   const lines = stackIds.map((id, i) => {
     const p = PRODUCTS[id];
     if (!p) return null;
-    const price = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || 'consultar precio';
+    const price = normalizePriceDisplay(p.p?.[0], 'consultar precio');
     return `${i + 1}. ${p.n} — ${p.b} — ${price}`;
   }).filter(Boolean).join('\n');
 
   const total = stackIds.reduce((sum, id) => {
     const p = PRODUCTS[id];
-    return sum + extractPrice(p?.p?.[0] || '');
+    return sum + parseCRCPrice(p?.p?.[0] || '');
   }, 0);
-  const totalLine = total > 0 ? `\nTotal estimado: ~${formatTotal(total)} (+IVA)` : '';
+  const totalLine = total > 0 ? `\nTotal estimado: ~${formatCRC(total)} (+IVA)` : '';
 
   return `Hola MacroForge! Armé mi propio stack personalizado:\n\n📦 Mi stack:\n\n${lines}\n${totalLine}\n\n¿Me pueden confirmar disponibilidad y precio final para comprarlo?`;
 }
@@ -195,7 +187,7 @@ function ResultCard({ item, index }) {
   const p = PRODUCTS[item.id];
   if (!p) return null;
   const img    = resolveProductImage(p.u);
-  const price  = (p.p?.[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
+  const price  = normalizePriceDisplay(p.p?.[0], '');
   const insight = PRODUCT_INSIGHTS[item.slug] || '';
   return (
     <div className="ai-product-card">

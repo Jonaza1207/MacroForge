@@ -45,6 +45,7 @@ import {
   getRecommendedSubscriptionInterval,
   getSubscriptionDiscount,
 } from '../lib/subscriptionCheckout';
+import { parseCRCPrice, formatCRC, normalizePriceDisplay } from '../lib/priceFormatter';
 import { getStackSupplyEstimate } from '../lib/refillIntelligence';
 import { buildWaUrl } from '../lib/whatsapp';
 import RevenueAccelerationLayer from './RevenueAccelerationLayer';
@@ -71,19 +72,14 @@ const BUD_LABELS = {
   basic: 'Stack esencial', mid: 'Stack balanceado', full: 'Stack completo',
 };
 
-// ── Price helpers ─────────────────────────────────────────────
-function parsePrice(priceStr) {
-  const m = (priceStr || '').match(/([\d,]+)/);
-  return m ? parseFloat(m[1].replace(/,/g, '')) || 0 : 0;
-}
-function formatTotal(num) { return `₡${num.toLocaleString('es-CR')}`; }
+// Price helpers re-exported from central formatter (parseCRCPrice, formatCRC, normalizePriceDisplay)
 
 // ── Product card for checkout ─────────────────────────────────
 function CheckoutProduct({ id, index }) {
   const p = PRODUCTS[id];
   if (!p) return null;
   const img    = resolveProductImage(p.u);
-  const price  = (p.p?.[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
+  const price  = normalizePriceDisplay(p.p?.[0], '');
   const supply = SUPPLY_DAYS[p.c];
   return (
     <div className="sc-product">
@@ -138,7 +134,7 @@ export default function StackCheckoutLayer({
     : (manualProductIds || []).filter(id => Boolean(id && PRODUCTS[id]));
 
   // Derived values
-  const total = productIds.reduce((sum, id) => sum + parsePrice(PRODUCTS[id]?.p?.[0] || ''), 0);
+  const total = productIds.reduce((sum, id) => sum + parseCRCPrice(PRODUCTS[id]?.p?.[0] || ''), 0);
 
   const minSupply = productIds.reduce((min, id) => {
     const days = SUPPLY_DAYS[PRODUCTS[id]?.c];
@@ -305,7 +301,7 @@ export default function StackCheckoutLayer({
             </div>
           </div>
           <div className="sc-total-value">
-            {total > 0 ? `~${formatTotal(total)}` : 'Consultar'}
+            {total > 0 ? `~${formatCRC(total)}` : 'Consultar'}
             {total > 0 && <small>+IVA</small>}
           </div>
         </div>

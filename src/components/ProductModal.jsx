@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
+import { normalizePriceDisplay } from '../lib/priceFormatter';
 import { PRODUCT_LABELS } from '../data/labels';
 import { HEALTH } from '../data/health';
 import { resolveProductImage } from '../data/images';
@@ -16,8 +17,8 @@ const SECTION_COLORS = { gym: '#E3001E', vita: '#00C896', dote: '#D4A843' };
 
 function parsePrices(prices) {
   return prices.map((pr, i) => {
-    const m = pr.match(/(₡\s*[\d\s,.]+)/);
-    const val = m ? m[0].trim() : pr;
+    const m    = pr.match(/(₡\s*[\d\s,.]+)/);
+    const val  = normalizePriceDisplay(pr);
     const rest = m ? pr.replace(m[0], '').trim() : '';
     return { val, rest: rest || `Presentación ${i + 1}` };
   });
@@ -293,8 +294,8 @@ export default function ProductModal({ productId, onClose, onOpen }) {
               <h4>También te puede interesar</h4>
               <div className="modal-related-grid">
                 {related.map(([rid, r]) => {
-                  const rImg  = resolveProductImage(r.u);
-                  const rPrice = r.p[0]?.match(/(₡\s*[\d\s,.]+)/)?.[0]?.trim() || '';
+                  const rImg   = resolveProductImage(r.u);
+                  const rPrice = normalizePriceDisplay(r.p[0], '');
                   return (
                     <button
                       key={rid}

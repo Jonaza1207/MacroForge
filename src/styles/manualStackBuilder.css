@@ -398,6 +398,7 @@
   font-size: 11px;
   color: var(--text-2);
   margin-top: 1px;
+  white-space: nowrap;
 }
 .msb-stack-prompt {
   font-size: 10px;

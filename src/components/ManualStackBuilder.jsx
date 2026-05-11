@@ -26,6 +26,7 @@ import { useState, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
 import { resolveProductImage } from '../data/images';
 import { analytics } from '../lib/analytics';
+import { parseCRCPrice, formatCRC, normalizePriceDisplay } from '../lib/priceFormatter';
 import '../styles/manualStackBuilder.css';
 
 // ── Full product catalog grouped by section → category ────────
@@ -115,15 +116,6 @@ const MAX_STACK = 8;
 // ── Utilities ─────────────────────────────────────────────────
 const normS = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-function parsePrice(id) {
-  const m = (PRODUCTS[id]?.p?.[0] || '').match(/([\d,]+)/);
-  return m ? parseFloat(m[1].replace(/,/g, '')) || 0 : 0;
-}
-
-function formatTotal(num) {
-  return `₡${num.toLocaleString('es-CR')}`;
-}
-
 function getStackPrompt(size) {
   if (size === 1) return 'Podés agregar proteína, creatina o recuperación para completar tu stack.';
   if (size <= 3)  return 'Tu stack tiene buena base. Podés sumar recuperación o salud general.';
@@ -168,7 +160,7 @@ function ProductItem({ id, inStack, atMax, onAdd, onRemove }) {
   if (!p) return null;
 
   const img   = resolveProductImage(p.u);
-  const price = (p.p?.[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || 'Consultar precio';
+  const price = normalizePriceDisplay(p.p?.[0]);
 
   return (
     <div className="msb-product-item">
@@ -214,7 +206,7 @@ export default function ManualStackBuilder({ stack, onAdd, onRemove, onCheckout 
   const atMax   = stack.length >= MAX_STACK;
 
   const stackTotal = useMemo(() => {
-    return stack.reduce((sum, id) => sum + parsePrice(id), 0);
+    return stack.reduce((sum, id) => sum + parseCRCPrice(PRODUCTS[id]?.p?.[0] || ''), 0);
   }, [stack]);
 
   const focusConfig = useMemo(() => {
@@ -290,8 +282,8 @@ export default function ManualStackBuilder({ stack, onAdd, onRemove, onCheckout 
     }
 
     // Sort by price
-    if (productSort === 'price-asc')  ids.sort((a, b) => parsePrice(a) - parsePrice(b));
-    if (productSort === 'price-desc') ids.sort((a, b) => parsePrice(b) - parsePrice(a));
+    if (productSort === 'price-asc')  ids.sort((a, b) => parseCRCPrice(PRODUCTS[a]?.p?.[0] || '') - parseCRCPrice(PRODUCTS[b]?.p?.[0] || ''));
+    if (productSort === 'price-desc') ids.sort((a, b) => parseCRCPrice(PRODUCTS[b]?.p?.[0] || '') - parseCRCPrice(PRODUCTS[a]?.p?.[0] || ''));
 
     return ids;
   }, [isProductStep, globalSearch, selectedCategory, selectedSection, productSearch, productSort]);
@@ -539,7 +531,7 @@ export default function ManualStackBuilder({ stack, onAdd, onRemove, onCheckout 
                   {stack.length} producto{stack.length !== 1 ? 's' : ''}
                   {atMax && <span style={{ color: 'var(--text-3)', fontWeight: 400, fontSize: 10 }}> (máx.)</span>}
                 </div>
-                {stackTotal > 0 && <div className="msb-stack-total">~{formatTotal(stackTotal)} +IVA</div>}
+                {stackTotal > 0 && <div className="msb-stack-total">~{formatCRC(stackTotal)} +IVA</div>}
                 {stackPrompt && <div className="msb-stack-prompt">{stackPrompt}</div>}
               </div>
               <button

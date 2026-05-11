@@ -4,6 +4,7 @@ import { PRODUCT_LABELS, CLICK_THRESHOLD_POPULAR } from '../data/labels';
 import { isDynamicPopular, trackView, trackCta } from '../hooks/useClickTracking';
 import { analytics } from '../lib/analytics';
 import { buildWaUrl } from '../lib/whatsapp';
+import { normalizePriceDisplay } from '../lib/priceFormatter';
 
 function slugFrom(url) {
   return url?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
@@ -30,8 +31,7 @@ function ProductCard({ product, badge: badgeProp, onClick }) {
   const showFallback = !showImage;
 
   const firstPrice = p[0] || '';
-  const priceMatch = firstPrice.match(/(₡\s*[\d\s,.]+)(.*)/);
-  const priceVal   = priceMatch ? priceMatch[1].trim() : firstPrice;
+  const priceVal   = normalizePriceDisplay(firstPrice);
   const hasFlavors = Array.isArray(f) && f.some(fl => fl && fl.trim());
 
   const slug  = useMemo(() => slugFrom(u), [u]);

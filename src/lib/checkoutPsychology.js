@@ -36,6 +36,7 @@
  */
 
 import { PRODUCTS } from '../data/products';
+import { parseCRCPrice, formatCRC, normalizePriceDisplay } from './priceFormatter';
 
 // ── Category → Benefit Pillar map ────────────────────────────────
 // Maps a product's category to a human-readable benefit pillar.
@@ -277,11 +278,11 @@ export function buildPremiumWAMessage({ source, productIds, total, guidedSelecti
   const lines = productIds.map((id, i) => {
     const p = PRODUCTS[id];
     if (!p) return null;
-    const price = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || 'consultar precio';
+    const price = normalizePriceDisplay(p.p[0], 'consultar precio');
     return `${i + 1}. ${p.n} — ${p.b} — ${price}`;
   }).filter(Boolean).join('\n');
 
-  const totalLine  = total > 0 ? `\nTotal estimado: ~₡${total.toLocaleString('es-CR')} (+IVA)` : '';
+  const totalLine  = total > 0 ? `\nTotal estimado: ~${formatCRC(total)} (+IVA)` : '';
   const coverLine  = coverage?.length > 0 ? `\nCubre: ${coverage.slice(0, 3).join(' · ')}` : '';
 
   const GOAL_LABELS_WA = {
