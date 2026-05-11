@@ -24,7 +24,7 @@
 
 import { useState, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
-import { resolveProductImage } from '../data/images';
+import { resolveProductImage, resolveDoTERRAImage } from '../data/images';
 import { analytics } from '../lib/analytics';
 import { parseCRCPrice, formatCRC, normalizePriceDisplay } from '../lib/priceFormatter';
 import '../styles/manualStackBuilder.css';
@@ -159,7 +159,7 @@ function ProductItem({ id, inStack, atMax, onAdd, onRemove }) {
   const p = PRODUCTS[id];
   if (!p) return null;
 
-  const img   = resolveProductImage(p.u);
+  const img   = resolveProductImage(p.u) || resolveDoTERRAImage(p.n);
   const price = normalizePriceDisplay(p.p?.[0]);
 
   return (

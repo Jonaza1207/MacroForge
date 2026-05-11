@@ -3,7 +3,7 @@ import { PRODUCTS } from '../data/products';
 import { normalizePriceDisplay } from '../lib/priceFormatter';
 import { PRODUCT_LABELS } from '../data/labels';
 import { HEALTH } from '../data/health';
-import { resolveProductImage } from '../data/images';
+import { resolveProductImage, resolveDoTERRAImage } from '../data/images';
 import { CATEGORY_TYPES } from '../data/catalog';
 import { trackCta } from '../hooks/useClickTracking';
 import { useFavorites } from '../hooks/useFavorites';
@@ -83,7 +83,7 @@ export default function ProductModal({ productId, onClose, onOpen }) {
   const favorited    = isFavorite(productId);
   const sectionColor = SECTION_COLORS[p.s];
   const cardType     = CATEGORY_TYPES[p.c] || 'SUPPLEMENT';
-  const imgUrl       = resolveProductImage(p.u);
+  const imgUrl       = resolveProductImage(p.u) || resolveDoTERRAImage(p.n);
   const slug         = p.u?.match(/\/tienda\/([^/?#]+)/)?.[1] || null;
 
   const waUrl = buildWaUrl('product', { name: p.n, brand: p.b });

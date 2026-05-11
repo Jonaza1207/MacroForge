@@ -466,7 +466,61 @@ const IMAGE_MAP = {
   'superior14-creatine': 'Superior14-100-Creatine-Monohydrate',
   'gnc-beyond-raw-creatine': 'GNC-beyond-raw-creatine-HCL',
   'gnc-essential-amino-complete': 'GNC-essential-amino-complete-raspberry-Iced-Tea',
+  // ── doTERRA — the one product with a URL slug ──────────────
+  'curcumadoterra': 'Curcuma',
 };
+
+// ── doTERRA name → filename map ───────────────────────────────
+// Most doTERRA products have no URL (product.u = ""), so the URL-based
+// IMAGE_MAP resolver returns null for them. This map provides a name-based
+// fallback: resolveDoTERRAImage(product.n) is called after resolveProductImage
+// returns null, covering every doTERRA product that has a local image file.
+const DOTERRA_NAME_MAP = {
+  'Curcuma':                      'Curcuma',
+  'Doterra Balance':              'Doterra-Balance',
+  'Doterra Balance 5 mL':         'Doterra-Balance-5mL',
+  'Doterra Brave roll on':        'Doterra-Brave-roll-on',
+  'Doterra Calmer roll on':       'Doterra-Calmer-roll-on',
+  'Doterra Cheer':                'Doterra-Cheer',
+  'Doterra Citrus Bloom':         'Doterra-Citrus-Bloom',
+  'Doterra Console':              'Doterra-Console',
+  'Doterra Forgive':              'Doterra-Forgive',
+  'Doterra Immortelle':           'Doterra-Immortelle',
+  'Doterra Motivate':             'Doterra-Motivate',
+  'Doterra Passion':              'Doterra-Passion',
+  'Doterra Peace':                'Doterra-Peace',
+  'Doterra Rescuer roll on':      'Doterra-Rescuer-roll-on',
+  'Doterra Serenity':             'Doterra-Serenity',
+  'Doterra Serenity Touch':       'Doterra-Serenity-Touch',
+  'Doterra Smart & Sassy':        'Doterra-Smart-&-Sassy',
+  'Doterra Steady roll on':       'Doterra-Steady-roll-on',
+  'Doterra Stronger roll on':     'Doterra-Stronger-roll-on',
+  'Doterra Tamer roll on':        'Doterra-Tamer-roll-on',
+  'Doterra Thinker roll on':      'Doterra-Thinker-roll-on',
+  'Doterra Whisper Touch 10 mL':  'Doterra-Whisper-Touch-10mL',
+  'Zendocrine':                   'Zendocrine',
+  'Zendocrine Softgels':          'Zendocrine-Softgels',
+  'ZenGest':                      'ZenGest',
+  'ZenGest 5 mL':                 'ZenGest-5mL',
+  'ZenGest Touch':                'ZenGest-Touch',
+  'xEO Mega':                     'xEO-Mega',
+  'Volo Marble Diffuser':         'Volo-Marble-Difusser',
+  'Volo Onyx Diffuser':           'Volo-Onyx-Diffuser',
+};
+
+/**
+ * Resolve a doTERRA product image by exact product name.
+ * Called as fallback when resolveProductImage() returns null (no URL).
+ *
+ * @param {string} productName — product.n from PRODUCTS catalog
+ * @returns {string|null}
+ */
+export function resolveDoTERRAImage(productName) {
+  if (!productName) return null;
+  const filename = DOTERRA_NAME_MAP[productName];
+  if (!filename) return null;
+  return LOCAL_IMAGES[filename] || null;
+}
 
 export function resolveProductImage(url) {
   if (!url) return null;

@@ -20,7 +20,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
-import { resolveProductImage } from '../data/images';
+import { resolveProductImage, resolveDoTERRAImage } from '../data/images';
 import { analytics } from '../lib/analytics';
 import { parseCRCPrice, formatCRC, normalizePriceDisplay } from '../lib/priceFormatter';
 import { WA_NUMBER } from '../data/catalog';
@@ -186,7 +186,7 @@ function OptionCard({ option, selected, onSelect }) {
 function ResultCard({ item, index }) {
   const p = PRODUCTS[item.id];
   if (!p) return null;
-  const img    = resolveProductImage(p.u);
+  const img    = resolveProductImage(p.u) || resolveDoTERRAImage(p.n);
   const price  = normalizePriceDisplay(p.p?.[0], '');
   const insight = PRODUCT_INSIGHTS[item.slug] || '';
   return (

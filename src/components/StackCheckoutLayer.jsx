@@ -31,7 +31,7 @@
 
 import { useState } from 'react';
 import { PRODUCTS } from '../data/products';
-import { resolveProductImage } from '../data/images';
+import { resolveProductImage, resolveDoTERRAImage } from '../data/images';
 import { analytics } from '../lib/analytics';
 import { WA_NUMBER } from '../data/catalog';
 import {
@@ -78,7 +78,7 @@ const BUD_LABELS = {
 function CheckoutProduct({ id, index }) {
   const p = PRODUCTS[id];
   if (!p) return null;
-  const img    = resolveProductImage(p.u);
+  const img    = resolveProductImage(p.u) || resolveDoTERRAImage(p.n);
   const price  = normalizePriceDisplay(p.p?.[0], '');
   const supply = SUPPLY_DAYS[p.c];
   return (

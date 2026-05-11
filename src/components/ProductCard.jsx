@@ -1,5 +1,5 @@
 import { memo, useState, useMemo } from 'react';
-import { resolveProductImage } from '../data/images';
+import { resolveProductImage, resolveDoTERRAImage } from '../data/images';
 import { PRODUCT_LABELS, CLICK_THRESHOLD_POPULAR } from '../data/labels';
 import { isDynamicPopular, trackView, trackCta } from '../hooks/useClickTracking';
 import { analytics } from '../lib/analytics';
@@ -26,7 +26,7 @@ function ProductCard({ product, badge: badgeProp, onClick }) {
   const [imgError, setImgError] = useState(false);
   const { n, b, p, u, f } = product;
 
-  const imageUrl     = resolveProductImage(u);
+  const imageUrl     = resolveProductImage(u) || resolveDoTERRAImage(n);
   const showImage    = Boolean(imageUrl) && !imgError;
   const showFallback = !showImage;
 
