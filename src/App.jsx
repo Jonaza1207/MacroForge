@@ -339,6 +339,16 @@ export default function App() {
         affinity:  () => console.table(getCrmProfile().category_affinity),
       };
 
+      // Phase 3.6 — Revenue tracking status
+      window.__mfTracking = {
+        status: () => console.log(analytics.trackingStatus),
+        test:   () => {
+          console.log('%c[MacroForge] Firing test events...', 'color:#E3001E;font-weight:700');
+          analytics.stackCTA('tracking_test', 'Revenue Tracking Test');
+          console.log('  ✓ stack_cta_click fired — check GA4 Realtime + Meta Events Manager');
+        },
+      };
+
       devLogAnalytics();
     }
   }, []);

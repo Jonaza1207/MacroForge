@@ -2,49 +2,35 @@
  * MacroForge — Centralized Analytics Layer
  *
  * ALL event tracking routes through this module.
- * Writes to a localStorage event buffer (zero dependencies) AND
- * forwards to GA4 + Meta Pixel when IDs are present.
+ * Writes to a localStorage event buffer AND forwards to
+ * GA4 + Meta Pixel when IDs are configured.
  *
- * ── GA4 activation ──────────────────────────────────────────────
- * Set VITE_GA4_ID in your .env file:
+ * ── Activation ───────────────────────────────────────────────────
+ * Add to .env (local) or GitHub Secrets (production):
  *   VITE_GA4_ID=G-XXXXXXXXXX
- *
- * Then add to index.html <head> (replace YOUR_ID with the same value):
- *   <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_ID"></script>
- *   <script>
- *     window.dataLayer = window.dataLayer || [];
- *     function gtag(){dataLayer.push(arguments);}
- *     gtag('js', new Date());
- *     gtag('config', 'YOUR_ID', { send_page_view: false });
- *   </script>
- *
- * page_view is sent manually via analytics.pageView() to prevent
- * duplicate fires from the SPA router + gtag auto-collection.
- *
- * ── Meta Pixel activation ────────────────────────────────────────
- * Set VITE_PIXEL_ID in your .env file:
  *   VITE_PIXEL_ID=1234567890123456
  *
- * Then add to index.html <head>:
- *   <script>
- *     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
- *     n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
- *     n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
- *     t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
- *     document,'script','https://connect.facebook.net/en_US/fbevents.js');
- *     fbq('init', 'YOUR_PIXEL_ID');
- *     // Do NOT call fbq('track','PageView') here — analytics.pageView() handles it
- *   </script>
+ * Tracking scripts are loaded DYNAMICALLY by src/lib/tracking.js.
+ * No changes to index.html required.
+ * Scripts load async — zero impact on First Contentful Paint.
+ * Events fire before scripts load are queued and replayed automatically.
  *
- * ── Dev console helpers ──────────────────────────────────────────
+ * ── Dev console ──────────────────────────────────────────────────
  *   window.__mfEvents()        → last 30 buffered events
  *   window.__mfEvents.all()    → full buffer
  *   window.__mfEvents.clear()  → clear buffer
+ *   window.__mfStack.report()  → AI Stack Builder funnel
+ *   window.__mfSegment.report()→ customer segment + lead score
  */
 
-// ── IDs: read from Vite env vars, fall back to null ──────────────
-// In production: set VITE_GA4_ID and VITE_PIXEL_ID in your .env
-// In GitHub Pages: set them as repository secrets and inject via CI
+import { initTracking, TRACKING_STATUS } from './tracking';
+
+// ── Initialize tracking scripts on module load ────────────────────
+// Runs once when analytics.js is first imported by the app.
+// Graceful no-op if VITE_GA4_ID / VITE_PIXEL_ID are not set.
+initTracking();
+
+// ── IDs (used by _ga4 / _pixel checks) ───────────────────────────
 const GA4_ID   = import.meta.env?.VITE_GA4_ID   || null;
 const PIXEL_ID = import.meta.env?.VITE_PIXEL_ID  || null;
 
@@ -66,14 +52,25 @@ function _buffer(name, params) {
 function _ga4(name, params) {
   if (!GA4_ID) return;
   try {
-    if (typeof gtag !== 'undefined') gtag('event', name, params);
+    // window.gtag is defined synchronously by tracking.js before this runs
+    if (typeof window.gtag === 'function') window.gtag('event', name, params);
   } catch {}
 }
 
 // ── Meta Pixel event map ──────────────────────────────────────────
 // Maps internal event names → standard Meta Pixel event names.
-// Standard events unlock Meta's optimization algorithms (conversion,
-// purchase intent, lookalike audiences).
+// Standard events unlock Meta's optimization algorithms:
+//   conversion modeling, purchase intent, lookalike audience creation.
+//
+// Retargeting audience map:
+//   ViewContent      → product page viewers (product_view)
+//   InitiateCheckout → stack WA senders (whatsapp_click, stack_cta_click)
+//   AddToCart        → manual stack builders who add products
+//   AddToWishlist    → users who favorite products
+//   Lead             → goal/funnel entry events (goal_nav_click, gateway_select)
+//   Search           → search activity
+//   Contact          → WhatsApp float button
+//
 const FB_MAP = {
   product_view:    { event: 'ViewContent',       standard: true  },
   whatsapp_click:  { event: 'InitiateCheckout',  standard: true  },
@@ -84,17 +81,84 @@ const FB_MAP = {
   share:           { event: 'CustomizeProduct',  standard: false },
   stack_cta_click: { event: 'InitiateCheckout',  standard: true  },
   return_visit:    { event: 'CustomAudience',    standard: false },
+  gateway_select:  { event: 'Lead',              standard: true  }, // entering purchase funnel
 };
 
+// ── Meta Pixel firing (standard map + param-conditional retargeting) ──
 function _pixel(name, params) {
   if (!PIXEL_ID) return;
-  const mapping = FB_MAP[name];
-  if (!mapping) return;
   try {
-    if (typeof fbq !== 'undefined') {
-      const method = mapping.standard ? 'track' : 'trackCustom';
-      fbq(method, mapping.event, params);
+    if (typeof window.fbq !== 'function') return;
+
+    // ── Standard event map ─────────────────────────────────────
+    const mapping = FB_MAP[name];
+    if (mapping) {
+      window.fbq(mapping.standard ? 'track' : 'trackCustom', mapping.event, params);
     }
+
+    // ── Param-conditional retargeting signals ──────────────────
+    // These fire IN ADDITION to the standard map (not instead of).
+    // Each creates a distinct Meta custom audience for precise retargeting.
+
+    // Audience: "Chose manual stack path" (advanced / high-intent buyer)
+    // Audience: "Chose guided stack path" (undecided / beginner)
+    if (name === 'gateway_select') {
+      window.fbq('trackCustom', 'StackPathSelected', { path: params.choice });
+    }
+
+    // Audience: "Specific fitness goal expressed" (muscle, cut, performance…)
+    // Audience: "Premium budget selected" (highest AOV signal)
+    // Audience: "Abandoned stack" (retarget with urgency)
+    // Audience: "Completed guided stack → WA" (hottest lead)
+    if (name === 'stack_step') {
+      if (params.action === 'step_complete' && params.step === 'goal') {
+        window.fbq('trackCustom', 'GoalSelected', { goal: params.value });
+      }
+      if (params.action === 'step_complete' && params.step === 'budget' && params.value === 'full') {
+        window.fbq('trackCustom', 'PremiumBudgetSelected', {});
+      }
+      if (params.action === 'abandoned') {
+        window.fbq('trackCustom', 'StackAbandoned', { step_reached: params.step_reached });
+      }
+      if (params.action === 'wa_clicked') {
+        window.fbq('track', 'InitiateCheckout', {
+          content_name: `Guided stack: ${params.goal || 'custom'}`,
+          num_items:    params.stack_size || 1,
+          currency:     'CRC',
+        });
+      }
+    }
+
+    // Audience: "Manual stack builder" (product-specific, high AOV)
+    // AddToCart → standard audience creation in Meta
+    // InitiateCheckout on send → highest-intent conversion signal
+    if (name === 'manual_stack') {
+      if (params.action === 'product_added') {
+        window.fbq('track', 'AddToCart', {
+          content_name:     params.item_name     || '',
+          content_category: params.item_category || '',
+          currency:         'CRC',
+        });
+      }
+      if (params.action === 'wa_clicked') {
+        window.fbq('track', 'InitiateCheckout', {
+          num_items: params.stack_size    || 1,
+          value:     params.estimated_total || 0,
+          currency:  'CRC',
+        });
+      }
+      if (params.action === 'abandoned') {
+        window.fbq('trackCustom', 'ManualStackAbandoned', {
+          stack_size: params.stack_size || 0,
+        });
+      }
+    }
+
+    // Audience: "doTERRA interested" — separate retargeting segment
+    if (name === 'view_item_list' && params?.item_list_id === 'dote') {
+      window.fbq('trackCustom', 'DoTerraInterested', { section: 'dote' });
+    }
+
   } catch {}
 }
 
@@ -114,10 +178,10 @@ function _fire(name, params = {}) {
 
 export const analytics = {
 
-  /** SPA page view — call once on mount and on view changes if needed */
+  /** SPA page view — call on mount and on significant route changes */
   pageView(path, title) {
     _ga4('page_view', { page_path: path || window.location.pathname, page_title: title || document.title });
-    try { if (PIXEL_ID && typeof fbq !== 'undefined') fbq('track', 'PageView'); } catch {}
+    try { if (PIXEL_ID && typeof window.fbq === 'function') window.fbq('track', 'PageView'); } catch {}
     _buffer('page_view', { path, title });
   },
 
@@ -248,7 +312,7 @@ export const analytics = {
   /** Refill hint acted on — user clicked WhatsApp from the refill reminder */
   refillHintClick(productId, category, daysSince) {
     _fire('refill_hint_click', {
-      item_id:  String(productId),
+      item_id:             String(productId),
       category,
       days_since_purchase: daysSince,
     });
@@ -256,34 +320,30 @@ export const analytics = {
 
   /**
    * Stack Commerce Gateway path selected.
-   * Fires when the user chooses between Manual and AI-guided flows.
-   * Future: feed into segmentation (manual = advanced buyer, guided = undecided)
+   * Fires: Lead (standard Meta) + StackPathSelected (custom audience)
+   * GA4 audience: filter gateway_select where params.choice = 'manual' | 'guided'
    */
   gatewaySelect(choice) {
-    _fire('gateway_select', { choice }); // 'manual' | 'guided'
+    _fire('gateway_select', { choice });
   },
 
   /**
    * Manual Stack Builder interaction.
-   * actions: 'product_added' | 'product_removed' | 'wa_clicked' | 'abandoned'
-   * Future: persist to behavioral_tracking table in Supabase
+   * product_added  → AddToCart (Meta standard)
+   * wa_clicked     → InitiateCheckout (Meta standard) — highest conversion signal
+   * abandoned      → ManualStackAbandoned (Meta custom)
+   * product_removed → buffered only
    */
   manualStack(action, params = {}) {
     _fire('manual_stack', { action, ...params });
   },
 
   /**
-   * AI Stack Builder step event — tracks every meaningful moment in the funnel.
-   *
-   * actions:
-   *   'step_complete'  — user advanced from a step (includes which value they selected)
-   *   'abandoned'      — user closed the builder before reaching results
-   *   'wa_clicked'     — user sent the stack to WhatsApp (conversion event)
-   *   'restarted'      — user clicked "Armar otro stack"
-   *
-   * Future: when Supabase is active, fire these to:
-   *   POST /api/analytics/stack-step
-   *   Persisted in table: behavioral_tracking(session_id, action, payload, created_at)
+   * AI Stack Builder guided flow step event.
+   * step_complete + goal     → GoalSelected (Meta custom audience)
+   * step_complete + budget full → PremiumBudgetSelected (Meta custom audience)
+   * abandoned                → StackAbandoned (Meta custom audience)
+   * wa_clicked               → InitiateCheckout (Meta standard)
    */
   stackStep(action, params = {}) {
     _fire('stack_step', { action, ...params });
@@ -296,4 +356,7 @@ export const analytics = {
   clearBuffer() {
     try { localStorage.removeItem(BUFFER_KEY); } catch {}
   },
+
+  /** Expose tracking status in dev console */
+  trackingStatus: TRACKING_STATUS,
 };
