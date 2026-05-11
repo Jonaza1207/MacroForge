@@ -421,7 +421,44 @@
   border-color: rgba(212, 168, 67, 0.4);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   SUBSCRIPTION STICKY CTA — always visible between pay and WA
+   Gold palette. Premium feel. Impossible to miss.
+   ══════════════════════════════════════════════════════════════ */
+.sc-sub-sticky-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(212, 168, 67, 0.1);
+  border: 1.5px solid rgba(212, 168, 67, 0.38);
+  border-radius: var(--r-pill);
+  padding: 11px 20px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dote);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  line-height: 1.3;
+  flex-wrap: wrap;
+}
+.sc-sub-sticky-btn:hover  { background: rgba(212, 168, 67, 0.18); border-color: rgba(212, 168, 67, 0.6); }
+.sc-sub-sticky-btn:active { transform: scale(0.97); }
+.sc-sub-sticky-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+.sc-sub-sticky-btn--loading { opacity: 0.82; cursor: not-allowed; }
+.sc-sub-meta {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.72;
+  white-space: nowrap;
+}
+
 /* ── Light mode ─────────────────────────────────────────── */
 [data-theme="light"] .sc-product { background: var(--surface); }
 [data-theme="light"] .sc-total   { background: var(--surface); }
 [data-theme="light"] .sc-trust-item { background: var(--surface-2); }
+[data-theme="light"] .sc-sub-sticky-btn { background: rgba(212, 168, 67, 0.07); }

@@ -20,6 +20,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { PRODUCTS }            from '../data/products';
 import { analytics }           from '../lib/analytics';
 import { buildWaUrl }          from '../lib/whatsapp';
 import {
@@ -114,7 +115,7 @@ export default function RetentionEngineLayer({
     try {
       const { checkout_url, subscription } = await initiateSubscriptionCheckout({
         productIds,
-        products:          null,  // backend resolves via catalog_data in payload
+        products:          PRODUCTS,
         source,
         tier,
         guidedSelections,

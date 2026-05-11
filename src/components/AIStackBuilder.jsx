@@ -195,14 +195,14 @@ function ResultCard({ item, index }) {
   const p = PRODUCTS[item.id];
   if (!p) return null;
   const img    = resolveProductImage(p.u);
-  const price  = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
+  const price  = (p.p?.[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
   const insight = PRODUCT_INSIGHTS[item.slug] || '';
   return (
     <div className="ai-product-card">
       <div className="ai-product-num">{index + 1}</div>
       <div className="ai-product-img">
         {img ? <img src={img} alt={p.n} loading="lazy" decoding="async" onError={e=>{e.currentTarget.style.display='none';}} />
-              : <div className="ai-product-img-fallback">{p.b.charAt(0)}</div>}
+              : <div className="ai-product-img-fallback">{(p.b || '?').charAt(0)}</div>}
       </div>
       <div className="ai-product-info">
         <div className="ai-product-brand">{p.b}</div>
@@ -442,7 +442,6 @@ export default function AIStackBuilder() {
     const p = PRODUCTS[id];
     analytics.manualStack('product_removed', { item_id: String(id), item_name: p?.n });
     setManualStack(prev => prev.filter(x => x !== id));
-    if (manualStack.length <= 1) setShowStackReview(false);
   }
 
   function handleManualWA() {

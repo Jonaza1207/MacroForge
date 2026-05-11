@@ -40,6 +40,13 @@ import {
   buildPremiumWAMessage,
 } from '../lib/checkoutPsychology';
 import { initiateShopifyCheckout, CHECKOUT_ERRORS } from '../lib/shopifyCheckout';
+import {
+  initiateSubscriptionCheckout,
+  getRecommendedSubscriptionInterval,
+  getSubscriptionDiscount,
+} from '../lib/subscriptionCheckout';
+import { getStackSupplyEstimate } from '../lib/refillIntelligence';
+import { buildWaUrl } from '../lib/whatsapp';
 import RevenueAccelerationLayer from './RevenueAccelerationLayer';
 import RetentionEngineLayer from './RetentionEngineLayer';
 import '../styles/stackCheckout.css';
@@ -76,7 +83,7 @@ function CheckoutProduct({ id, index }) {
   const p = PRODUCTS[id];
   if (!p) return null;
   const img    = resolveProductImage(p.u);
-  const price  = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
+  const price  = (p.p?.[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
   const supply = SUPPLY_DAYS[p.c];
   return (
     <div className="sc-product">
@@ -85,7 +92,7 @@ function CheckoutProduct({ id, index }) {
         {img
           ? <img src={img} alt={p.n} loading="lazy" decoding="async"
               onError={e => { e.currentTarget.style.display = 'none'; }} />
-          : <div className="sc-img-fallback">{p.b.charAt(0)}</div>
+          : <div className="sc-img-fallback">{(p.b || '?').charAt(0)}</div>
         }
       </div>
       <div className="sc-info">
@@ -123,6 +130,7 @@ export default function StackCheckoutLayer({
   const [saved,          setSaved]          = useState(false);
   const [payState,       setPayState]       = useState('idle');   // 'idle'|'loading'|'error'
   const [payError,       setPayError]       = useState(null);     // user-facing error message
+  const [subState,       setSubState]       = useState('idle');   // 'idle'|'loading'|'error'
 
   // Normalize to array of product IDs
   const productIds = source === 'guided'
@@ -143,6 +151,16 @@ export default function StackCheckoutLayer({
   // Stack tier (for WA message context)
   const tier     = getStackTier(productIds.length, guidedSelections?.budget);
   const coverage = getStackCoverage(productIds);
+
+  // Subscription recommendation — computed once, used in sticky footer CTA
+  const supplyEst   = getStackSupplyEstimate(productIds);
+  const recInterval = getRecommendedSubscriptionInterval(supplyEst?.min);
+  const discountPct = getSubscriptionDiscount(tier?.tier);
+  const subWaUrl    = buildWaUrl('subscriptionOffer', {
+    stackName:     tier?.label || 'Mi Stack',
+    discount:      `${discountPct}%`,
+    intervalLabel: recInterval.label,
+  });
 
   // Premium WA message — Phase 5 hot-buyer framing
   const waMessage = buildPremiumWAMessage({
@@ -202,6 +220,39 @@ export default function StackCheckoutLayer({
         setPayError('El pago directo no está disponible en este momento. Usá WhatsApp abajo.');
         analytics.checkoutLayer('shopify_checkout_failed', { reason: err.reason || err.code });
       }
+    }
+  }
+
+  async function handleSubscribeNow() {
+    setSubState('loading');
+    analytics.subscriptionEvent('subscription_cta_clicked', {
+      stack_tier:    tier?.tier || 'esencial',
+      interval_days: recInterval.days,
+      discount_pct:  discountPct,
+      cta_location:  'sticky_footer',
+    });
+    try {
+      const { checkout_url } = await initiateSubscriptionCheckout({
+        productIds,
+        products:           PRODUCTS,
+        source,
+        tier,
+        guidedSelections,
+        estimatedTotal:     total,
+        supplyEstimateDays: supplyEst?.min,
+        intervalPreference: recInterval.days,
+      });
+      analytics.subscriptionEvent('subscription_checkout_created', {
+        stack_tier:    tier?.tier || 'esencial',
+        interval_days: recInterval.days,
+        discount_pct:  discountPct,
+      });
+      window.location.href = checkout_url;
+    } catch {
+      setSubState('error');
+      analytics.subscriptionEvent('subscription_checkout_failed', {
+        cta_location: 'sticky_footer',
+      });
     }
   }
 
@@ -301,6 +352,36 @@ export default function StackCheckoutLayer({
         {/* Error message — directs to WA when Shopify fails */}
         {payState === 'error' && payError && (
           <div className="sc-pay-error" role="alert">{payError}</div>
+        )}
+
+        {/* Subscription CTA — revenue-critical, sticky, always visible */}
+        {subState === 'error' ? (
+          <a
+            className="sc-sub-sticky-btn sc-sub-sticky-btn--fallback"
+            href={subWaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => analytics.subscriptionEvent('subscription_wa_fallback_clicked', { cta_location: 'sticky_footer' })}
+          >
+            📅 Consultar suscripción por WhatsApp →
+          </a>
+        ) : (
+          <button
+            className={`sc-sub-sticky-btn${subState === 'loading' ? ' sc-sub-sticky-btn--loading' : ''}`}
+            onClick={handleSubscribeNow}
+            disabled={subState === 'loading'}
+            type="button"
+          >
+            {subState === 'loading' ? (
+              <><span className="sc-pay-spinner" aria-hidden="true" /> Procesando...</>
+            ) : (
+              <>
+                <span>📅</span>
+                <span>Suscribirme y ahorrar {discountPct}%</span>
+                <span className="sc-sub-meta">· cada {recInterval.label}</span>
+              </>
+            )}
+          </button>
         )}
 
         {/* Divider */}
