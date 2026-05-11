@@ -20,16 +20,17 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
-import { PRODUCT_LABELS } from '../data/labels';
 import { resolveProductImage } from '../data/images';
 import { analytics } from '../lib/analytics';
 import { WA_NUMBER } from '../data/catalog';
 import { saveStack, getSavedStack, hasSavedStack, STACK_SAVED_EVENT } from '../lib/stackPersistence';
+import { getFavoriteStacks, openFavoriteStack, FAVORITE_STACKS_EVENT } from '../lib/favoriteStacks';
 import StackCheckoutLayer from './StackCheckoutLayer';
+import ManualStackBuilder from './ManualStackBuilder';
 import '../styles/aiStackBuilder.css';
 import '../styles/stackCommerce.css';
 
-// ── Module-level maps (computed once) ─────────────────────────
+// ── Module-level maps (computed once, used by guided flow) ─────
 const SLUG_TO_ID = (() => {
   const m = {};
   for (const [id, p] of Object.entries(PRODUCTS)) {
@@ -39,17 +40,7 @@ const SLUG_TO_ID = (() => {
   return m;
 })();
 
-// Verified curated product IDs — shown as initial "Destacados" in manual mode
-const FEATURED_IDS = (() => {
-  return Object.keys(PRODUCT_LABELS)
-    .map(slug => SLUG_TO_ID[slug])
-    .filter(id => Boolean(id && PRODUCTS[id]));
-})();
-
-const MAX_MANUAL = 8; // max products in a manual stack (keeps WA message clean)
-
-// ── Search normalization (accent-tolerant) ────────────────────
-const normS = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const MAX_MANUAL = 8; // passed to addToStack guard
 
 // ── Guided-flow constants (unchanged from Phase 2) ────────────
 const GOALS = [
@@ -235,21 +226,32 @@ export default function AIStackBuilder() {
   const [stepIndex,  setStepIndex]  = useState(0);
   const [selections, setSelections] = useState(INITIAL_SELECTIONS);
 
-  // ── Manual-builder state (Phase 3.5) ─────────────────────
-  const [manualStack,       setManualStack]       = useState([]);
-  const [manualSearch,      setManualSearch]      = useState('');
-  const [manualFilter,      setManualFilter]      = useState('all');
-  const [showStackReview,   setShowStackReview]   = useState(false);
+  // ── Manual-builder state ──────────────────────────────────
+  // ManualStackBuilder.jsx owns all internal step/search/filter state.
+  // AIStackBuilder only owns the stack array (shared with checkout + persistence).
+  const [manualStack, setManualStack] = useState([]);
 
   // ── Phase 4: Checkout + persistence state ─────────────────
-  const [checkoutSource,  setCheckoutSource]  = useState(null); // which path entered checkout
+  const [checkoutSource,  setCheckoutSource]  = useState(null);
   const [hasSaved,        setHasSaved]        = useState(() => hasSavedStack());
 
-  // Re-read saved stack state when it changes (cross-tab or after save)
+  // ── Phase 5: Restoration context for acceleration layer ───
+  const [isRestored,      setIsRestored]      = useState(false);
+  const [restoredAt,      setRestoredAt]      = useState(null);
+
+  // Phase 6: Favorite stacks state
+  const [favStacks, setFavStacks] = useState(() => getFavoriteStacks());
+
+  // Re-read saved + favorites state when they change
   useEffect(() => {
-    const handler = () => setHasSaved(hasSavedStack());
-    window.addEventListener(STACK_SAVED_EVENT, handler);
-    return () => window.removeEventListener(STACK_SAVED_EVENT, handler);
+    const handleSaved = () => setHasSaved(hasSavedStack());
+    const handleFavs  = () => setFavStacks(getFavoriteStacks());
+    window.addEventListener(STACK_SAVED_EVENT, handleSaved);
+    window.addEventListener(FAVORITE_STACKS_EVENT, handleFavs);
+    return () => {
+      window.removeEventListener(STACK_SAVED_EVENT, handleSaved);
+      window.removeEventListener(FAVORITE_STACKS_EVENT, handleFavs);
+    };
   }, []);
 
   // ── Auto-advance analyzing → results ─────────────────────
@@ -275,38 +277,9 @@ export default function AIStackBuilder() {
     return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(buildGuidedWAMessage({ ...selections, stack: guidedStack }))}`;
   }, [guidedStack, selections]);
 
-  // ── Manual-builder derived values ─────────────────────────
-  const displayedProducts = useMemo(() => {
-    const q = normS(manualSearch.trim());
-    if (q.length >= 2) {
-      return Object.entries(PRODUCTS)
-        .filter(([, p]) => {
-          const nn = normS(p.n), nb = normS(p.b), nc = normS(p.c);
-          return nn.includes(q) || nb.includes(q) || nc.includes(q);
-        })
-        .sort(([, a], [, b]) => {
-          const sa = normS(a.n).startsWith(q) ? 10 : normS(a.n).includes(q) ? 5 : 0;
-          const sb = normS(b.n).startsWith(q) ? 10 : normS(b.n).includes(q) ? 5 : 0;
-          return sb - sa;
-        })
-        .slice(0, 30);
-    }
-    if (manualFilter === 'all') {
-      return FEATURED_IDS.map(id => [id, PRODUCTS[id]]).filter(([, p]) => Boolean(p));
-    }
-    return Object.entries(PRODUCTS)
-      .filter(([, p]) => p.s === manualFilter)
-      .slice(0, 30);
-  }, [manualSearch, manualFilter]);
-
-  const manualTotal = useMemo(() => {
-    return manualStack.reduce((sum, id) => sum + extractPrice(PRODUCTS[id]?.p?.[0] || ''), 0);
-  }, [manualStack]);
-
-  const manualWaUrl = useMemo(() => {
-    if (manualStack.length === 0) return '#';
-    return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(buildManualWAMessage(manualStack))}`;
-  }, [manualStack]);
+  // All manual-builder UI state (search, filter, sort, steps) lives in
+  // ManualStackBuilder.jsx. Only manualStack array remains here for
+  // checkout → retention → persistence → analytics continuity.
 
   // ── Core actions ──────────────────────────────────────────
   function open() {
@@ -315,10 +288,9 @@ export default function AIStackBuilder() {
     setStepIndex(0);
     setSelections(INITIAL_SELECTIONS);
     setManualStack([]);
-    setManualSearch('');
-    setManualFilter('all');
-    setShowStackReview(false);
     setCheckoutSource(null);
+    setIsRestored(false);
+    setRestoredAt(null);
     analytics.stackCTA('ai_builder_open', 'Stack Commerce Gateway');
     document.body.style.overflow = 'hidden';
   }
@@ -328,19 +300,22 @@ export default function AIStackBuilder() {
     const data = getSavedStack();
     if (!data) { setHasSaved(false); return; }
 
+    const savedAt = data.savedAt || null;
     setIsOpen(true);
     setCheckoutSource(data.type);
     setMode('checkout');
+    setIsRestored(true);
+    setRestoredAt(savedAt);
     document.body.style.overflow = 'hidden';
 
     if (data.type === 'guided' && data.selections) {
       setSelections(data.selections);
       setStepIndex(5);
     } else if (data.type === 'manual' && Array.isArray(data.productIds)) {
-      // Filter out any product IDs that no longer exist in the catalog
       setManualStack(data.productIds.filter(id => Boolean(PRODUCTS[id])));
     }
     analytics.stackStep('saved_stack_restored', { type: data.type });
+    analytics.revenueAcceleration('stack_restored', { type: data.type, saved_at: savedAt });
   }
 
   function close() {
@@ -358,10 +333,39 @@ export default function AIStackBuilder() {
     document.body.style.overflow = '';
   }
 
+  /** Open a named favorite stack directly to checkout — quick reorder */
+  function openFavorite(favId) {
+    const fav = openFavoriteStack(favId); // marks as opened, increments count
+    if (!fav) return;
+
+    setIsOpen(true);
+    setCheckoutSource(fav.type);
+    setMode('checkout');
+    setIsRestored(true);
+    setRestoredAt(fav.savedAt);
+    document.body.style.overflow = 'hidden';
+
+    if (fav.type === 'guided' && fav.selections) {
+      setSelections(fav.selections);
+      setStepIndex(5);
+    } else if (fav.type === 'manual' && Array.isArray(fav.productIds)) {
+      setManualStack(fav.productIds.filter(id => Boolean(PRODUCTS[id])));
+    }
+
+    analytics.retentionEvent('favorite_stack_opened', {
+      stack_name:  fav.name,
+      tier:        fav.tier,
+      open_count:  (fav.openCount || 0) + 1,
+      source:      fav.type,
+    });
+  }
+
   /** Transition to the checkout layer from guided or manual */
   function enterCheckout(source) {
     setCheckoutSource(source);
     setMode('checkout');
+    setIsRestored(false);  // fresh checkout — not a restoration
+    setRestoredAt(null);
     const sz = source === 'guided' ? guidedStack.length : manualStack.length;
     analytics.checkoutLayer('viewed', { source, stack_size: sz });
   }
@@ -383,7 +387,6 @@ export default function AIStackBuilder() {
     setMode('gateway');
     setStepIndex(0);
     setSelections(INITIAL_SELECTIONS);
-    setShowStackReview(false);
   }
 
   function selectGateway(choice) {
@@ -453,7 +456,6 @@ export default function AIStackBuilder() {
   const currentValue   = currentConfig ? selections[currentConfig.field] : null;
   const progressPct    = stepIndex >= 4 ? 100 : Math.round(((stepIndex + (currentValue ? 1 : 0)) / 4) * 100);
 
-  const inStackSet = new Set(manualStack);
 
   return (
     <>
@@ -479,6 +481,31 @@ export default function AIStackBuilder() {
           <div className="ai-trigger-meta-item"><span>✓</span> Sin registro</div>
           <div className="ai-trigger-meta-item"><span>✓</span> A WhatsApp en segundos</div>
         </div>
+
+        {/* Favorite stacks — quick reorder for returning customers */}
+        {favStacks.length > 0 && (
+          <div className="ai-trigger-favorites">
+            <div className="ai-trigger-favorites-label">Mis stacks favoritos</div>
+            <div className="ai-trigger-favorites-list">
+              {favStacks.slice(0, 3).map(fav => (
+                <button
+                  key={fav.id}
+                  className="ai-trigger-favorite-btn"
+                  onClick={() => openFavorite(fav.id)}
+                  type="button"
+                  aria-label={`Abrir ${fav.name}`}
+                >
+                  <span className="ai-trigger-favorite-name">{fav.name}</span>
+                  <span className="ai-trigger-favorite-meta">
+                    {fav.productIds?.length || 0} prod.
+                    {fav.openCount > 0 ? ` · ${fav.openCount + 1}ª vez` : ''}
+                  </span>
+                  <span className="ai-trigger-favorite-arrow">→</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Saved stack restore — shown when user has a previously saved stack */}
         {hasSaved && (
@@ -534,6 +561,8 @@ export default function AIStackBuilder() {
                 guidedStack={guidedStack}
                 manualProductIds={manualStack}
                 guidedSelections={selections}
+                isRestored={isRestored}
+                restoredAt={restoredAt}
                 onEdit={() => {
                   setMode(checkoutSource);
                   analytics.checkoutLayer('edit', { source: checkoutSource });
@@ -602,175 +631,17 @@ export default function AIStackBuilder() {
             )}
 
             {/* ════════════════════════════════════════════
-                MANUAL BUILDER
+                MANUAL BUILDER — Phase 6.5 Upgrade
+                Structured 3-step: Focus → Category → Products
+                All 649 products accessible. No artificial limits.
                 ════════════════════════════════════════════ */}
             {mode === 'manual' && (
-              <div className="sb-manual">
-
-                {/* Search */}
-                <div className="sb-search-wrap">
-                  <div className="sb-search-row">
-                    <span className="sb-search-icon" aria-hidden="true">🔍</span>
-                    <input
-                      className="sb-search"
-                      type="search"
-                      placeholder="Buscar producto, marca o categoría..."
-                      value={manualSearch}
-                      onChange={e => { setManualSearch(e.target.value); setManualFilter('all'); }}
-                      aria-label="Buscar producto"
-                      autoComplete="off"
-                    />
-                  </div>
-                </div>
-
-                {/* Section filters */}
-                {!manualSearch && (
-                  <div className="sb-filters" role="tablist" aria-label="Filtrar por sección">
-                    {[
-                      { id:'all',  label:'⭐ Destacados' },
-                      { id:'gym',  label:'💪 Gym' },
-                      { id:'vita', label:'🌿 Vitaminas' },
-                      { id:'dote', label:'🌸 doTERRA' },
-                    ].map(f => (
-                      <button
-                        key={f.id}
-                        className={`sb-filter-tab${manualFilter === f.id ? ' sb-filter-tab--active' : ''}`}
-                        onClick={() => setManualFilter(f.id)}
-                        type="button"
-                        role="tab"
-                        aria-selected={manualFilter === f.id}
-                      >
-                        {f.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Product list */}
-                <div className="sb-products" role="list">
-                  {!manualSearch && manualFilter === 'all' && (
-                    <div className="sb-products-label">Selección destacada — Catálogo 2026</div>
-                  )}
-                  {displayedProducts.length === 0 && (
-                    <div className="sb-empty">
-                      Sin resultados para "{manualSearch}".<br />
-                      Probá otro término o explorá por sección.
-                    </div>
-                  )}
-                  {displayedProducts.map(([id, p]) => {
-                    const img       = resolveProductImage(p.u);
-                    const price     = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
-                    const inStack   = inStackSet.has(id);
-                    const atMax     = manualStack.length >= MAX_MANUAL;
-                    return (
-                      <div key={id} className="sb-product" role="listitem">
-                        <div className="sb-product-img">
-                          {img
-                            ? <img src={img} alt={p.n} loading="lazy" decoding="async" onError={e=>{e.currentTarget.style.display='none';}} />
-                            : <div className="sb-product-fallback">{p.b.charAt(0)}</div>
-                          }
-                        </div>
-                        <div className="sb-product-info">
-                          <div className="sb-product-brand">{p.b}</div>
-                          <div className="sb-product-name">{p.n}</div>
-                          {price && <div className="sb-product-price">{price}</div>}
-                        </div>
-                        <button
-                          className={`sb-product-add${inStack ? ' sb-product-add--in-stack' : ''}`}
-                          onClick={() => inStack ? removeFromStack(id) : addToStack(id)}
-                          disabled={!inStack && atMax}
-                          type="button"
-                          aria-label={inStack ? `Quitar ${p.n}` : `Agregar ${p.n}`}
-                          title={!inStack && atMax ? `Máximo ${MAX_MANUAL} productos` : ''}
-                        >
-                          {inStack ? '✓' : '+'}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Stack bar — sticky bottom */}
-                <div className="sb-stack-bar">
-
-                  {/* Stack review panel (expands above bar) */}
-                  {showStackReview && manualStack.length > 0 && (
-                    <div className="sb-stack-review">
-                      <div className="sb-stack-review-heading">
-                        Mi stack — {manualStack.length} producto{manualStack.length !== 1 ? 's' : ''}
-                      </div>
-                      {manualStack.map((id, i) => {
-                        const p = PRODUCTS[id];
-                        if (!p) return null;
-                        return (
-                          <div key={id} className="sb-stack-item">
-                            <div className="sb-stack-item-num">{i + 1}</div>
-                            <div className="sb-stack-item-info">
-                              <div className="sb-stack-item-name">{p.n}</div>
-                              <div className="sb-stack-item-brand">{p.b}</div>
-                            </div>
-                            <button className="sb-stack-item-remove" onClick={() => removeFromStack(id)} type="button" aria-label={`Quitar ${p.n}`}>×</button>
-                          </div>
-                        );
-                      })}
-                      {manualTotal > 0 && (
-                        <div className="sb-stack-review-total">
-                          Total estimado: ~{formatTotal(manualTotal)} <small style={{color:'var(--text-3)',fontWeight:400}}>(+IVA)</small>
-                        </div>
-                      )}
-                      {manualStack.length > 0 && (
-                        <div className="sb-stack-hint">
-                          Revisá el resumen y confirmá disponibilidad al instante.
-                        </div>
-                      )}
-                      <button
-                        className="sb-stack-wa-btn"
-                        onClick={() => enterCheckout('manual')}
-                        type="button"
-                      >
-                        📋 Ver resumen y confirmar →
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Bar — empty or active */}
-                  {manualStack.length === 0 ? (
-                    <div className="sb-stack-bar-empty">
-                      <span>Agregá productos para armar tu stack</span>
-                    </div>
-                  ) : (
-                    <div className="sb-stack-bar-active">
-                      <div className="sb-stack-bar-summary">
-                        <div className="sb-stack-bar-info">
-                          <div className="sb-stack-bar-count">
-                            {manualStack.length} producto{manualStack.length !== 1 ? 's' : ''}
-                            {manualStack.length >= MAX_MANUAL && <span style={{ color:'var(--text-3)', fontWeight:400, fontSize:11 }}> (máx.)</span>}
-                          </div>
-                          {manualTotal > 0 && (
-                            <div className="sb-stack-bar-total">~{formatTotal(manualTotal)} +IVA</div>
-                          )}
-                        </div>
-                        <button
-                          className="sb-stack-bar-toggle"
-                          onClick={() => setShowStackReview(v => !v)}
-                          type="button"
-                        >
-                          {showStackReview ? 'Ocultar ▲' : `Ver stack ▼`}
-                        </button>
-                      </div>
-                      {!showStackReview && (
-                        <button
-                          className="sb-stack-wa-btn"
-                          onClick={() => enterCheckout('manual')}
-                          type="button"
-                        >
-                          📋 Ver resumen y confirmar →
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ManualStackBuilder
+                stack={manualStack}
+                onAdd={addToStack}
+                onRemove={removeFromStack}
+                onCheckout={() => enterCheckout('manual')}
+              />
             )}
 
             {/* ════════════════════════════════════════════

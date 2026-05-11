@@ -1,31 +1,32 @@
 /**
  * MacroForge — Stack Checkout Layer
  *
- * Phase 4 — Revenue Infrastructure
+ * Phase 4 (Revenue Infrastructure) + Phase 5 (Revenue Acceleration)
+ *
  * The premium conversion layer between stack creation and WhatsApp.
+ * Psychology: before clicking WhatsApp, the customer sees a structured
+ * order summary + stack intelligence that builds commitment.
+ * The seller receives a "hot buyer" message — not a casual inquiry.
  *
- * Psychology:
- *   Before clicking WhatsApp, the customer sees a structured order summary.
- *   This creates psychological commitment — they've reviewed their purchase,
- *   they know the total, they trust the products. The seller receives a
- *   serious, purchase-ready message instead of a casual inquiry.
+ * Phase 5 upgrades:
+ *   - RevenueAccelerationLayer: tier, coverage, completeness, suggestion
+ *   - Premium WA message: "quiero cerrar el pedido hoy" framing
+ *   - isRestored support: warm recognition for returning users
+ *   - 6 trust signals (upgraded from 4)
  *
- * Seller benefit:
- *   The enhanced WA message includes goal, budget tier, product list,
- *   prices, and an explicit "ready to buy" closing phrase. Close rates
- *   increase because there's no back-and-forth to establish intent.
- *
- * ── Future Shopify integration (Phase 5) ─────────────────────────
- * TODO: Replace the WA button with a Shopify Buy Button when checkout
- *   infrastructure is ready. The "Confirm" CTA maps 1:1 to checkout.
- * TODO: POST /api/checkout/create (Vercel Edge Function)
- *   Creates a Shopify draft order from the stack product IDs.
- *   Returns a checkout_url the customer opens directly.
+ * ── Future Shopify integration (Phase 6) ─────────────────────────
+ * TODO: Replace WA button with Shopify Buy Button when checkout ready.
+ *   POST /api/checkout/create → Shopify draft order → checkout_url
  *   Requires: Shopify Admin API key (server-side only, never frontend).
  *
- * ── Security ─────────────────────────────────────────────────────
- * No secrets. No payment credentials. No Shopify API in frontend.
- * This component is 100% frontend-safe for public deployment.
+ * TODO: POST /api/subscriptions/create
+ *   Shopify Selling Plan for refill subscriptions ("Suscribirse y ahorrar").
+ *
+ * TODO: Customer segmentation
+ *   tier.shopifyTag → Shopify customer tag via Admin API (server-side).
+ *   Enables tag-based pricing, loyalty tiers, and CRM segmentation.
+ *
+ * Security: No secrets. No payment credentials. 100% frontend-safe.
  */
 
 import { useState } from 'react';
@@ -33,45 +34,31 @@ import { PRODUCTS } from '../data/products';
 import { resolveProductImage } from '../data/images';
 import { analytics } from '../lib/analytics';
 import { WA_NUMBER } from '../data/catalog';
+import {
+  getStackTier,
+  getStackCoverage,
+  buildPremiumWAMessage,
+} from '../lib/checkoutPsychology';
+import { initiateShopifyCheckout, CHECKOUT_ERRORS } from '../lib/shopifyCheckout';
+import RevenueAccelerationLayer from './RevenueAccelerationLayer';
+import RetentionEngineLayer from './RetentionEngineLayer';
 import '../styles/stackCheckout.css';
+import '../styles/revenueAcceleration.css';
+import '../styles/retentionEngine.css';
 
 // ── Estimated supply per category (days) ─────────────────────
-// Shown per product so the customer understands recurring nature.
 const SUPPLY_DAYS = {
-  'Creatinas':              30,
-  'Proteínas Whey':         30,
-  'Proteínas Isoladas':     30,
-  'Gainers de Masa':        21,
-  'Pre-Entrenamientos':     45,
-  'BCAA':                   30,
-  'Glutamina':              30,
-  'Aminoácidos Esenciales': 30,
-  'Electrolitos':           30,
-  'Magnesio':               60,
-  'Vitaminas Esenciales':   30,
-  'Multivitamínicos':       30,
-  'Omega y Grasas Saludables': 30,
-  'Sueño y Relajación':     45,
-  'Probióticos':            30,
-  'Colágeno y Belleza':     30,
-};
-
-// ── Goal copy ─────────────────────────────────────────────────
-const GOAL_COPY = {
-  muscle:      'Tu stack está optimizado para ganar músculo de forma progresiva.',
-  cut:         'Tu stack está diseñado para definición sin perder masa muscular.',
-  performance: 'Stack optimizado para rendimiento y energía sostenida.',
-  wellness:    'Un stack completo para salud y bienestar general diario.',
-  recovery:    'Optimizado para recuperación muscular y articular.',
-  sleep:       'Stack pensado para mejorar la calidad del sueño y la recuperación.',
+  'Creatinas': 30, 'Proteínas Whey': 30, 'Proteínas Isoladas': 30,
+  'Gainers de Masa': 21, 'Pre-Entrenamientos': 45, 'BCAA': 30,
+  'Glutamina': 30, 'Aminoácidos Esenciales': 30, 'Electrolitos': 30,
+  'Magnesio': 60, 'Vitaminas Esenciales': 30, 'Multivitamínicos': 30,
+  'Omega y Grasas Saludables': 30, 'Sueño y Relajación': 45,
+  'Probióticos': 30, 'Colágeno y Belleza': 30,
 };
 
 const GOAL_LABELS = {
   muscle: 'Ganar músculo', cut: 'Definición', performance: 'Más rendimiento',
   wellness: 'Salud general', recovery: 'Recuperación', sleep: 'Dormir mejor',
-};
-const EXP_LABELS = {
-  beginner: 'Principiante', intermediate: 'Intermedio', advanced: 'Avanzado',
 };
 const BUD_LABELS = {
   basic: 'Stack esencial', mid: 'Stack balanceado', full: 'Stack completo',
@@ -82,62 +69,15 @@ function parsePrice(priceStr) {
   const m = (priceStr || '').match(/([\d,]+)/);
   return m ? parseFloat(m[1].replace(/,/g, '')) || 0 : 0;
 }
-
-function formatTotal(num) {
-  return `₡${num.toLocaleString('es-CR')}`;
-}
-
-// ── Enhanced WhatsApp message ─────────────────────────────────
-function buildCheckoutWAMessage({ source, productIds, total, guidedSelections }) {
-  const lines = productIds.map((id, i) => {
-    const p = PRODUCTS[id];
-    if (!p) return null;
-    const price = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || 'consultar precio';
-    return `${i + 1}. ${p.n} — ${p.b} — ${price}`;
-  }).filter(Boolean).join('\n');
-
-  const totalLine = total > 0
-    ? `\nTotal estimado: ~${formatTotal(total)} (+IVA)`
-    : '';
-
-  if (source === 'guided' && guidedSelections?.goal) {
-    const { goal, experience, budget } = guidedSelections;
-    return `Hola MacroForge! 🎯
-
-Armé mi stack personalizado y estoy listo para confirmar.
-
-📋 Mi perfil:
-• Objetivo: ${GOAL_LABELS[goal] || goal}
-• Experiencia: ${EXP_LABELS[experience] || experience}
-• Inversión: ${BUD_LABELS[budget] || budget}
-
-📦 Mi stack (${productIds.length} producto${productIds.length !== 1 ? 's' : ''}):
-${lines}
-${totalLine}
-
-¿Me confirman disponibilidad y precio final? Estoy listo para proceder.`;
-  }
-
-  return `Hola MacroForge! 🎯
-
-Armé mi propio stack y estoy listo para confirmar.
-
-📦 Mi stack (${productIds.length} producto${productIds.length !== 1 ? 's' : ''}):
-${lines}
-${totalLine}
-
-¿Me confirman disponibilidad y precio final para proceder?`;
-}
+function formatTotal(num) { return `₡${num.toLocaleString('es-CR')}`; }
 
 // ── Product card for checkout ─────────────────────────────────
 function CheckoutProduct({ id, index }) {
   const p = PRODUCTS[id];
   if (!p) return null;
-
   const img    = resolveProductImage(p.u);
   const price  = (p.p[0] || '').match(/(₡\s*[\d\s,.]+)/)?.[1]?.trim() || '';
   const supply = SUPPLY_DAYS[p.c];
-
   return (
     <div className="sc-product">
       <div className="sc-num">{index + 1}</div>
@@ -158,17 +98,31 @@ function CheckoutProduct({ id, index }) {
   );
 }
 
+// ── Six premium trust signals ─────────────────────────────────
+const TRUST_SIGNALS = [
+  'Productos originales garantizados',
+  'Asesoría personalizada incluida',
+  'Confirmamos disponibilidad al instante',
+  'Envíos en todo Costa Rica',
+  'Soporte directo por WhatsApp',
+  'Selección optimizada para tu objetivo',
+];
+
 // ── Main component ────────────────────────────────────────────
 export default function StackCheckoutLayer({
   source,
   guidedStack,
   manualProductIds,
   guidedSelections,
+  isRestored,
+  restoredAt,
   onEdit,
   onSave,
   onContinue,
 }) {
-  const [saved, setSaved] = useState(false);
+  const [saved,          setSaved]          = useState(false);
+  const [payState,       setPayState]       = useState('idle');   // 'idle'|'loading'|'error'
+  const [payError,       setPayError]       = useState(null);     // user-facing error message
 
   // Normalize to array of product IDs
   const productIds = source === 'guided'
@@ -176,28 +130,30 @@ export default function StackCheckoutLayer({
     : (manualProductIds || []).filter(id => Boolean(id && PRODUCTS[id]));
 
   // Derived values
-  const total = productIds.reduce((sum, id) => {
-    return sum + parsePrice(PRODUCTS[id]?.p?.[0] || '');
-  }, 0);
+  const total = productIds.reduce((sum, id) => sum + parsePrice(PRODUCTS[id]?.p?.[0] || ''), 0);
 
-  // Shortest supply = how long the stack lasts (first product to run out)
   const minSupply = productIds.reduce((min, id) => {
     const days = SUPPLY_DAYS[PRODUCTS[id]?.c];
     return days && days < min ? days : min;
   }, 999);
   const supplyDisplay = minSupply < 999 ? `~${minSupply} días` : null;
 
-  // Stack quality badge
-  const quality = productIds.length >= 5 ? 'premium'
-    : productIds.length >= 3 ? 'completo'
-    : 'básico';
-
-  // Goal context
   const goal = guidedSelections?.goal;
 
-  // WA message + URL
-  const waMessage = buildCheckoutWAMessage({ source, productIds, total, guidedSelections });
-  const waUrl     = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+  // Stack tier (for WA message context)
+  const tier     = getStackTier(productIds.length, guidedSelections?.budget);
+  const coverage = getStackCoverage(productIds);
+
+  // Premium WA message — Phase 5 hot-buyer framing
+  const waMessage = buildPremiumWAMessage({
+    source,
+    productIds,
+    total,
+    guidedSelections,
+    tierLabel: tier.label,
+    coverage,
+  });
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
 
   function handleWAClick() {
     onContinue?.(productIds.length, total);
@@ -205,13 +161,48 @@ export default function StackCheckoutLayer({
       source,
       stack_size:      productIds.length,
       estimated_total: total,
-      quality,
+      tier:            tier.tier,
     });
     analytics.whatsappClick(
       `checkout_${source}`,
       null,
-      goal ? `${GOAL_LABELS[goal]} — checkout` : 'manual stack — checkout'
+      goal ? `${GOAL_LABELS[goal]} — ${tier.label}` : `${tier.label} — manual`
     );
+  }
+
+  async function handlePayNow() {
+    setPayState('loading');
+    setPayError(null);
+    analytics.checkoutLayer('pay_now_clicked', { source, stack_size: productIds.length, tier: tier.tier });
+
+    try {
+      const checkoutUrl = await initiateShopifyCheckout({
+        productIds,
+        products: PRODUCTS,
+        source,
+        tier,
+        coverage,
+        guidedSelections,
+        estimatedTotal: total,
+      });
+
+      analytics.checkoutLayer('shopify_checkout_opened', { source, stack_size: productIds.length });
+      // Redirect to Shopify hosted checkout
+      window.location.href = checkoutUrl;
+
+    } catch (err) {
+      setPayState('error');
+
+      if (err.code === CHECKOUT_ERRORS.WHATSAPP_CONCIERGE) {
+        // High-value order: route to premium WA concierge
+        setPayError('Para este pedido, nuestro equipo te atiende personalmente por WhatsApp.');
+        analytics.checkoutLayer('shopify_routed_concierge', { reason: err.reason });
+      } else {
+        // General failure: fall back to WA
+        setPayError('El pago directo no está disponible en este momento. Usá WhatsApp abajo.');
+        analytics.checkoutLayer('shopify_checkout_failed', { reason: err.reason || err.code });
+      }
+    }
   }
 
   function handleSave() {
@@ -219,17 +210,10 @@ export default function StackCheckoutLayer({
     onSave?.();
   }
 
-  const TRUST = [
-    'Productos originales garantizados',
-    'Asesoría personalizada incluida',
-    'Envíos en todo Costa Rica',
-    'Confirmamos disponibilidad al instante',
-  ];
-
   return (
     <div className="sc-container">
 
-      {/* Scrollable content area */}
+      {/* Scrollable content */}
       <div className="sc-scroll">
 
         {/* Header */}
@@ -242,7 +226,6 @@ export default function StackCheckoutLayer({
             {guidedSelections?.budget && (
               <span className="sc-goal-tag">{BUD_LABELS[guidedSelections.budget]}</span>
             )}
-            <span className={`sc-quality sc-quality--${quality}`}>{quality.charAt(0).toUpperCase() + quality.slice(1)}</span>
           </div>
         </div>
 
@@ -252,6 +235,14 @@ export default function StackCheckoutLayer({
             <CheckoutProduct key={id} id={id} index={i} />
           ))}
         </div>
+
+        {/* Revenue Acceleration Layer — Phase 5 */}
+        <RevenueAccelerationLayer
+          productIds={productIds}
+          guidedSelections={guidedSelections}
+          isRestored={isRestored}
+          restoredAt={restoredAt}
+        />
 
         {/* Total summary */}
         <div className="sc-total">
@@ -268,9 +259,9 @@ export default function StackCheckoutLayer({
           </div>
         </div>
 
-        {/* Trust signals */}
+        {/* Six trust signals (upgraded from four) */}
         <div className="sc-trust">
-          {TRUST.map(t => (
+          {TRUST_SIGNALS.map(t => (
             <div key={t} className="sc-trust-item">
               <span className="sc-trust-check">✓</span>
               {t}
@@ -278,22 +269,46 @@ export default function StackCheckoutLayer({
           ))}
         </div>
 
-        {/* Goal-specific conversion copy */}
-        <div className="sc-conversion">
-          {goal && GOAL_COPY[goal]
-            ? GOAL_COPY[goal]
-            : 'Tu stack está listo para confirmar. Normalmente respondemos en minutos.'}
-        </div>
+        {/* Retention Engine Layer — Phase 6 */}
+        <RetentionEngineLayer
+          source={source}
+          productIds={productIds}
+          guidedSelections={guidedSelections}
+          tier={tier}
+        />
 
       </div>
 
-      {/* Sticky CTA block — never scrolls away on mobile */}
+      {/* Sticky CTA block — Phase 10: Shopify checkout + WA fallback */}
       <div className="sc-cta-block">
-        <div className="sc-cta-note">
-          Te confirmamos disponibilidad y precio en minutos por WhatsApp.
+
+        {/* Primary: Shopify direct checkout */}
+        <button
+          className={`sc-pay-btn${payState === 'loading' ? ' sc-pay-btn--loading' : ''}${payState === 'error' ? ' sc-pay-btn--error' : ''}`}
+          onClick={handlePayNow}
+          disabled={payState === 'loading'}
+          type="button"
+        >
+          {payState === 'loading' ? (
+            <><span className="sc-pay-spinner" aria-hidden="true" /> Procesando...</>
+          ) : payState === 'error' ? (
+            '⚡ Reintentar pago'
+          ) : (
+            '⚡ Pagar ahora'
+          )}
+        </button>
+
+        {/* Error message — directs to WA when Shopify fails */}
+        {payState === 'error' && payError && (
+          <div className="sc-pay-error" role="alert">{payError}</div>
+        )}
+
+        {/* Divider */}
+        <div className="sc-cta-divider">
+          <span>o consultar primero</span>
         </div>
 
-        {/* Primary — WhatsApp (highest intent signal) */}
+        {/* Secondary: WhatsApp (always available as fallback) */}
         <a
           className="sc-wa-btn"
           href={waUrl}
@@ -301,25 +316,23 @@ export default function StackCheckoutLayer({
           rel="noopener noreferrer"
           onClick={handleWAClick}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.112.549 4.1 1.51 5.827L.057 23.82a.5.5 0 0 0 .623.623l5.993-1.453A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.888 0-3.657-.519-5.17-1.42l-.37-.22-3.556.862.862-3.556-.22-.37A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
           </svg>
-          Confirmar disponibilidad por WhatsApp
+          Consultar por WhatsApp
         </a>
 
-        {/* Secondary CTAs */}
+        {/* Tertiary: edit + save */}
         <div className="sc-secondary-btns">
-          <button className="sc-edit-btn" onClick={onEdit} type="button">
-            ← Editar stack
-          </button>
+          <button className="sc-edit-btn" onClick={onEdit} type="button">← Editar</button>
           <button
             className={`sc-save-btn${saved ? ' sc-save-btn--saved' : ''}`}
             onClick={handleSave}
             type="button"
             disabled={saved}
           >
-            {saved ? '✓ Guardado' : '🔖 Guardar para después'}
+            {saved ? '✓ Guardado' : '🔖 Guardar'}
           </button>
         </div>
       </div>

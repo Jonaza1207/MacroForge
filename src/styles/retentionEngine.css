@@ -1,0 +1,223 @@
+/*
+ * MacroForge — Retention Engine Layer Styles
+ * Phase 6 — Retention + Recurring Revenue Engine
+ * Class prefix: re-
+ *
+ * Renders after trust signals in the checkout layer.
+ * Compact, elegant, non-intrusive. Plants the reorder seed
+ * without adding visual weight to the conversion flow.
+ */
+
+/* ══════════════════════════════════════════════════════════════
+   RETENTION SECTION WRAPPER
+   ══════════════════════════════════════════════════════════════ */
+.re-section {
+  border-top: 1px solid var(--border-2);
+  padding-top: 14px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: ai-step-in 0.25s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFILL TIMELINE — estimated supply duration
+   Compact, factual, creates urgency-free planning awareness.
+   ══════════════════════════════════════════════════════════════ */
+.re-refill {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.re-refill-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.re-refill-body { flex: 1; }
+.re-refill-main {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-1);
+  line-height: 1.4;
+  margin-bottom: 3px;
+}
+.re-refill-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REORDER PSYCHOLOGY — goal-aware motivational copy
+   Subtle, educational, never pushy. One sentence max.
+   ══════════════════════════════════════════════════════════════ */
+.re-psychology {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.55;
+  font-style: italic;
+  padding-left: 10px;
+  border-left: 2px solid var(--accent-border);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SAVE AS FAVORITE FORM — name input + save button
+   Compact, one-line, premium feel.
+   ══════════════════════════════════════════════════════════════ */
+.re-save-section { display: flex; flex-direction: column; gap: 6px; }
+.re-save-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.04em;
+}
+.re-save-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.re-save-input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-1);
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+.re-save-input:focus { border-color: var(--accent-border); }
+.re-save-input::placeholder { color: var(--text-3); }
+.re-save-btn {
+  flex-shrink: 0;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-1);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.re-save-btn:hover  { background: var(--surface-3); border-color: var(--accent-border); color: var(--accent); }
+.re-save-btn:active { transform: scale(0.96); }
+.re-save-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* Saved confirmation */
+.re-save-confirmed {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #00C896;
+  animation: ai-card-in 0.25s ease;
+}
+.re-save-confirmed-check { font-size: 14px; }
+
+/* ══════════════════════════════════════════════════════════════
+   SUBSCRIPTION TEASER — future recurring revenue hook
+   Very minimal. Plants the seed without making promises.
+   Uses doTERRA gold for "premium future" feel.
+   ══════════════════════════════════════════════════════════════ */
+.re-subscription-teaser {
+  background: rgba(212, 168, 67, 0.05);
+  border: 1px solid rgba(212, 168, 67, 0.18);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.re-subscription-icon { font-size: 14px; flex-shrink: 0; }
+.re-subscription-body { flex: 1; }
+.re-subscription-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dote);
+  margin-bottom: 3px;
+}
+.re-subscription-desc {
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TRIGGER SECTION — FAVORITE STACKS QUICK REORDER
+   Shown in the home-page trigger section when favorites exist.
+   ══════════════════════════════════════════════════════════════ */
+.ai-trigger-favorites {
+  margin-top: 14px;
+  width: 100%;
+  animation: ai-step-in 0.3s ease;
+}
+.ai-trigger-favorites-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.ai-trigger-favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ai-trigger-favorite-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-1);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+.ai-trigger-favorite-btn:hover {
+  border-color: var(--accent-border);
+  background: var(--surface-3);
+}
+.ai-trigger-favorite-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ai-trigger-favorite-meta {
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+.ai-trigger-favorite-arrow {
+  font-size: 12px;
+  color: var(--accent);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+/* ── Light mode ─────────────────────────────────────────── */
+[data-theme="light"] .re-save-input { background: var(--surface); }
+[data-theme="light"] .ai-trigger-favorite-btn { background: var(--surface); }

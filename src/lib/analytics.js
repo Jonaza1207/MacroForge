@@ -363,6 +363,91 @@ export const analytics = {
   },
 
   /**
+   * WhatsApp Automation Queue events — Phase 8.
+   * Tracks intent lifecycle without exposing PII or sending messages.
+   * actions: 'automation_intent_created' | 'automation_intent_deduped' |
+   *          'automation_intent_expired' | 'automation_intent_cleared' |
+   *          'automation_campaign_eligible' | 'automation_queue_viewed'
+   *
+   * Future: these events feed into Supabase lifecycle_events table and
+   * trigger backend automation eligibility checks.
+   */
+  automationEvent(action, params = {}) {
+    _fire('automation', { action, ...params });
+  },
+
+  /**
+   * Customer Journey + Reactivation events — Phase 7.
+   * actions: 'journey_state_detected' | 'reactivation_prompt_shown' |
+   *          'refill_signal_shown' | 'vip_recognition_shown' |
+   *          'recovery_cta_clicked' | 'reorder_prompt_shown'
+   *
+   * Future: these events feed into the Supabase lifecycle_events table
+   * and trigger WhatsApp automation workflows when state changes are detected.
+   */
+  journeyEvent(action, params = {}) {
+    _fire('journey', { action, ...params });
+    // VIP recognition → Meta Lead event (high-value segment signal)
+    if (action === 'vip_recognition_shown' && PIXEL_ID) {
+      try {
+        if (typeof window.fbq === 'function') {
+          window.fbq('trackCustom', 'VIPCustomerDetected', { level: params.level });
+        }
+      } catch {}
+    }
+    // Recovery CTA clicked → Meta InitiateCheckout (re-entry into funnel)
+    if (action === 'recovery_cta_clicked' && PIXEL_ID) {
+      try {
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'InitiateCheckout', { content_name: 'Reactivation Recovery' });
+        }
+      } catch {}
+    }
+  },
+
+  /**
+   * Retention Engine Layer interaction — Phase 6.
+   * actions: 'retention_layer_viewed' | 'save_favorite_completed' |
+   *          'favorite_stack_opened' | 'favorite_stack_deleted' |
+   *          'refill_timeline_seen' | 'subscription_teaser_seen'
+   *
+   * Future: feed into Supabase retention_events table when backend is active.
+   * High-value audience: users who save favorites → Meta "StackSavedForRepeat" audience.
+   */
+  retentionEvent(action, params = {}) {
+    _fire('retention', { action, ...params });
+    // High-retention signal: saving a favorite → Meta AddToWishlist (already in FB_MAP for 'favorite')
+    if (action === 'save_favorite_completed' && PIXEL_ID) {
+      try {
+        if (typeof window.fbq === 'function') {
+          window.fbq('trackCustom', 'StackSavedAsFavorite', {
+            tier:   params.tier   || 'esencial',
+            goal:   params.goal   || null,
+            source: params.source || 'unknown',
+          });
+        }
+      } catch {}
+    }
+    if (action === 'favorite_stack_opened' && PIXEL_ID) {
+      try {
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'Lead', { content_name: 'Favorite Stack Restored', num_opens: params.open_count });
+        }
+      } catch {}
+    }
+  },
+
+  /**
+   * Revenue Acceleration Layer interaction — Phase 5.
+   * actions: 'layer_viewed' | 'suggestion_shown'
+   * Params include: tier, score, coverage count, goal source.
+   * Used to understand which stack tiers and completeness levels convert best.
+   */
+  revenueAcceleration(action, params = {}) {
+    _fire('revenue_acceleration', { action, ...params });
+  },
+
+  /**
    * Stack Checkout Layer interaction — Phase 4 Revenue Infrastructure.
    * actions: 'viewed' | 'continue' | 'edit' | 'save'
    *

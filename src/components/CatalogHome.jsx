@@ -3,11 +3,12 @@ import { PRODUCTS } from '../data/products';
 import GoalNav from './GoalNav';
 
 // All lazy — zero cost to first contentful paint.
-const RefillSection    = lazy(() => import('./RefillSection'));
-const RecentlyViewed   = lazy(() => import('./RecentlyViewed'));
-const FavoritesList    = lazy(() => import('./FavoritesList'));
-const EditorialSection = lazy(() => import('./EditorialSection'));
-const FeaturedProducts = lazy(() => import('./FeaturedProducts'));
+const ReactivationCenter = lazy(() => import('./ReactivationCenter'));
+const RefillSection      = lazy(() => import('./RefillSection'));
+const RecentlyViewed     = lazy(() => import('./RecentlyViewed'));
+const FavoritesList      = lazy(() => import('./FavoritesList'));
+const EditorialSection   = lazy(() => import('./EditorialSection'));
+const FeaturedProducts   = lazy(() => import('./FeaturedProducts'));
 
 const SECTION_META = {
   gym: {
@@ -31,7 +32,14 @@ export default function CatalogHome({ sections, sectionCounts, onSelectSection, 
   return (
     <div className="catalog-home">
 
-      {/* Refill reminder — top priority for returning users with purchase history */}
+      {/* Reactivation Center — Phase 7: journey status + abandoned recovery + VIP + refill signals.
+          Renders only for returning users with behavioral history.
+          New visitors see nothing here — the page stays clean. */}
+      <Suspense fallback={null}>
+        <ReactivationCenter />
+      </Suspense>
+
+      {/* Refill reminder — detailed refill candidates for purchase-history users */}
       {onOpenProduct && (
         <Suspense fallback={null}>
           <RefillSection onOpenProduct={onOpenProduct} />

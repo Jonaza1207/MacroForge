@@ -18,6 +18,14 @@ import { addRecentlyViewed } from './hooks/useRecentlyViewed';
 import { logIntelReport, getIntelReport } from './lib/intelligence';
 import { logStackReport, getStackReport } from './lib/stackIntelligence';
 import { logSegmentReport, getCrmProfile, getPrimarySegment, getLeadScore } from './lib/segmentation';
+import {
+  initAutomation,
+  getAutomationStatus,
+  logAutomationReport,
+  registerAutomationIntent,
+  CAMPAIGNS,
+} from './lib/whatsappAutomation';
+import { getIntents, getPendingIntents, clearAllIntents, getQueueStatus } from './lib/automationQueue';
 
 // Below-fold & interaction-gated components — lazy loaded
 const ProductModal    = lazy(() => import('./components/ProductModal'));
@@ -238,6 +246,8 @@ export default function App() {
   // ── Return-visitor analytics (fires once on mount) ───────────
   useEffect(() => {
     if (visitType.type === 'returning') analytics.returnVisit(visitType.count);
+    // Phase 8: evaluate automation eligibility on every visit (safe, deduped)
+    initAutomation();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Deep link: read initial hash ─────────────────────────────
@@ -346,6 +356,28 @@ export default function App() {
           console.log('%c[MacroForge] Firing test events...', 'color:#E3001E;font-weight:700');
           analytics.stackCTA('tracking_test', 'Revenue Tracking Test');
           console.log('  ✓ stack_cta_click fired — check GA4 Realtime + Meta Events Manager');
+        },
+      };
+
+      // Phase 8 — WhatsApp Automation Infrastructure
+      window.__mfAutomation = {
+        status:     () => console.log(getAutomationStatus()),
+        list:       () => console.table(getIntents()),
+        pending:    () => console.table(getPendingIntents()),
+        queue:      () => console.log(getQueueStatus()),
+        clear:      () => { clearAllIntents(); console.log('[MacroForge Automation] Queue cleared.'); },
+        report:     () => logAutomationReport(),
+        campaigns:  () => console.table(Object.values(CAMPAIGNS).map(c => ({
+          id:       c.id,
+          priority: c.priority,
+          template: c.templateKey,
+          cooldown: `${Math.round(c.cooldownMs / 86400_000)}d`,
+          consent:  c.consentRequired,
+        }))),
+        testIntent: (type) => {
+          const intent = registerAutomationIntent(type || 'abandoned_stack_24h', { test: true, visitCount: 1, segment: 'test' });
+          console.log(intent ? `[MacroForge Automation] Test intent created: ${type}` : '[MacroForge Automation] Intent deduped or invalid.');
+          return intent;
         },
       };
 

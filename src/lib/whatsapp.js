@@ -120,6 +120,42 @@ export const WA_TEMPLATES = {
   searchMiss: ({ query = '' } = {}) =>
     `Hola MacroForge! Busqué "${query}" en el catálogo y no apareció. ¿Lo tienen disponible o pueden conseguirlo?`,
 
+  // ── Lifecycle / reactivation templates (Phase 7) ────────────────
+
+  /**
+   * Abandoned checkout recovery — user built a stack but didn't complete.
+   * Warm, premium, non-desperate. Creates continuity without pressure.
+   * Future: triggered automatically 24–48h after checkout abandonment.
+   */
+  abandonedStack: ({ stackName = '', tierLabel = 'stack' } = {}) =>
+    `Hola MacroForge! Tenía mi ${tierLabel} guardado${stackName ? ` — "${stackName}"` : ''} y quiero retomarlo. ¿Pueden ayudarme a cerrarlo?`,
+
+  /**
+   * Refill reminder — supplement cycle approaching end.
+   * Future: triggered automatically at 75% of supply cycle.
+   */
+  refillReminder: ({ productName = '', daysElapsed = '' } = {}) =>
+    `Hola MacroForge! ${daysElapsed ? `Pasaron ${daysElapsed} días y` : ''}creo que es momento de reabastecer${productName ? ` mi ${productName}` : ' mis suplementos'}. ¿Están disponibles?`,
+
+  /**
+   * VIP customer reorder — premium buyer requesting their next order.
+   * Signals: frecuent buyer, premium tier, multiple favorites.
+   */
+  vipReorder: ({ stackName = '' } = {}) =>
+    `Hola MacroForge! Soy cliente frecuente y quiero hacer mi próximo pedido${stackName ? ` — el stack "${stackName}"` : ''}. ¿Me pueden ayudar con disponibilidad y precio?`,
+
+  /**
+   * General loyalty followup — returning customer with no specific stack.
+   */
+  loyaltyFollowup: () =>
+    `Hola MacroForge! Quiero mantener mi rutina de suplementación. ¿Pueden ayudarme con mi próximo reabastecimiento?`,
+
+  /**
+   * Premium reactivation — VIP customer returning after a gap.
+   */
+  premiumReactivation: ({ stackName = '', tierLabel = 'Stack Premium' } = {}) =>
+    `Hola MacroForge! Como cliente premium, quiero retomar mi ${tierLabel}${stackName ? ` — "${stackName}"` : ''}. ¿Sigue disponible todo?`,
+
   // ── Raw override ─────────────────────────────────────────────────
 
   /** Escape hatch — for one-off messages */

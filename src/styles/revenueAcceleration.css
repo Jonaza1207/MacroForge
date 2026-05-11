@@ -1,0 +1,187 @@
+/*
+ * MacroForge — Revenue Acceleration Layer Styles
+ * Phase 5 — High-Conversion Revenue Acceleration
+ * Class prefix: ra-
+ *
+ * These styles power the smart stack analysis section that sits between
+ * the product list and the total in the checkout layer.
+ * Performance: transform + opacity animations only.
+ */
+
+/* ══════════════════════════════════════════════════════════════
+   RESTORED STACK NOTICE — warm recognition for returning users
+   ══════════════════════════════════════════════════════════════ */
+.ra-restored-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(212, 168, 67, 0.08);
+  border: 1px solid rgba(212, 168, 67, 0.22);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: var(--dote);
+  font-weight: 600;
+  animation: ai-card-in 0.3s ease;
+}
+.ra-restored-icon { font-size: 14px; }
+
+/* ══════════════════════════════════════════════════════════════
+   ACCELERATION CONTAINER — wrapper for all new elements
+   ══════════════════════════════════════════════════════════════ */
+.ra-container {
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: ai-step-in 0.25s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STACK TIER — premium status badge with description
+   ══════════════════════════════════════════════════════════════ */
+.ra-tier {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+}
+.ra-tier-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ra-tier-body { flex: 1; min-width: 0; }
+.ra-tier-label {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.ra-tier-desc {
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COMPLETENESS BAR — progress toward a "complete" stack
+   Only shown when goal is known (guided flow).
+   ══════════════════════════════════════════════════════════════ */
+.ra-completeness {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
+}
+.ra-completeness-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+.ra-completeness-label {
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+.ra-completeness-pct {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+.ra-bar-track {
+  height: 4px;
+  background: var(--surface-3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ra-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COVERAGE PILLARS — what the stack covers
+   ══════════════════════════════════════════════════════════════ */
+.ra-coverage {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
+}
+.ra-coverage-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
+.ra-coverage-pillars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ra-pillar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--surface-3);
+  border-radius: var(--r-pill);
+  padding: 4px 10px;
+}
+.ra-pillar-check {
+  color: #00C896;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUGGESTION — soft educational upsell when stack is incomplete
+   Deliberately subtle — helpful, never pushy.
+   ══════════════════════════════════════════════════════════════ */
+.ra-suggestion {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(227, 0, 30, 0.04);
+  border: 1px solid rgba(227, 0, 30, 0.12);
+  border-radius: var(--r);
+  padding: 10px 14px;
+}
+.ra-suggestion-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.ra-suggestion-text {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VALUE MESSAGE — intelligent, goal-aware reinforcement
+   ══════════════════════════════════════════════════════════════ */
+.ra-value-msg {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  line-height: 1.5;
+  font-style: italic;
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
+  margin-top: 2px;
+}
+
+/* ── Light theme overrides ─────────────────────────────── */
+[data-theme="light"] .ra-tier,
+[data-theme="light"] .ra-completeness,
+[data-theme="light"] .ra-coverage  { background: var(--surface); }
+[data-theme="light"] .ra-pillar    { background: var(--surface-2); }

@@ -1,0 +1,437 @@
+/*
+ * MacroForge — Manual Stack Builder Styles
+ * Phase 6.5 — Manual Stack Builder Revenue UX Upgrade
+ * Class prefix: msb-
+ *
+ * Three-step discovery flow: Focus → Category → Products
+ * Designed for high-intent advanced buyers who know what they want.
+ * Premium dark aesthetic. Mobile-first. Performance-first.
+ */
+
+/* ══════════════════════════════════════════════════════════════
+   CONTAINER — fills the modal body
+   ══════════════════════════════════════════════════════════════ */
+.msb-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ai-step-in 0.22s ease;
+}
+
+/* ── Internal back button ── */
+.msb-back {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 20px 4px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s;
+}
+.msb-back:hover { color: var(--text-2); }
+
+/* ══════════════════════════════════════════════════════════════
+   STEP — scrollable content area
+   ══════════════════════════════════════════════════════════════ */
+.msb-step {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 20px 8px;
+}
+.msb-step-heading {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  margin: 0 0 4px;
+}
+.msb-step-sub {
+  font-size: 12px;
+  color: var(--text-2);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP 1 — FOCUS GRID (stack purpose selection)
+   ══════════════════════════════════════════════════════════════ */
+.msb-focus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.msb-focus-card {
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.msb-focus-card:hover  { background: var(--surface-3); border-color: rgba(255,255,255,0.2); }
+.msb-focus-card:active { transform: scale(0.97); }
+.msb-focus-icon { font-size: 20px; line-height: 1; }
+.msb-focus-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.2;
+}
+.msb-focus-desc {
+  font-size: 10px;
+  color: var(--text-3);
+  line-height: 1.3;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP 2 — CATEGORY SELECTION
+   ══════════════════════════════════════════════════════════════ */
+
+/* Global search bar */
+.msb-search-row {
+  position: relative;
+  margin-bottom: 14px;
+}
+.msb-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+.msb-search-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 10px 14px 10px 38px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-1);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.msb-search-input:focus { border-color: var(--accent-border); }
+.msb-search-input::placeholder { color: var(--text-3); }
+
+/* Section group header */
+.msb-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 6px;
+}
+.msb-section-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.msb-section-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* Category cards list */
+.msb-cat-list { display: flex; flex-direction: column; gap: 6px; }
+
+.msb-cat-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  width: 100%;
+}
+.msb-cat-card:hover  { background: var(--surface-3); }
+.msb-cat-card:active { transform: scale(0.98); }
+.msb-cat-card--featured { border-color: var(--accent-border); }
+.msb-cat-card--featured:hover { border-color: var(--accent); }
+
+.msb-cat-icon { font-size: 16px; flex-shrink: 0; }
+.msb-cat-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.msb-cat-count {
+  font-size: 11px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.msb-cat-arrow {
+  font-size: 14px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: transform 0.15s, color 0.15s;
+}
+.msb-cat-card:hover .msb-cat-arrow { transform: translateX(3px); color: var(--text-2); }
+.msb-cat-card--featured .msb-cat-arrow { color: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════════
+   STEP 3 — PRODUCT BROWSING
+   ══════════════════════════════════════════════════════════════ */
+.msb-products-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.msb-products-count {
+  font-size: 11px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* Toolbar: local search + sort */
+.msb-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.msb-toolbar-search {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.msb-toolbar-search span {
+  position: absolute;
+  left: 10px;
+  font-size: 12px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+.msb-toolbar-input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 7px 10px 7px 30px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-1);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.msb-toolbar-input:focus { border-color: var(--accent-border); }
+.msb-toolbar-input::placeholder { color: var(--text-3); }
+
+.msb-sort-select {
+  flex-shrink: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-1);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Product list */
+.msb-product-list { display: flex; flex-direction: column; }
+.msb-product-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-2);
+  transition: background 0.1s;
+}
+.msb-product-item:last-child { border-bottom: none; }
+
+.msb-product-img {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.msb-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.msb-product-fallback {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-3);
+}
+.msb-product-info { flex: 1; min-width: 0; }
+.msb-product-brand {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.msb-product-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.msb-product-price {
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.msb-product-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Add / remove toggle button */
+.msb-product-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: none;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.1s;
+  color: var(--text-2);
+  font-weight: 700;
+}
+.msb-product-btn:hover  { background: var(--surface-3); border-color: var(--text-2); color: var(--text-1); }
+.msb-product-btn:active { transform: scale(0.9); }
+.msb-product-btn--add:hover  { background: var(--accent); border-color: var(--accent); color: #fff; }
+.msb-product-btn--in-stack {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-size: 12px;
+}
+.msb-product-btn--in-stack:hover { background: var(--accent-hover); }
+.msb-product-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Empty state */
+.msb-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STICKY STACK BAR — visible throughout Steps 2 and 3
+   ══════════════════════════════════════════════════════════════ */
+.msb-stack-bar {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 10px 20px;
+}
+.msb-stack-empty {
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 4px 0;
+}
+.msb-stack-active {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.msb-stack-info { flex: 1; min-width: 0; }
+.msb-stack-count {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+.msb-stack-total {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 1px;
+}
+.msb-stack-prompt {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.msb-checkout-btn {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.12s;
+  box-shadow: 0 2px 12px rgba(227, 0, 30, 0.25);
+}
+.msb-checkout-btn:hover  { background: var(--accent-hover); }
+.msb-checkout-btn:active { transform: scale(0.97); }
+.msb-max-notice {
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: center;
+  padding-top: 6px;
+}
+
+/* ── Light mode ──────────────────────────────────────────── */
+[data-theme="light"] .msb-focus-card { background: var(--surface); }
+[data-theme="light"] .msb-cat-card   { background: var(--surface); }
+[data-theme="light"] .msb-search-input,
+[data-theme="light"] .msb-toolbar-input,
+[data-theme="light"] .msb-sort-select { background: var(--surface); }
