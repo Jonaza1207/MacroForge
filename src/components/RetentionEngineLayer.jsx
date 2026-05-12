@@ -190,11 +190,11 @@ export default function RetentionEngineLayer({
           <span className="re-subscription-icon" aria-hidden="true">📅</span>
           <div className="re-subscription-copy">
             <div className="re-subscription-title">
-              Suscribirte y ahorrar {discountPct}%
+              Suscripción personalizada · {discountPct}% off
             </div>
             <div className="re-subscription-desc">
-              Recibí tu stack cada {recommendedInterval.label}. Ideal para no quedarte sin suplementos.
-              Cancelás o ajustás cuando querás.
+              Recibí tu stack cada {recommendedInterval.label} con descuento preferencial.
+              Lo coordinamos directamente por WhatsApp antes de activar.
             </div>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function RetentionEngineLayer({
           >
             {subState === 'loading'
               ? <><span className="re-sub-spinner" aria-hidden="true" /> Procesando...</>
-              : `📅 Suscribirme · ${discountPct}% off`
+              : `📅 Iniciar suscripción personalizada`
             }
           </button>
           {(subState === 'error') && (

@@ -34,7 +34,6 @@ const WhySection      = lazy(() => import('./components/WhySection'));
 const StackSelling    = lazy(() => import('./components/StackSelling'));
 const AIStackBuilder  = lazy(() => import('./components/AIStackBuilder'));
 const AccountPreview  = lazy(() => import('./components/AccountPreview'));
-const BrandTeaser     = lazy(() => import('./components/BrandTeaser'));
 const GuidePage       = lazy(() => import('./components/GuidePage'));
 
 // ── Module-level constants (computed once) ────────────────────
@@ -669,7 +668,6 @@ export default function App() {
           <StackSelling />
           <AIStackBuilder />
           <AccountPreview />
-          <BrandTeaser />
         </Suspense>
       )}
 

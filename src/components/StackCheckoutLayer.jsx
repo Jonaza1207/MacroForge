@@ -339,9 +339,9 @@ export default function StackCheckoutLayer({
           {payState === 'loading' ? (
             <><span className="sc-pay-spinner" aria-hidden="true" /> Procesando...</>
           ) : payState === 'error' ? (
-            '⚡ Reintentar pago'
+            '⚡ Reintentar'
           ) : (
-            '⚡ Pagar ahora'
+            '⚡ Confirmar pedido'
           )}
         </button>
 
@@ -373,8 +373,8 @@ export default function StackCheckoutLayer({
             ) : (
               <>
                 <span>📅</span>
-                <span>Suscribirme y ahorrar {discountPct}%</span>
-                <span className="sc-sub-meta">· cada {recInterval.label}</span>
+                <span>Suscripción mensual · {discountPct}% off</span>
+                <span className="sc-sub-meta">· Coordinada por WhatsApp</span>
               </>
             )}
           </button>

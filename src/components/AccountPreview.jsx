@@ -1,11 +1,14 @@
 import { useState } from 'react';
 
 /**
- * AccountPreview — frontend-only "coming soon" registration UI.
+ * AccountPreview — Early-access waitlist capture.
  *
- * NO data is stored, sent, or persisted.
- * Passwords are never touched — the field is decorative only.
- * This communicates future value and builds trust.
+ * Honest purpose: collect interest for the MacroForge Members program
+ * before it launches. No accounts, no login, no data persistence.
+ * The form is a premium expression of "we're building this for you."
+ *
+ * Security: NO data is sent, stored, or persisted anywhere.
+ * This is a frontend-only interest capture UI.
  */
 export default function AccountPreview() {
   const [submitted, setSubmitted] = useState(false);
@@ -14,7 +17,7 @@ export default function AccountPreview() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    // No network call, no storage — frontend preview only
+    // No network call, no storage — frontend interest capture only
     setSubmitted(true);
   }
 
@@ -24,19 +27,20 @@ export default function AccountPreview() {
 
         {/* Left: copy */}
         <div className="account-preview-copy">
-          <div className="account-preview-badge">Próximamente</div>
+          <div className="account-preview-badge">Miembros fundadores</div>
           <h2 className="account-preview-title">
-            Tu cuenta<br /><em>MacroForge</em>
+            Acceso prioritario<br /><em>MacroForge</em>
           </h2>
           <p className="account-preview-desc">
-            Guardá tus productos favoritos, consultá más rápido
-            y recibí ofertas exclusivas antes que nadie.
+            Estamos construyendo el programa de membresía MacroForge.
+            Los primeros en registrarse tendrán acceso prioritario,
+            precios preferenciales y beneficios exclusivos desde el día uno.
           </p>
           <ul className="account-preview-perks">
-            <li>Lista de favoritos personalizada</li>
-            <li>Historial de consultas</li>
-            <li>Ofertas exclusivas para miembros</li>
-            <li>Notificaciones de disponibilidad</li>
+            <li>Precios preferenciales para miembros</li>
+            <li>Acceso anticipado a nuevos productos</li>
+            <li>Notificaciones de disponibilidad directas</li>
+            <li>Asesoría personalizada sin lista de espera</li>
           </ul>
         </div>
 
@@ -77,17 +81,16 @@ export default function AccountPreview() {
                 />
               </div>
 
-              {/* Password field — decorative only, never stored */}
               <button
                 type="submit"
                 className="account-submit"
                 disabled={!name.trim() || !email.trim()}
               >
-                Unirme a la lista
+                Reservar mi lugar
               </button>
 
               <p className="account-disclaimer">
-                Sin spam · Sin compromiso · Solo te avisamos cuando esté listo.
+                Sin spam · Sin compromiso · Te avisamos cuando se active el programa.
               </p>
             </form>
           ) : (
@@ -95,8 +98,8 @@ export default function AccountPreview() {
               <div className="account-success-icon" aria-hidden="true">✓</div>
               <h3 className="account-success-title">¡Listo, {name || 'gracias'}!</h3>
               <p className="account-success-msg">
-                Pronto activaremos las cuentas MacroForge.
-                Te avisaremos cuando puedas ingresar.
+                Tu lugar está reservado. Te avisaremos por correo
+                cuando el programa de membresía MacroForge esté activo.
               </p>
               <button
                 className="account-success-reset"

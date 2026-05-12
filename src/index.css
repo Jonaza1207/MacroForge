@@ -1955,64 +1955,6 @@ input  { font-family: inherit; }
   margin-top: -2px;
 }
 
-/* ── Brand teaser — AlfaVitamins coming soon ─────────────── */
-.brand-teaser {
-  padding: 0 24px 40px;
-  border-top: 1px solid var(--border-2);
-}
-.brand-teaser-inner {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 44px 32px;
-  background: var(--surface);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-lg);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.brand-teaser-inner::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 55% 80% at 50% 0%, rgba(227,0,30,0.04), transparent 62%);
-  pointer-events: none;
-}
-.brand-teaser-eyebrow {
-  font-size: 10px; font-weight: 800;
-  letter-spacing: 0.3em; text-transform: uppercase;
-  color: var(--accent); opacity: 0.65;
-  margin-bottom: 14px;
-}
-.brand-teaser-name {
-  font-size: clamp(28px, 5vw, 46px);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: var(--text-1);
-  opacity: 0.68;
-  margin-bottom: 12px;
-  line-height: 1;
-}
-.brand-teaser-sub {
-  font-size: 14px; font-weight: 500;
-  color: var(--text-2);
-  margin-bottom: 20px;
-  max-width: 320px;
-  margin-left: auto; margin-right: auto;
-  line-height: 1.6;
-}
-.brand-teaser-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--text-3);
-  padding: 6px 16px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-pill);
-}
-@media (min-width: 640px)  { .brand-teaser { padding-left: 40px; padding-right: 40px; } }
-@media (min-width: 1024px) { .brand-teaser { padding-left: 64px; padding-right: 64px; } }
 
 /* ── Account preview (coming soon) ──────────────────────── */
 .account-preview {
