@@ -481,7 +481,26 @@ const IMAGE_MAP = {
 // "contains" candidates were explicitly excluded (see smart-match report).
 const DOTERRA_NAME_MAP = {
   // ── Curcuma (URL-mapped product also present in IMAGE_MAP) ──
-  'Curcuma':                                    'Curcuma',
+  'Cúrcuma':                                    'Curcuma',
+
+  // ── Newly detected files (added by user after Phase 1) ──────
+  'Árbol de Té (Melaleuca)':                    'Arbol-de-te-melaleuca',
+  'Árbol de Té (Melaleuca) 5 mL':               'Arbol-de-Te-Melaleuca-5mL',
+  'Árbol de Té (Melaleuca) Touch':              'Arbol-de-te-melaleuca-Touch',
+  'Breathe 5 mL':                               'Breathe-5mL',
+  'Breathe Touch':                              'Breathe-Touch',
+  'Deep Blue Polyphenol Complex':               'Deep-Blue-Polyphenol-Complex',
+  'Davana Touch':                               'Davana-Touch',
+  'Ensenciales para la Familia + Difusor Pebble': 'Esenciales-para-la-Faminilia-Difusor-Pebble',
+  'Jengibre':                                   'Jengibre',
+  'Rosa Touch':                                 'Rosa-Touch',
+  'Salvia Esclarea':                            'Salvia-Esclarea',
+  'Salvia Española':                            'Salvia-Española',
+  'Tomillo':                                    'Tomillo',
+  'Toronja':                                    'Toronja',
+  'Vetiver':                                    'Vetiver',
+  'Yarrow / Pom 15 mL':                         'Yarrow-Pom-15mL',
+  'Ylang Ylang':                                'Ylang-Ylang',
 
   // ── Aceites Esenciales Individuales ─────────────────────────
   'Romero':                                     'Romero',
@@ -511,8 +530,8 @@ const DOTERRA_NAME_MAP = {
   'Lavanda Touch':                              'Lavanda-Touch',
   'Lima':                                       'Lima',
   'Limoncillo':                                 'Limoncillo',
-  'Limon':                                      'Limon',
-  'Limon 5 mL':                                 'Limon-5mL',
+  'Limón':                                      'Limon',
+  'Limón 5 mL':                                 'Limon-5mL',
   'Madagascar Vanilla':                         'Madagascar-Vanilla',
   'Mandarina':                                  'Mandarina',
   'Manzanilla Romana':                          'Manzanilla-Romana',
@@ -522,9 +541,9 @@ const DOTERRA_NAME_MAP = {
   'Mirra':                                      'Mirra',
   'Naranja':                                    'Naranja',
   'Naranja 5 mL':                               'Naranja-5mL',
-  'Oregano':                                    'Oregano',
-  'Oregano 5 mL':                               'Oregano-5mL',
-  'Oregano Touch':                              'Oregano-Touch',
+  'Orégano':                                    'Oregano',
+  'Orégano 5 mL':                               'Oregano-5mL',
+  'Orégano Touch':                              'Oregano-Touch',
   'Osmanthus':                                  'Osmanthus',
   'Perlas de Menta':                            'Perlas-de-Menta',
   'Petitgrain':                                 'Petitgrain',
@@ -643,7 +662,7 @@ const DOTERRA_NAME_MAP = {
   'On Guard Capsulas Blandas':                  'On-Guard-Capsulas-Blandas',
   'On Guard Protecting Throat Drops':           'On-Guard-Protecting-Throat-Drops',
   'Paquete de Nutrientes Diarios':              'Paquete-de-Nutrientes-Diarios',
-  'PB Assist Jr':                               'PB-Assist-Jr',
+  // PB Assist Jr removed from store (product 489 deleted from catalog)
   'PB Core':                                    'PB-Core',
   'Peppermint Softgels':                        'Peppermint-Softgels',
   'Phytoestrogen Complex':                      'Phytoestrogen-Complex',

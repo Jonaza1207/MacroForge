@@ -417,13 +417,14 @@ input  { font-family: inherit; }
 
 /* ── Hero stats ──────────────────────────────────────────── */
 .hero-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0 20px;
   padding: 22px 0;
   border-top: 1px solid var(--border-2);
   border-bottom: 1px solid var(--border-2);
   margin-bottom: 24px;
+  align-items: start;
 }
 .stat-num {
   font-size: 36px;
@@ -432,6 +433,7 @@ input  { font-family: inherit; }
   line-height: 1;
   letter-spacing: -0.03em;
   text-shadow: 0 0 16px rgba(227,0,30,0.22);
+  white-space: nowrap;
 }
 .stat-lbl {
   font-size: 9px;
@@ -846,9 +848,11 @@ input  { font-family: inherit; }
   font-size: 11px; font-weight: 500; color: var(--text-3);
 }
 
-/* ── Hero stat — percentage variant (100%) ───────────────── */
+/* ── Hero stat — percentage variant (100%) ─────────────────
+   Uses the same font-size as other stats. Grid layout ensures
+   all four blocks have equal widths, so size parity is correct. */
 .stat-num--pct {
-  font-size: 28px; /* tighter than the large number stats */
+  letter-spacing: -0.04em; /* slightly tighter for the % character */
 }
 
 /* ── Catalog home ────────────────────────────────────────── */
@@ -2294,6 +2298,10 @@ input  { font-family: inherit; }
 @media (max-width: 420px) {
   .hero h1  { font-size: 42px; }
   .stat-num { font-size: 28px; }
+}
+@media (max-width: 360px) {
+  /* On very small screens (iPhone SE / older Android) wrap to 2×2 grid */
+  .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 18px 20px; }
 }
 
 /* ── prefers-reduced-motion: disable all decorative animations ──
