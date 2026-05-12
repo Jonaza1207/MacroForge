@@ -697,7 +697,7 @@ const DOTERRA_NAME_MAP = {
 
   // ── Almacenamiento y Accesorios ──────────────────────────────
   'Botella Roll on Amber 10 mL (6 pack)':       'Botella-Roll-on-Amber-10mL-6-pack',
-  'Botella de Spray 30 mL (3 pack)':            'Botella-de-Spray-30mL-3-pack',
+
   'Botellas 5 mL (6 pack)':                     'Botellas-5mL-6-pack',
   'Botellas de Muestra':                        'Botellas-de-Muestra',
   'Caja de Madera con Logo':                    'Caja-de-Madera-con-Logo',

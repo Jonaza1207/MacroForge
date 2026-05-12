@@ -7,7 +7,7 @@ const WHY_ITEMS = [
   {
     icon: '💬',
     title: 'Atención por WhatsApp',
-    desc: 'Respondemos en minutos. Asesoría directa, sin bots ni formularios.',
+    desc: 'Asesoría directa, personalizada y sin compromiso. Confirmamos disponibilidad con el proveedor.',
   },
   {
     icon: '🎯',

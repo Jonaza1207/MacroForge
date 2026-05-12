@@ -104,7 +104,7 @@ export default function GuidePage({ slug, onClose, onOpenProduct }) {
       <div className="guide-cta-block">
         <div className="guide-cta-label">¿Querés asesoría personalizada?</div>
         <p className="guide-cta-sub">
-          Normalmente respondemos en minutos. Sin compromiso, sin presión.
+          Confirmamos disponibilidad directamente con el proveedor. Sin compromiso, sin presión.
         </p>
         <a
           className="guide-cta-btn"

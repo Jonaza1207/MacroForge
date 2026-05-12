@@ -533,7 +533,7 @@ export default function App() {
               <div className="trust-bar-text"><span className="trust-bar-label">Envíos en Costa Rica</span><span className="trust-bar-sub">A todo el país</span></div>
             </div>
             <div className="trust-bar-item"><span className="trust-bar-icon">⚡</span>
-              <div className="trust-bar-text"><span className="trust-bar-label">Respuesta en minutos</span><span className="trust-bar-sub">Atención directa por WhatsApp</span></div>
+              <div className="trust-bar-text"><span className="trust-bar-label">Atención personalizada</span><span className="trust-bar-sub">Directa y sin bots por WhatsApp</span></div>
             </div>
             <div className="trust-bar-item"><span className="trust-bar-icon">🎯</span>
               <div className="trust-bar-text"><span className="trust-bar-label">Asesoría personalizada</span><span className="trust-bar-sub">Sin costo · Sin compromiso</span></div>
