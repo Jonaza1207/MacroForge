@@ -326,68 +326,12 @@ export default function StackCheckoutLayer({
 
       </div>
 
-      {/* Sticky CTA block — Phase 10: Shopify checkout + WA fallback */}
+      {/* Sticky CTA — catalog mode: WhatsApp as the primary conversion path */}
       <div className="sc-cta-block">
 
-        {/* Primary: Shopify direct checkout */}
-        <button
-          className={`sc-pay-btn${payState === 'loading' ? ' sc-pay-btn--loading' : ''}${payState === 'error' ? ' sc-pay-btn--error' : ''}`}
-          onClick={handlePayNow}
-          disabled={payState === 'loading'}
-          type="button"
-        >
-          {payState === 'loading' ? (
-            <><span className="sc-pay-spinner" aria-hidden="true" /> Procesando...</>
-          ) : payState === 'error' ? (
-            '⚡ Reintentar'
-          ) : (
-            '⚡ Confirmar pedido'
-          )}
-        </button>
-
-        {/* Error message — directs to WA when Shopify fails */}
-        {payState === 'error' && payError && (
-          <div className="sc-pay-error" role="alert">{payError}</div>
-        )}
-
-        {/* Subscription CTA — revenue-critical, sticky, always visible */}
-        {subState === 'error' ? (
-          <a
-            className="sc-sub-sticky-btn sc-sub-sticky-btn--fallback"
-            href={subWaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => analytics.subscriptionEvent('subscription_wa_fallback_clicked', { cta_location: 'sticky_footer' })}
-          >
-            📅 Consultar suscripción por WhatsApp →
-          </a>
-        ) : (
-          <button
-            className={`sc-sub-sticky-btn${subState === 'loading' ? ' sc-sub-sticky-btn--loading' : ''}`}
-            onClick={handleSubscribeNow}
-            disabled={subState === 'loading'}
-            type="button"
-          >
-            {subState === 'loading' ? (
-              <><span className="sc-pay-spinner" aria-hidden="true" /> Procesando...</>
-            ) : (
-              <>
-                <span>📅</span>
-                <span>Suscripción mensual · {discountPct}% off</span>
-                <span className="sc-sub-meta">· Coordinada por WhatsApp</span>
-              </>
-            )}
-          </button>
-        )}
-
-        {/* Divider */}
-        <div className="sc-cta-divider">
-          <span>o consultar primero</span>
-        </div>
-
-        {/* Secondary: WhatsApp (always available as fallback) */}
+        {/* Primary: WhatsApp consultation */}
         <a
-          className="sc-wa-btn"
+          className="sc-wa-btn sc-wa-btn--primary"
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"

@@ -22,7 +22,6 @@
 import { useState, useEffect } from 'react';
 import { PRODUCTS }            from '../data/products';
 import { analytics }           from '../lib/analytics';
-import { buildWaUrl }          from '../lib/whatsapp';
 import {
   getStackSupplyEstimate,
   getRefillTimelineMessage,
@@ -32,12 +31,6 @@ import {
   saveFavoriteStack,
   getDefaultStackName,
 } from '../lib/favoriteStacks';
-import {
-  initiateSubscriptionCheckout,
-  getRecommendedSubscriptionInterval,
-  getSubscriptionDiscount,
-  CHECKOUT_ERRORS,
-} from '../lib/subscriptionCheckout';
 import '../styles/retentionEngine.css';
 
 export default function RetentionEngineLayer({
@@ -53,25 +46,10 @@ export default function RetentionEngineLayer({
   const refillMessage  = getRefillTimelineMessage(estimate);
   const reorderMessage = getReorderPsychologyMessage(goal);
 
-  // Subscription recommendation
-  const recommendedInterval = getRecommendedSubscriptionInterval(estimate?.min);
-  const discountPct         = getSubscriptionDiscount(tier?.tier || 'esencial');
-
   // Save-as-favorite state
   const defaultName    = getDefaultStackName(goal, tier?.tier || 'esencial');
   const [name, setName] = useState(defaultName);
   const [saved, setSaved] = useState(false);
-
-  // Subscription state
-  const [subState, setSubState] = useState('idle');  // 'idle'|'loading'|'error'
-  const [subError, setSubError] = useState(null);
-
-  // WhatsApp fallback for subscription
-  const subWaUrl = buildWaUrl('subscriptionOffer', {
-    stackName:     defaultName,
-    discount:      `${discountPct}%`,
-    intervalLabel: recommendedInterval.label,
-  });
 
   useEffect(() => {
     analytics.retentionEvent('retention_layer_viewed', {
@@ -80,12 +58,6 @@ export default function RetentionEngineLayer({
       goal,
       tier:                tier?.tier ?? 'unknown',
       product_count:       productIds.length,
-    });
-    // Track subscription CTA viewed
-    analytics.subscriptionEvent('subscription_cta_viewed', {
-      stack_tier:    tier?.tier || 'esencial',
-      interval_days: recommendedInterval.days,
-      discount_pct:  discountPct,
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -101,42 +73,6 @@ export default function RetentionEngineLayer({
     analytics.retentionEvent('save_favorite_completed', {
       stack_name: name.trim(), source, product_count: productIds.length, tier: tier?.tier ?? 'esencial', goal,
     });
-  }
-
-  async function handleSubscribe() {
-    setSubState('loading');
-    setSubError(null);
-    analytics.subscriptionEvent('subscription_cta_clicked', {
-      stack_tier:    tier?.tier || 'esencial',
-      interval_days: recommendedInterval.days,
-      discount_pct:  discountPct,
-    });
-
-    try {
-      const { checkout_url, subscription } = await initiateSubscriptionCheckout({
-        productIds,
-        products:          PRODUCTS,
-        source,
-        tier,
-        guidedSelections,
-        estimatedTotal:    0,
-        supplyEstimateDays: estimate?.min,
-        intervalPreference: recommendedInterval.days,
-      });
-
-      analytics.subscriptionEvent('subscription_checkout_created', {
-        stack_tier:    tier?.tier || 'esencial',
-        interval_days: subscription?.interval_days || recommendedInterval.days,
-        discount_pct:  subscription?.discount_pct || discountPct,
-      });
-
-      window.location.href = checkout_url;
-
-    } catch (err) {
-      setSubState('error');
-      setSubError('La suscripción no está disponible aún. Consultá por WhatsApp para configurarla.');
-      analytics.subscriptionEvent('subscription_checkout_failed', { reason: err.code || err.message });
-    }
   }
 
   return (
@@ -182,51 +118,6 @@ export default function RetentionEngineLayer({
             </button>
           </div>
         )}
-      </div>
-
-      {/* 4. Subscription CTA (Phase 11) */}
-      <div className="re-subscription-section">
-        <div className="re-subscription-header">
-          <span className="re-subscription-icon" aria-hidden="true">📅</span>
-          <div className="re-subscription-copy">
-            <div className="re-subscription-title">
-              Suscripción personalizada · {discountPct}% off
-            </div>
-            <div className="re-subscription-desc">
-              Recibí tu stack cada {recommendedInterval.label} con descuento preferencial.
-              Lo coordinamos directamente por WhatsApp antes de activar.
-            </div>
-          </div>
-        </div>
-
-        {subState === 'error' && subError && (
-          <div className="re-sub-error" role="alert">{subError}</div>
-        )}
-
-        <div className="re-subscription-actions">
-          <button
-            className={`re-sub-btn${subState === 'loading' ? ' re-sub-btn--loading' : ''}`}
-            onClick={handleSubscribe}
-            disabled={subState === 'loading'}
-            type="button"
-          >
-            {subState === 'loading'
-              ? <><span className="re-sub-spinner" aria-hidden="true" /> Procesando...</>
-              : `📅 Iniciar suscripción personalizada`
-            }
-          </button>
-          {(subState === 'error') && (
-            <a
-              className="re-sub-wa-link"
-              href={subWaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => analytics.subscriptionEvent('subscription_wa_fallback_clicked')}
-            >
-              💬 Consultar suscripción por WhatsApp →
-            </a>
-          )}
-        </div>
       </div>
 
     </div>
