@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://jonaza1207.github.io/MacroForge/sitemap.xml
+Sitemap: https://macroforge-health.vercel.app/sitemap.xml
 
 # Crawl rate hint (optional, respected by some bots)
 Crawl-delay: 1
