@@ -35,8 +35,6 @@ import { buildWaUrl }                 from '../lib/whatsapp';
 import { getReactivationProfile }     from '../lib/reactivationEngine';
 import { getJourneyProfile }          from '../lib/customerJourney';
 import { computeLocalLoyaltyLevel }   from '../lib/loyaltyStatus';
-import { deriveOwnReferralCode, copyReferralLink } from '../lib/referralCode';
-import { getLeadScore }               from '../lib/segmentation';
 import CustomerJourneyStatus          from './CustomerJourneyStatus';
 import LoyaltyBadge                   from './LoyaltyBadge';
 import '../styles/reactivationCenter.css';
@@ -44,28 +42,14 @@ import '../styles/loyalty.css';
 
 export default function ReactivationCenter() {
   const [dismissed,   setDismissed]   = useState(false);
-  const [codeCopied,  setCodeCopied]  = useState(false);
 
   // Compute all reactivation signals (pure reads, no side effects)
   const profile    = getReactivationProfile();
   const journey    = getJourneyProfile();
   const loyalLevel = computeLocalLoyaltyLevel();
-  const leadScore  = getLeadScore();
-  const refCode    = deriveOwnReferralCode();
 
   // Show loyalty card: returning users with engagement (Builder+ level)
   const showLoyaltyCard = profile.isReturning && loyalLevel.rank >= 2;
-  // Show referral card: committed+ users who've shown purchase intent
-  const showReferralCard = profile.isReturning && leadScore >= 25 && refCode;
-
-  async function handleCopyCode() {
-    const success = await copyReferralLink();
-    if (success) {
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2500);
-      analytics.communityEvent('referral_link_copied', { level: loyalLevel.id });
-    }
-  }
 
   // Fire analytics on mount
   useEffect(() => {
@@ -214,34 +198,6 @@ export default function ReactivationCenter() {
       {/* ── Phase 13: Loyalty card — for returning users at Builder+ level ── */}
       {showLoyaltyCard && (
         <LoyaltyBadge variant="card" progressPct={40} />
-      )}
-
-      {/* ── Phase 13: Referral card — for users with purchase intent ── */}
-      {showReferralCard && (
-        <div className="ref-card">
-          <div className="ref-card-header">
-            <span className="ref-card-icon" aria-hidden="true">🎁</span>
-            <div className="ref-card-body">
-              <div className="ref-card-title">Compartí MacroForge y ganás puntos</div>
-              <div className="ref-card-desc">
-                Tu referido obtiene un descuento. Vos ganás {loyalLevel.rank >= 3 ? '10%' : '7%'} de bonificación.
-              </div>
-            </div>
-          </div>
-          <div className="ref-code-row">
-            <span className="ref-code">{refCode}</span>
-            <button
-              className={`ref-copy-btn${codeCopied ? ' ref-copy-btn--copied' : ''}`}
-              onClick={handleCopyCode}
-              type="button"
-            >
-              {codeCopied ? '✓ Copiado' : 'Copiar'}
-            </button>
-          </div>
-          <div className="ref-discount-note">
-            Compartí el enlace. Tu referido puede aplicar este código en su próxima compra.
-          </div>
-        </div>
       )}
 
     </section>

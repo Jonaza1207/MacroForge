@@ -465,9 +465,12 @@ input  { font-family: inherit; }
     0 2px 8px rgba(0,0,0,0.42);
   text-align: center;
   opacity: 0.82;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
+  transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
 }
+.hero-section-indicator:hover { transform: translateY(-4px); }
+.hero-section-indicator:active { transform: translateY(-1px); }
 .hero-section-icon { font-size: 18px; }
 .hero-section-label {
   font-size: 9px;
@@ -1795,8 +1798,7 @@ input  { font-family: inherit; }
    STACK SELLING — "Armemos tu stack"
    Consultative multi-product system. Converts single-product
    buyers into full-system buyers via WhatsApp consultation.
-   Positioned between WhySection (trust) and AccountPreview
-   (future retention) — perfect psychological placement.
+   Positioned below WhySection (trust).
    ══════════════════════════════════════════════════════════════ */
 .stack-section {
   padding: 44px 24px 52px;
@@ -1955,152 +1957,6 @@ input  { font-family: inherit; }
   margin-top: -2px;
 }
 
-
-/* ── Account preview (coming soon) ──────────────────────── */
-.account-preview {
-  padding: 40px 24px 48px;
-  border-top: 1px solid var(--border-2);
-  background: var(--surface);
-}
-.account-preview-inner {
-  max-width: 920px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
-}
-@media (max-width: 700px) {
-  .account-preview-inner { grid-template-columns: 1fr; gap: 32px; }
-}
-
-/* Copy side */
-.account-preview-badge {
-  display: inline-block;
-  font-size: 9px; font-weight: 800;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: var(--r-pill);
-  background: var(--accent-dim);
-  color: var(--accent);
-  border: 1px solid var(--accent-border);
-  margin-bottom: 14px;
-}
-.account-preview-title {
-  font-size: clamp(26px, 4vw, 38px);
-  font-weight: 900; letter-spacing: -0.03em;
-  line-height: 1.05; color: var(--text-1); margin-bottom: 14px;
-}
-.account-preview-title em { font-style: normal; color: var(--accent); }
-.account-preview-desc {
-  font-size: 14px; font-weight: 500; color: var(--text-2);
-  line-height: 1.75; margin-bottom: 20px; max-width: 380px;
-}
-.account-preview-perks {
-  list-style: none; display: flex; flex-direction: column; gap: 8px;
-}
-.account-preview-perks li {
-  font-size: 13px; font-weight: 600; color: var(--text-2);
-  display: flex; align-items: center; gap: 8px;
-}
-.account-preview-perks li::before {
-  content: '✓'; color: var(--vita); font-weight: 900; font-size: 12px;
-  flex-shrink: 0;
-}
-
-/* Form side */
-.account-preview-form-wrap {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 28px 24px;
-}
-.account-preview-form { display: flex; flex-direction: column; gap: 16px; }
-.account-field { display: flex; flex-direction: column; gap: 5px; }
-.account-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--text-3);
-}
-.account-label-note {
-  font-size: 9px; font-weight: 500; text-transform: none; letter-spacing: 0;
-  color: var(--text-3); opacity: 0.7;
-}
-.account-input {
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 10px 13px;
-  color: var(--text-1);
-  font-family: inherit; font-size: 13px; font-weight: 500;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.account-input:focus {
-  border-color: var(--accent-border);
-  box-shadow: 0 0 0 3px var(--accent-dim);
-}
-.account-input::placeholder { color: var(--text-3); }
-
-.account-submit {
-  width: 100%; padding: 13px 20px;
-  background: var(--accent); color: #fff;
-  border: none; border-radius: var(--r-pill);
-  font-family: inherit; font-size: 14px; font-weight: 800;
-  letter-spacing: 0.04em; cursor: pointer;
-  box-shadow: 0 4px 18px var(--accent-glow);
-  transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
-  margin-top: 4px;
-}
-.account-submit:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 24px var(--accent-glow);
-  transform: translateY(-1px);
-}
-.account-submit:active:not(:disabled) { transform: scale(0.98); }
-.account-submit:disabled {
-  opacity: 0.45; cursor: not-allowed; box-shadow: none;
-}
-.account-disclaimer {
-  font-size: 10px; font-weight: 600; color: var(--text-3);
-  text-align: center; letter-spacing: 0.04em; line-height: 1.5;
-}
-
-/* Success state */
-.account-success {
-  text-align: center;
-  display: flex; flex-direction: column;
-  align-items: center; gap: 12px;
-  padding: 8px 0;
-}
-.account-success-icon {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: rgba(0,200,150,0.12);
-  border: 2px solid rgba(0,200,150,0.35);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; font-weight: 900; color: var(--vita);
-}
-.account-success-title {
-  font-size: 18px; font-weight: 900; color: var(--text-1);
-  letter-spacing: -0.02em;
-}
-.account-success-msg {
-  font-size: 13px; font-weight: 500; color: var(--text-2);
-  line-height: 1.65; max-width: 260px;
-}
-.account-success-reset {
-  font-size: 11px; font-weight: 700; color: var(--text-3);
-  background: none; border: none; cursor: pointer;
-  text-decoration: underline; text-underline-offset: 3px;
-  transition: color 0.15s;
-}
-.account-success-reset:hover { color: var(--text-1); }
-
-/* Light mode */
-[data-theme="light"] .account-preview { background: var(--surface-2); }
-[data-theme="light"] .account-preview-form-wrap { background: var(--surface); }
-
-/* Responsive padding */
-@media (min-width: 640px) { .account-preview { padding-left: 40px; padding-right: 40px; } }
-@media (min-width: 1024px) { .account-preview { padding-left: 64px; padding-right: 64px; } }
 
 /* ── Footer ──────────────────────────────────────────────── */
 .footer {

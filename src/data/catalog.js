@@ -37,7 +37,7 @@ export const SECTIONS = {
   },
 };
 
-export const WA_NUMBER = '50684436311';
+export const WA_NUMBER = '50661118315';
 
 // ══════════════════════════════════════════════════════════════════
 // ALFAVITAMINS ACTIVATION BLUEPRINT — ready to enable

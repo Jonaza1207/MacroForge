@@ -34,7 +34,7 @@ export default function Hero({ onNavigate }) {
         <div className="hero-topbar-right">
           <span className="hero-location">📍 San José, CR</span>
           <a className="hero-wa-pill" href={waUrl} target="_blank" rel="noopener noreferrer">
-            💬 8443-6311
+            💬 +506 6111-8315
           </a>
         </div>
       </div>
@@ -91,23 +91,38 @@ export default function Hero({ onNavigate }) {
             </div>
           </div>
 
-          {/* Category visual indicators — decorative, non-interactive */}
+          {/* Category quick navigation */}
           <div className="hero-sections">
-            <div className="hero-section-indicator hero-section-gym">
+            <button
+              className="hero-section-indicator hero-section-gym"
+              type="button"
+              onClick={() => onNavigate('gym')}
+              aria-label="Explorar Gym"
+            >
               <span className="hero-section-icon">💪</span>
               <span className="hero-section-label">Gym</span>
               <span className="hero-section-sub">Proteína, fuerza y rendimiento diario</span>
-            </div>
-            <div className="hero-section-indicator hero-section-vita">
+            </button>
+            <button
+              className="hero-section-indicator hero-section-vita"
+              type="button"
+              onClick={() => onNavigate('vita')}
+              aria-label="Explorar Vitaminas"
+            >
               <span className="hero-section-icon">🌿</span>
               <span className="hero-section-label">Vitaminas</span>
               <span className="hero-section-sub">Energía, salud y bienestar esencial</span>
-            </div>
-            <div className="hero-section-indicator hero-section-dote">
+            </button>
+            <button
+              className="hero-section-indicator hero-section-dote"
+              type="button"
+              onClick={() => onNavigate('dote')}
+              aria-label="Explorar doTERRA"
+            >
               <span className="hero-section-icon">🌸</span>
               <span className="hero-section-label">doTERRA</span>
               <span className="hero-section-sub">Aceites esenciales 100% originales</span>
-            </div>
+            </button>
           </div>
         </div>
 

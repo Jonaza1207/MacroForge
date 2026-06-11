@@ -1,7 +1,7 @@
 /*
  * MacroForge — Loyalty + Community Styles
  * Phase 13 — Scale + Media + Community Ecosystem
- * Class prefixes: loy- (loyalty), ref- (referral)
+ * Class prefix: loy- (loyalty)
  *
  * Design principles:
  *   - Subtle, not gamey
@@ -103,78 +103,6 @@
   padding: 3px 8px;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   REFERRAL CARD — referral code display in ReactivationCenter
-   ══════════════════════════════════════════════════════════════ */
-.ref-card {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 16px;
-  animation: ai-card-in 0.3s ease 0.1s both;
-}
-.ref-card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.ref-card-icon { font-size: 20px; flex-shrink: 0; }
-.ref-card-body { flex: 1; }
-.ref-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-1);
-  margin-bottom: 3px;
-}
-.ref-card-desc { font-size: 12px; color: var(--text-2); line-height: 1.4; }
-
-.ref-code-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface-3);
-  border-radius: var(--r);
-  padding: 8px 12px;
-}
-.ref-code {
-  flex: 1;
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  color: var(--text-1);
-  font-family: 'Courier New', monospace;
-}
-.ref-copy-btn {
-  flex-shrink: 0;
-  background: var(--accent);
-  border: none;
-  border-radius: var(--r-pill);
-  padding: 6px 12px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-.ref-copy-btn:hover  { background: var(--accent-hover); }
-.ref-copy-btn:active { transform: scale(0.95); }
-.ref-copy-btn--copied {
-  background: #00C896;
-  pointer-events: none;
-}
-
-.ref-discount-note {
-  font-size: 11px;
-  color: var(--text-3);
-  margin-top: 6px;
-  text-align: center;
-  line-height: 1.4;
-}
-
 /* ── Light mode ────────────────────────────────────────────── */
-[data-theme="light"] .loy-card,
-[data-theme="light"] .ref-card { background: var(--surface); }
+[data-theme="light"] .loy-card { background: var(--surface); }
 [data-theme="light"] .loy-perk  { background: var(--surface-2); }
-[data-theme="light"] .ref-code-row { background: var(--surface-2); }
