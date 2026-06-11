@@ -29,8 +29,18 @@ export default function ThemeToggle({ theme, onToggle }) {
       aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
       title={isDark ? 'Modo claro' : 'Modo oscuro'}
     >
-      <span className={`theme-toggle-icon ${isDark ? 'is-sun' : 'is-moon'}`}>
-        {isDark ? <SunIcon /> : <MoonIcon />}
+      <span className={`theme-toggle-option ${!isDark ? 'is-active' : ''}`} aria-hidden="true">
+        <span className="theme-toggle-icon is-sun">
+          <SunIcon />
+        </span>
+        <span className="theme-toggle-label">Light</span>
+      </span>
+      <span className="theme-toggle-divider" aria-hidden="true" />
+      <span className={`theme-toggle-option ${isDark ? 'is-active' : ''}`} aria-hidden="true">
+        <span className="theme-toggle-icon is-moon">
+          <MoonIcon />
+        </span>
+        <span className="theme-toggle-label">Dark</span>
       </span>
     </button>
   );
