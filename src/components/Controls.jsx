@@ -16,6 +16,14 @@ export default function Controls({
 }) {
   const sectionData = activeSection ? SECTIONS[activeSection] : null;
   const isHome = view === 'home';
+  const placeholder = (
+    view === 'category' ? `Buscar en ${activeCategory}...`
+    : view === 'section' ? `Buscar en ${sectionData?.label?.split(' ')[0] || ''}...`
+    : 'Buscar producto, marca...'
+  );
+  const mobilePlaceholder = isHome
+    ? 'Buscar producto, marca o categoría...'
+    : placeholder;
 
   return (
     <div className="controls">
@@ -65,14 +73,18 @@ export default function Controls({
         <span className="search-icon">🔍</span>
         <input
           type="text"
-          placeholder={
-            view === 'category' ? `Buscar en ${activeCategory}...`
-            : view === 'section' ? `Buscar en ${sectionData?.label?.split(' ')[0] || ''}...`
-            : 'Buscar producto, marca...'
-          }
+          placeholder={placeholder}
           value={searchQuery}
           onChange={e => onSearch(e.target.value)}
         />
+        {!searchQuery && (
+          <span className="search-placeholder-mobile" aria-hidden="true">
+            <span className="search-placeholder-track">
+              <span>{mobilePlaceholder}</span>
+              <span aria-hidden="true">{mobilePlaceholder}</span>
+            </span>
+          </span>
+        )}
         {searchQuery && (
           <button
             className="search-clear"
