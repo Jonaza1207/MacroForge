@@ -26,6 +26,7 @@ const CODE_PATTERN    = /^MF-[A-Z0-9]{5,6}$/;
 const STORAGE_KEY     = 'mf_referral_code';
 const TIMESTAMP_KEY   = 'mf_referral_ts';
 const EXPIRY_MS       = 30 * 86400_000;  // 30 days
+const SITE_URL        = 'https://macroforge-health.vercel.app/';
 
 // ── Capture from URL ──────────────────────────────────────────────
 
@@ -118,8 +119,7 @@ export function deriveOwnReferralCode() {
 export function getReferralLink() {
   const code = deriveOwnReferralCode();
   if (!code) return null;
-  const base = window.location.origin + (window.location.pathname || '/');
-  return `${base}?ref=${code}`;
+  return `${SITE_URL}?ref=${code}`;
 }
 
 /**

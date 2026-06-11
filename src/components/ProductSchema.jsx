@@ -1,20 +1,22 @@
 import { useEffect } from 'react';
 
-const BASE_URL   = 'https://jonaza1207.github.io/MacroForge';
+const BASE_URL   = 'https://macroforge-health.vercel.app';
 const SCRIPT_ID  = 'mf-product-schema';
 const SELLER_REF = `${BASE_URL}/#organization`;
 
 /**
- * Validate and normalize a URL string for safe use in JSON-LD.
- * Returns the canonical href if valid, otherwise undefined.
+ * Build the official MacroForge deep link from a catalog source URL.
+ * Returns undefined if the source URL has no valid product slug.
  * Never throws — always safe to call with arbitrary product data.
  */
-function safeAbsoluteUrl(value) {
+function buildProductUrl(value) {
   if (!value || typeof value !== 'string') return undefined;
   try {
     const trimmed = value.trim();
     if (!/^https?:\/\//i.test(trimmed)) return undefined;
-    return new URL(trimmed).href;
+    const sourceUrl = new URL(trimmed);
+    const slug = sourceUrl.pathname.match(/\/tienda\/([^/?#]+)/)?.[1];
+    return slug ? `${BASE_URL}/#product/${slug}` : undefined;
   } catch {
     return undefined;
   }
@@ -62,8 +64,7 @@ export default function ProductSchema({ product }) {
 
     const price = extractPrice(product.p?.[0]);
 
-    // Validate product URL through URL constructor — rejects any malformed value
-    const productUrl = safeAbsoluteUrl(product.u);
+    const productUrl = buildProductUrl(product.u);
 
     const schema = {
       '@context': 'https://schema.org',

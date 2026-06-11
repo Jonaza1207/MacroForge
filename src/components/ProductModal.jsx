@@ -14,6 +14,7 @@ import ProductSchema from './ProductSchema';
 
 const SECTION_LABELS = { gym: 'GYM', vita: 'VITAMINAS', dote: 'DOTERRA' };
 const SECTION_COLORS = { gym: '#E3001E', vita: '#00C896', dote: '#D4A843' };
+const SITE_URL = 'https://macroforge-health.vercel.app/';
 
 function parsePrices(prices) {
   return prices.map((pr, i) => {
@@ -95,7 +96,7 @@ export default function ProductModal({ productId, onClose, onOpen }) {
   const prices = parsePrices(p.p);
 
   // ── Share system: Web Share API → clipboard fallback ─────────
-  const shareUrl  = `${window.location.origin}${window.location.pathname}#product/${slug}`;
+  const shareUrl  = `${SITE_URL}#product/${slug}`;
   const shareTitle = `${p.n} — MacroForge`;
   const shareText  = `Mirá este suplemento en MacroForge: ${p.n} de ${p.b}`;
 
